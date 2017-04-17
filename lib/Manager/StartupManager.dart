@@ -1,0 +1,51 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:testProject/Manager/FileManager.dart';
+import 'package:testProject/Models/Models.dart';
+
+class Startup {
+  static Future<bool> initialize() async {
+    await FileManager.initialize();
+
+    var dir = await FileManager.createFolder("ShoppingLists");
+    FileManager.fileCreate("token.txt");
+    FileManager.fileCreate("User.txt");
+    FileManager.fileCreate("ShoppingLists.txt");
+
+    User.token = await FileManager.readAsString("token.txt");
+
+    User.username = await FileManager.readAsString("User.txt");
+    User.shoppingLists = new List<ShoppingList>();
+
+    var li = dir.listSync();
+    for (var list in dir.listSync()) //TODO fix this null thing
+      if (list != null)
+        User.shoppingLists.add(await ShoppingList
+            .load(int.parse(list.path.split('/').last.split('.')[0])));
+
+    /*User.shoppingLists = (await FileManager.readAsLines("ShoppingLists.txt"))
+        .where((s) => s != "")
+        .map((x) => new ShoppingList()
+          ..name = x.split("|")[1]
+          ..id = int.parse(x.split("|")[0]))
+        ?.toList();*/
+    if (User.shoppingLists.length > 0)
+      User.currentList = User.shoppingLists[0];
+    else {
+      User.currentList = new ShoppingList()
+        ..name = "TempList"
+        ..id = 1
+        ..shoppingItems = new List<ShoppingItem>();
+      User.currentList.shoppingItems.add(new ShoppingItem()
+        ..name =
+            "Das hier soll ein sehr langer Text sein, um zu schauen, wie die App damit umgeht"
+        ..amount = 2
+        ..listId = 1);
+      User.currentList.shoppingItems.add(new ShoppingItem()
+        ..name = "Test"
+        ..amount = 3
+        ..listId = 1);
+    }
+    return true;
+  }
+}
