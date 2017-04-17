@@ -23,12 +23,6 @@ class Startup {
         User.shoppingLists.add(await ShoppingList
             .load(int.parse(list.path.split('/').last.split('.')[0])));
 
-    /*User.shoppingLists = (await FileManager.readAsLines("ShoppingLists.txt"))
-        .where((s) => s != "")
-        .map((x) => new ShoppingList()
-          ..name = x.split("|")[1]
-          ..id = int.parse(x.split("|")[0]))
-        ?.toList();*/
     if (User.shoppingLists.length > 0)
       User.currentList = User.shoppingLists[0];
     else {
