@@ -7,6 +7,6 @@ class ShoppingItem {
 
   @override
   String toString(){
-    return name + "\u{31}" + amount.toString() + "\u{31}" + id.toString();
+    return name + "\u{1F}" + amount.toString() + "\u{1F}" + id.toString();
   }
 }

@@ -15,13 +15,12 @@ class Startup {
     User.token = await FileManager.readAsString("token.txt");
 
     User.username = await FileManager.readAsString("User.txt");
-    User.shoppingLists = new List<ShoppingList>();
 
-    var li = dir.listSync();
-    for (var list in dir.listSync()) //TODO fix this null thing
+    for (var list in dir.listSync())
       if (list != null)
         User.shoppingLists.add(await ShoppingList
             .load(int.parse(list.path.split('/').last.split('.')[0])));
+
 
     if (User.shoppingLists.length > 0)
       User.currentList = User.shoppingLists[0];

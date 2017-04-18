@@ -30,14 +30,14 @@ class FileManager {
       {bool append: false}) async {
     var file = await (await _getFile(filename))
         .open(mode: append ? FileMode.APPEND : FileMode.WRITE);
-    file.writeString(text + "\u{31}");
+    file.writeString(text + "\u{13}");
   }
 
   static Future<String> readAsString(String filename) async =>
       (await _getFile(filename)).readAsString();
 
   static Future<List<String>> readAsLines(String filename) async =>
-      (await _getFile(filename)).readAsStringSync().split("\u{31}");
+      (await _getFile(filename)).readAsStringSync().split("\u{13}");
 
   static bool fileExists(String filename) {
     var f = new File(applicationDocumentsDirectory + filename);

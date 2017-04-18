@@ -255,10 +255,10 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void changeCurrentList(int id) => setState(() {
-        User.currentListIndex = id;
+  void changeCurrentList(int index) => setState(() {
+        User.currentListIndex = index;
         setState(() => User.currentList =
-            User.shoppingLists.firstWhere((x) => x.id == id));
+            User.shoppingLists[index]);
       });
 
   Future<Null> _getEAN() async {
@@ -344,9 +344,11 @@ class _HomeState extends State<Home> {
     //User.shoppingLists.add(new ShoppingList());
     //User.shoppingLists.add(new ShoppingList());
     var list = User.shoppingLists.isNotEmpty
-        ? User.shoppingLists.map((x) => new ListTile(
-            title: new Text(x.name),
-            onTap: () => changeCurrentList(User.shoppingLists.indexOf(x)))).toList()
+        ? User.shoppingLists
+            .map((x) => new ListTile(
+                title: new Text(x.name),
+                onTap: () => changeCurrentList(User.shoppingLists.indexOf(x))))
+            .toList()
         : [
             new ListTile(title: const Text("nothing")),
             new ListTile(title: const Text("here"))

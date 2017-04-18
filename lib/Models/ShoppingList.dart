@@ -14,12 +14,13 @@ class ShoppingList { //TODO Implement with server synchronize
     ..id = id
     ..name = items[0]
     ..shoppingItems = items.sublist(1).where((s) => s != "").map((s) {
-    var split = s.split("|");
+    var split = s.split("\u{1F}");
     var item = new ShoppingItem()
     ..name = split[0]
     ..amount = int.parse(split[1])
     //..Id = int.parse(split[2])
     ..listId = id;
+    return item;
     }).toList();
   }
 
