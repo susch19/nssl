@@ -193,9 +193,7 @@ class _HomeState extends State<Home> {
   }
   //Navigator.push(cont, new MaterialPageRoute(builder: (x) => new LoginPage()));
 
-  Future refresh() => ShoppingListSync.getList(20);
-
-  void handleDismissDrawer(DismissDirection dir, Widget w) =>
+  Future handleDismissDrawer(DismissDirection dir, Widget w) =>
       handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, Widget w, ShoppingItem s) {
     final String action =
@@ -203,24 +201,31 @@ class _HomeState extends State<Home> {
     var index = User.currentList.shoppingItems.indexOf(s);
     setState(() => User.currentList.shoppingItems.remove(s));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
+    ShoppingListSync.deleteProduct(User.currentList.id, s.id);
     showInSnackBar('You have $action ${s.name}',
         action: new SnackBarAction(
             label: 'UNDO',
             onPressed: () {
               setState(() {
                 User.currentList.shoppingItems.insert(index, s);
+                ShoppingListSync.changeProduct(
+                    User.currentList.id, s.id, s.amount);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
               });
             }),
         duration: new Duration(seconds: 10));
   }
 
-  void handleDismiss(DismissDirection direction, Widget item, List list) {
+  Future handleDismiss(
+      DismissDirection direction, Widget item, List list) async {
     final String action =
         (direction == DismissDirection.endToStart) ? 'archived' : 'deleted';
     var index = list.indexOf(item);
     setState(() => list.remove(item));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
+
+    //ShoppingListSync.deleteProduct(User.currentList.id, )
+
     showInSnackBar('You have $action $item',
         action: new SnackBarAction(
             label: 'UNDO',
@@ -257,8 +262,7 @@ class _HomeState extends State<Home> {
 
   void changeCurrentList(int index) => setState(() {
         User.currentListIndex = index;
-        setState(() => User.currentList =
-            User.shoppingLists[index]);
+        setState(() => User.currentList = User.shoppingLists[index]);
       });
 
   Future<Null> _getEAN() async {
@@ -273,14 +277,15 @@ class _HomeState extends State<Home> {
       ean = methodCall.arguments;
       //SimpleDialog sd = new SimpleDialog(children: [new Text(ean)]);
       //showDialog(context: cont, child: sd);
-      var p = await ProductSync.getProduct(ean);
-
-      var z = JSON.decode(p.body);
+      var z = JSON.decode((await ProductSync.getProduct(ean)).body);
       var k = ProductAddPage.fromJson(z);
+      var res = await ShoppingListSync.addProduct(
+          User.currentList.id, k.name, '-', 1);
+      var p = AddListItemResult.fromJson(res.body);
       setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
-        ..name = k.name
+        ..name = p.name
         ..amount = 1
-        ..listId = 1));
+        ..id = p.productId));
     }
   }
 

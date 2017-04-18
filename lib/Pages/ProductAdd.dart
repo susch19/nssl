@@ -45,18 +45,18 @@ class _ProductAddPageState extends State<ProductAddPage> {
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var p = ChangeListItemResult.fromJson((await ShoppingListSync
-                .changeProduct(User.currentList.id, item.id, 1))
+        var answer = await ShoppingListSync
+            .changeProduct(User.currentList.id, item.id, 1);
+        var p = ChangeListItemResult.fromJson((answer)
             .body);
         setState((){item.amount = p.amount;});
       } else {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                User.currentList.id, name, gtin, 1))
+                User.currentList.id, name, gtin ?? '-', 1))
             .body);
         afterAdd = new ShoppingItem()
           ..name = p.name
           ..amount = 1
-          ..listId = User.currentList.id
           ..id = p.productId;
         setState(()=>User.currentList.shoppingItems.add(afterAdd));
       }
