@@ -32,12 +32,10 @@ class Startup {
       User.currentList.shoppingItems.add(new ShoppingItem()
         ..name =
             "Das hier soll ein sehr langer Text sein, um zu schauen, wie die App damit umgeht"
-        ..amount = 2
-        ..listId = 1);
+        ..amount = 2);
       User.currentList.shoppingItems.add(new ShoppingItem()
         ..name = "Test"
-        ..amount = 3
-        ..listId = 1);
+        ..amount = 3);
     }
     return true;
   }

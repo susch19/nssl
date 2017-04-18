@@ -1,7 +1,6 @@
 class ShoppingItem {
   //int Id;
   int amount;
-  int listId;
   String name;
   int id;
 

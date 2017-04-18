@@ -18,8 +18,7 @@ class ShoppingList { //TODO Implement with server synchronize
     var item = new ShoppingItem()
     ..name = split[0]
     ..amount = int.parse(split[1])
-    //..Id = int.parse(split[2])
-    ..listId = id;
+    ..id = int.parse(split[2]);
     return item;
     }).toList();
   }
