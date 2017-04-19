@@ -202,6 +202,7 @@ class _HomeState extends State<Home> {
     setState(() => User.currentList.shoppingItems.remove(s));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
     ShoppingListSync.deleteProduct(User.currentList.id, s.id);
+    User.currentList.save();
     showInSnackBar('You have $action ${s.name}',
         action: new SnackBarAction(
             label: 'UNDO',
@@ -211,6 +212,7 @@ class _HomeState extends State<Home> {
                 ShoppingListSync.changeProduct(
                     User.currentList.id, s.id, s.amount);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
+                User.currentList.save();
               });
             }),
         duration: new Duration(seconds: 10));
@@ -332,7 +334,7 @@ class _HomeState extends State<Home> {
     setState(() => User.shoppingLists.add(newList));
     User.currentListIndex = User.shoppingLists.indexOf(newList);
     //setState(() => User.currentListId); //TODO is this needed?
-    FileManager.fileCreate("ShoppingLists/${newList.id}.sl");
+    FileManager.createFile("ShoppingLists/${newList.id}.sl");
     FileManager.writeln("ShoppingLists/${newList.id}.sl", newList.name);
   }
 

@@ -44,9 +44,10 @@ class FileManager {
     return f.existsSync();
   }
 
-  static void fileCreate(String filename) {
+  static Future<bool> createFile(String filename, {String path = ""}) async{
     var f = new File(applicationDocumentsDirectory + "/" + filename);
-    if (!f.existsSync()) f.createSync();
+    if (!(await f.exists())) f.create();
+    return true;
   }
 
   static bool folderExists(String path, String name) {
@@ -65,4 +66,10 @@ class FileManager {
           "/" +
           (path != "" ? path + "/" : path) +
           name);
+
+  static Future<bool> deleteFile(String filename, {String path = ""}) async{
+      await (await _getFile((path != "" ? path + "/" : path) + filename))
+          .delete();
+      return true;
+  }
 }

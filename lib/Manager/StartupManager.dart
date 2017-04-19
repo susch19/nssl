@@ -8,9 +8,9 @@ class Startup {
     await FileManager.initialize();
 
     var dir = await FileManager.createFolder("ShoppingLists");
-    FileManager.fileCreate("token.txt");
-    FileManager.fileCreate("User.txt");
-    FileManager.fileCreate("ShoppingLists.txt");
+    FileManager.createFile("token.txt");
+    FileManager.createFile("User.txt");
+    FileManager.createFile("ShoppingLists.txt");
 
     User.token = await FileManager.readAsString("token.txt");
 
