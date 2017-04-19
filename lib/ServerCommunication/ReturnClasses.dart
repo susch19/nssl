@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:testProject/Models.dart';
+
 class CreateResult {
   bool success;
   String error;
@@ -137,6 +139,31 @@ class AddListResult {
     r.error = data["error"];
     r.id = data["id"];
     r.name = data["name"];
+    return r;
+  }
+}
+
+class GetListResult {
+  int id;
+  String name;
+  int userId;
+  String owner;
+  Iterable<ShoppingItem> products;
+  String contributors;
+
+  static GetListResult fromJson(String dataString) =>
+      _fromJson(JSON.decode(dataString));
+
+  static GetListResult _fromJson(Map data) {
+    var r = new GetListResult();
+    r.id = data["id"];
+    r.name = data["name"];
+    r.userId = data["userId"];
+    r.owner = data["owner"];
+    List<Map> unMaped = data["products"] ?? new List<Map>();
+    r.products = unMaped
+        .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+    r.contributors = data["contributors"];
     return r;
   }
 }

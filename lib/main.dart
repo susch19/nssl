@@ -63,21 +63,24 @@ class _HomeState extends State<Home> {
             .copyWith(platform: TargetPlatform.android),
         home: new Scaffold(
             key: _mainScaffoldKey,
-            appBar: new AppBar(title: new Text(User.currentList.name), actions: <Widget>[
-              new PopupMenuButton<String>(
-                  onSelected: selectedOption,
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<String>>[
-                        new PopupMenuItem<String>(
-                            value: 'Login/Register',
-                            child: new Text('Login/Register')),
-                        new PopupMenuItem<String>(
-                            value: 'Options', child: new Text('Change Theme')),
-                        new PopupMenuItem<String>(
-                            value: 'PerformanceOverlay',
-                            child: new Text('Toggle Performance Overlay')),
-                      ])
-            ]),
+            appBar: new AppBar(
+                title: new Text(User.currentList.name),
+                actions: <Widget>[
+                  new PopupMenuButton<String>(
+                      onSelected: selectedOption,
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<String>>[
+                            new PopupMenuItem<String>(
+                                value: 'Login/Register',
+                                child: new Text('Login/Register')),
+                            new PopupMenuItem<String>(
+                                value: 'Options',
+                                child: new Text('Change Theme')),
+                            new PopupMenuItem<String>(
+                                value: 'PerformanceOverlay',
+                                child: new Text('Toggle Performance Overlay')),
+                          ])
+                ]),
             body: new Builder(builder: buildBody),
             drawer: _buildDrawer(context),
             persistentFooterButtons: [
@@ -365,12 +368,37 @@ class _HomeState extends State<Home> {
     //dismissDirection: DismissDirection.startToEnd);
 
     var d = new Scaffold(
-        body: new ListView(
-            children: [userheader, new Column(children: drawerList.children)]),
+        body: new RefreshIndicator(
+            child: new ListView(children: [
+              userheader,
+              new Column(children: drawerList.children),
+            ], physics: const AlwaysScrollableScrollPhysics()),
+            onRefresh: _handleDrawerRefresh,
+            displacement: 1.0),
         persistentFooterButtons: [
           new FlatButton(child: const Text("add list"), onPressed: addList)
         ]);
 
     return new Drawer(child: d);
+  }
+
+  Future<Null> _handleDrawerRefresh() async {
+    User.shoppingLists.clear(); //TODO is there a faster way of renew a list?
+    for (int id in InfoResult.fromJson((await UserSync.info()).body).listIds) {
+      var res =
+          GetListResult.fromJson(((await ShoppingListSync.getList(id)).body));
+      var list = new ShoppingList()
+        ..id = res.id
+        ..name = res.name
+        ..shoppingItems = new List<ShoppingItem>();
+      for (var item in res.products)
+        list.shoppingItems.add(new ShoppingItem()
+          ..name = item.name
+          ..id = item.id
+          ..amount = item.amount);
+      setState(()=>User.shoppingLists.add(list));
+      list.save();
+    }
+    return new Future<Null>.value();
   }
 }

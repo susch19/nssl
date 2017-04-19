@@ -25,7 +25,8 @@ class ShoppingList {
 
   Future save() async {
     var filename = "ShoppingLists/${id.toString()}.sl";
-    await FileManager.deleteFile(filename);
+    if (FileManager.fileExists(filename))
+      await FileManager.deleteFile(filename);
     await FileManager.createFile(filename);
     await FileManager.writeln(filename, name);
 
