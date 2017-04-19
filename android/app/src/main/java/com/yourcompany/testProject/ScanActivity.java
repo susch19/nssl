@@ -1,12 +1,7 @@
 package com.yourcompany.testProject;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -18,7 +13,7 @@ import com.scandit.barcodepicker.ScanSettings;
 import com.scandit.recognition.Barcode;
 import com.scandit.recognition.SymbologySettings;
 
-import io.flutter.plugin.common.FlutterMethodChannel;
+import io.flutter.plugin.common.MethodChannel;
 
 /**
  * Created by susch on 16.04.2017.
@@ -41,30 +36,9 @@ public class ScanActivity extends Activity implements OnScanListener {
     protected void onPause() {
         super.onPause();
 
-        // When the activity is in the background immediately stop the
-        // scanning to save resources and free the camera.
         mBarcodePicker.stopScanning();
         mPaused = true;
     }
-
-
-    /*
-        @Override
-        protected void onResume() {
-            super.onResume();
-
-            mPaused = false;
-            // Handle permissions for Marshmallow and onwards...
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                grantCameraPermissionsThenStartScanning();
-            } else {
-                // Once the activity is in the foreground again, restart scanning.
-                mBarcodePicker.startScanning();
-            }
-        } */
-
-
-
 
     public void initializeBarcodeScanning() {
         // Switch to full screen.
@@ -117,14 +91,7 @@ public class ScanActivity extends Activity implements OnScanListener {
         }
 
         BarcodePicker picker = new BarcodePicker(this, settings);
-
-
-
         mBarcodePicker = picker;
-        //layout.addView(mBarcodePicker);
-
-        // Register listener, in order to be notified about relevant events
-        // (e.g. a successfully scanned bar code).
         mBarcodePicker.setOnScanListener(this);
     }
 
@@ -136,13 +103,8 @@ public class ScanActivity extends Activity implements OnScanListener {
 
     @Override
     public void onBackPressed() {
-
         mBarcodePicker.stopScanning();
         this.finish();
-        //setContentView(MainActivity.flutterView);
-
-        // layout.removeView(mBarcodePicker);
-
     }
 
     @Override
@@ -158,11 +120,7 @@ public class ScanActivity extends Activity implements OnScanListener {
             message = cleanData;
         }
 
-        new FlutterMethodChannel(MainActivity.flutterView, MainActivity.CHANNEL).invokeMethod("setEAN", message);
-        // mBarcodePicker.stopScanning();
+        new MethodChannel(MainActivity.flutterView, MainActivity.CHANNEL).invokeMethod("setEAN", message);
         this.finish();
-
-        //setContentView(flutterView);
-        //onStop();
     }
 }

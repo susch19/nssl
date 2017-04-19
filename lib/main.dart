@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
       new GlobalKey<ScaffoldState>();
 
   static const platform =
-      const PlatformMethodChannel('com.yourcompany.testProject/Scandit');
+      const MethodChannel('com.yourcompany.testProject/Scandit');
 
   String ean = "";
   MyList<ListTile> drawerList;

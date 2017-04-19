@@ -3,26 +3,18 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
-import com.scandit.barcodepicker.BarcodePicker;
-import com.scandit.barcodepicker.OnScanListener;
-import com.scandit.barcodepicker.ScanSession;
-import com.scandit.barcodepicker.ScanSettings;
 import com.scandit.barcodepicker.ScanditLicense;
-import com.scandit.recognition.Barcode;
-import com.scandit.recognition.SymbologySettings;
 
 import io.flutter.app.FlutterActivity;
-import io.flutter.plugin.common.FlutterMethodChannel;
-import io.flutter.plugin.common.FlutterMethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.FlutterMethodChannel.Response;
 import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.view.FlutterView;
 
 public class MainActivity extends FlutterActivity {
@@ -49,22 +41,22 @@ public class MainActivity extends FlutterActivity {
 
         cont = this;
 
-        new FlutterMethodChannel(flutterView, CHANNEL).setMethodCallHandler(
+        new MethodChannel(flutterView, CHANNEL).setMethodCallHandler(
                 new MethodCallHandler() {
                     @Override
-                    public void onMethodCall(MethodCall call, Response response) {
+                    public void onMethodCall(MethodCall call, Result result) {
                         if (call.method.equals("getEAN")) {
                             startActivity(new Intent(cont, ScanActivity.class));
 
                             //String ean = getEAN();
 
                             if (ean != "") {
-                                response.success(ean);
+                                result.success(ean);
                             } else {
-                                response.error("ERROR", "Something went wrong.", null);
+                                result.error("ERROR", "Something went wrong.", null);
                             }
                         } else {
-                            response.notImplemented();
+                            result.notImplemented();
                         }
                     }
                 });
