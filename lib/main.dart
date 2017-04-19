@@ -53,7 +53,6 @@ class _HomeState extends State<Home> {
   MyList<ListTile> drawerList;
   List mainList;
   bool performanceOverlay = false;
-  String _title = User.currentList.name;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,7 @@ class _HomeState extends State<Home> {
             .copyWith(platform: TargetPlatform.android),
         home: new Scaffold(
             key: _mainScaffoldKey,
-            appBar: new AppBar(title: new Text(_title), actions: <Widget>[
+            appBar: new AppBar(title: new Text(User.currentList.name), actions: <Widget>[
               new PopupMenuButton<String>(
                   onSelected: selectedOption,
                   itemBuilder: (BuildContext context) =>
