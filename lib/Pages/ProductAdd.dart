@@ -5,7 +5,6 @@ import 'package:testProject/ServerCommunication/SC.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:testProject/ServerCommunication/SC.dart';
 
 class ProductAddPage extends StatefulWidget {
   ProductAddPage({Key key, this.title}) : super(key: key);
@@ -126,8 +125,6 @@ class _ProductAddPageState extends State<ProductAddPage> {
           duration: new Duration(seconds: 3));
     } else
       setState(() => prList.addAll(z.map(ProductAddPage.fromJson).toList()));
-    /*setState(() => childs.addAll(prList.map((j) => new ListTile(
-        title: new Text(j.name), onTap: () => _addProductToList(j.name)))));*/
   }
 
   Widget buildBody() {

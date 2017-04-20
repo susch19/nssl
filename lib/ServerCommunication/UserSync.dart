@@ -27,8 +27,4 @@ class UserSync {
           int userId, String oldPassword, String newPassword, String token) =>
       HelperMethods.put(path, new ChangePasswordArgs(oldPassword, newPassword));
 
-//static bool DeleteUser () async
-//{
-//  return false;
-//}
 }

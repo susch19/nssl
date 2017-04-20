@@ -8,7 +8,7 @@ import 'package:testProject/Models/Models.dart';
 class Registration extends StatefulWidget {
   Registration({Key key}) : super(key: key);
 
-  //static const String routeName = '/Registration';
+  static const String routeName = '/Registration';
 
   @override
   RegistrationState createState() => new RegistrationState();
@@ -99,15 +99,6 @@ class RegistrationState extends State<Registration> {
         User.username = response.username;
       }
     });
-
-    /*UserSync.Create(name, email, password).then((res) {
-      if (!HelperMethods.ReactToRespone(res,
-          scaffoldState: _scaffoldKey.currentState)) return;
-      print(res.body);
-      var response = CreateResult.fromJson(res.body);
-
-      Navigator.pop(_scaffoldKey.currentContext);
-    });*/
   }
 
   String _validateName(String value) {
@@ -148,14 +139,10 @@ class RegistrationState extends State<Registration> {
     return new Scaffold(
         key: _scaffoldKey,
         appBar: new AppBar(title: new Text('Registration')),
-        body: /*new Form(
-            //key: _formKey,
-            child:*/
+        body:
             new Container(
                 padding: const EdgeInsets.all(32.0),
                 child: new Column(children: [
-                  // It's simpler to use an InputFormField, as below, but a FormField
-                  // that builds an Input is equivalent.
                   new TextField(
                       decoration: new InputDecoration(
                         hintText: 'The name to login and to be found by others',
@@ -171,8 +158,6 @@ class RegistrationState extends State<Registration> {
                         person.name = s;
                         //Focus.moveTo(emailInput.key);
                       }
-                      //onChanged: field.onChanged,
-                      //errorText: field.errorText
                       ),
 
                   new TextField(

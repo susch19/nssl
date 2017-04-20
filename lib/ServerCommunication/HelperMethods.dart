@@ -6,9 +6,6 @@ import 'package:testProject/Models/Models.dart';
 
 class HelperMethods {
   static const String url = "https://susch.undo.it:443";
-  //static const String url = "http://176.95.26.106:80";
-  //static const String url = "http://192.168.49.46:4344";
-
 
   static Future<http.Response> post(String path, [Object body = null]) async {
     var g = http.post("$url/$path",

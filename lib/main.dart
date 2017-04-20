@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:testProject/Pages/Registration.dart';
 import 'package:testProject/Pages/Login.dart';
 import 'package:testProject/Pages/ProductAdd.dart';
-import 'package:testProject/list.dart';
 import 'package:testProject/Manager/Manager.dart';
 import 'package:testProject/Models/Models.dart';
 import 'package:testProject/ServerCommunication/SC.dart';
@@ -14,9 +13,6 @@ import 'package:flutter/services.dart';
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
 }
-
-//final List<ShoppingList> shoppingLists = new List<ShoppingList>();
-
 ThemeData dTheme = new ThemeData(
     primarySwatch: Colors.teal,
     accentColor: Colors.teal[600],
@@ -50,7 +46,6 @@ class _HomeState extends State<Home> {
       const MethodChannel('com.yourcompany.testProject/Scandit');
 
   String ean = "";
-  MyList<ListTile> drawerList;
   List mainList;
   bool performanceOverlay = false;
 
@@ -97,34 +92,6 @@ class _HomeState extends State<Home> {
 
   Widget buildBody(BuildContext context) {
     cont = context;
-    /* MyList<ListTile> mainList;
-    if (User.shoppingLists != null || User.shoppingLists.isNotEmpty) {
-      var list = User.currentList ?? new ShoppingList();
-      if (list.shoppingItems == null || list.shoppingItems.isEmpty)
-        mainList =
-            new MyList(children: [new ListTile(title: new Text("no items"))]);
-      else
-        mainList = new MyList(
-            children: list.shoppingItems.map((x) {
-              return new ListTile(
-                  title: new Row(children: [
-                new Align(
-                    child: new Text(x.name != "" ? x.name : "empty"),
-                    alignment: FractionalOffset.centerLeft),
-                new Align(
-                    child:
-                        new Text(x.amount != 0 ? x.amount.toString() : "empty"),
-                    alignment: FractionalOffset.centerRight)
-              ]));
-            }).toList(),
-            //divider: true,
-           // onRefresh: refresh,
-            //onDismiss: handleDismissMain,
-            //dismissDirection: DismissDirection.startToEnd
-        );
-    } else
-      mainList =
-          new MyList(children: [new ListTile(title: new Text("no items"))]);*/
 
     mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
@@ -177,17 +144,11 @@ class _HomeState extends State<Home> {
   Future register() => Navigator.pushNamed(cont, "/registration");
   Future search() => Navigator.pushNamed(cont, "/search");
 
-  Future login() {
-    return Navigator.pushNamed(cont, "/login");
-    //Navigator.pushNamed(cont, "/login");
-    //var sd = new SimpleDialog(title: const Text("login"), children: [new LoginPage(scaffoldKey: _mainScaffoldKey)]);
+  Future login() => Navigator.pushNamed(cont, "/login");
 
-    //return showDialog(context: cont, child: sd);
-  }
-  //Navigator.push(cont, new MaterialPageRoute(builder: (x) => new LoginPage()));
 
-  Future handleDismissDrawer(DismissDirection dir, Widget w) =>
-      handleDismiss(dir, w, drawerList.children);
+  //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
+  //    handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, Widget w, ShoppingItem s) {
     final String action =
         (dir == DismissDirection.endToStart) ? 'archived' : 'deleted';
@@ -219,7 +180,6 @@ class _HomeState extends State<Home> {
     setState(() => list.remove(item));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
 
-    //ShoppingListSync.deleteProduct(User.currentList.id, )
 
     showInSnackBar('You have $action $item',
         action: new SnackBarAction(
@@ -270,8 +230,6 @@ class _HomeState extends State<Home> {
 
     if (method == "setEAN") {
       ean = methodCall.arguments;
-      //SimpleDialog sd = new SimpleDialog(children: [new Text(ean)]);
-      //showDialog(context: cont, child: sd);
       var z = JSON.decode((await ProductSync.getProduct(ean)).body);
       var k = ProductAddPage.fromJson(z);
       var res = await ShoppingListSync.addProduct(
@@ -314,8 +272,6 @@ class _HomeState extends State<Home> {
     );
 
     showDialog(child: sd, context: cont);
-    /*.then((x) async {
-      */
   }
 
   Future addListServer(String listName) async {
@@ -338,11 +294,7 @@ class _HomeState extends State<Home> {
       accountEmail: new Text(User.eMail ?? "Not logged in yet"),
       currentAccountPicture: new CircleAvatar(child: const Text("SH")),
     );
-    // actions: [new IconButton(icon: new Icon(Icons.add), onPressed: addList)
 
-    //User.shoppingLists.add(new ShoppingList());
-    //User.shoppingLists.add(new ShoppingList());
-    //User.shoppingLists.add(new ShoppingList());
     var list = User.shoppingLists.isNotEmpty
         ? User.shoppingLists
             .map((x) => new ListTile(
@@ -353,16 +305,13 @@ class _HomeState extends State<Home> {
             new ListTile(title: const Text("nothing")),
             new ListTile(title: const Text("here"))
           ];
-    drawerList = new MyList<ListTile>(children: list);
-    //,
-    //onDismiss: handleDismissDrawer,
-    //dismissDirection: DismissDirection.startToEnd);
+    //drawerList = new MyList<ListTile>(children: list);
 
     var d = new Scaffold(
         body: new RefreshIndicator(
             child: new ListView(children: [
               userheader,
-              new Column(children: drawerList.children),
+              new Column(children: list),
             ], physics: const AlwaysScrollableScrollPhysics()),
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),

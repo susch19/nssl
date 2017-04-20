@@ -145,9 +145,7 @@ class LoginPageState extends State<LoginPage> {
                           errorText: pwInput.errorText,
                         ),
                         obscureText: true,
-                        // onChanged: (input) => setState(() {
-                        //      pwInput.errorText = _validatePassword(input);
-                        //   }),
+
                         controller: pwInput.textEditingController,
                         onSubmitted: (val) {
                           //Focus.moveTo(submit.key);
