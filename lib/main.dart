@@ -155,24 +155,15 @@ class _HomeState extends State<Home> {
       );
     }).toList(growable: true);
 
-    //mainList = ListTile.divideTiles(context: context, tiles: mainList);
+    var lv = new ListView(
+      children: mainList.toList(),
+      physics: const AlwaysScrollableScrollPhysics(),
+    );
 
-    /*var secondList = mainList.map((f)=> new Dismissible(
-        key: new ObjectKey(f),
-        child: f,
-    onDismissed: (DismissDirection d) => handleDismissMain(d, f),
-    direction: DismissDirection.startToEnd,
-    background: new Container(
-    decoration: new BoxDecoration(
-    backgroundColor: Theme.of(context).primaryColor),
-    child: new ListTile(
-    leading: new Icon(Icons.delete,
-    color: Theme.of(context).accentIconTheme.color,
-    size: 36.0))),
-    )).toList();*/
-    var lv = new ListView(children: mainList.toList());
-
-    return lv;
+    return new RefreshIndicator(
+      child: lv,
+      onRefresh: _handleMainListRefresh,
+    );
   }
 
   void showInSnackBar(String value,
@@ -396,9 +387,25 @@ class _HomeState extends State<Home> {
           ..name = item.name
           ..id = item.id
           ..amount = item.amount);
-      setState(()=>User.shoppingLists.add(list));
+      setState(() => User.shoppingLists.add(list));
       list.save();
     }
+    return new Future<Null>.value();
+  }
+
+  Future<Null> _handleMainListRefresh() async {
+    User.currentList.shoppingItems
+        .clear(); //TODO is there a faster way of renew a list?
+    var res = GetListResult
+        .fromJson((await ShoppingListSync.getList(User.currentList.id)).body);
+    for (var item in res.products)
+      User.currentList.shoppingItems.add(new ShoppingItem()
+        ..name = item.name
+        ..id = item.id
+        ..amount = item.amount);
+    setState(() {});
+    User.currentList.save();
+
     return new Future<Null>.value();
   }
 }
