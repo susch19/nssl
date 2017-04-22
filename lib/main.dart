@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
 }
+
 ThemeData dTheme = new ThemeData(
     primarySwatch: Colors.teal,
     accentColor: Colors.teal[600],
@@ -96,14 +97,10 @@ class _HomeState extends State<Home> {
     mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
         title: new Row(children: [
-          new Align(
-              child: new Text(
-                  x.amount != 0 ? x.amount.toString() + "x " : "empty"),
-              alignment: FractionalOffset.centerRight),
-          new Align(
-              child: new Text(x.name != "" ? x.name : "empty",
-                  maxLines: 2, softWrap: true),
-              alignment: FractionalOffset.centerLeft),
+          new Text(x.amount.toString() + "x  " ,
+              maxLines: 2, softWrap: true),
+          new Expanded(child: new Text(x.name ,
+              maxLines: 2, softWrap: true)),
         ]),
       );
 
@@ -146,7 +143,6 @@ class _HomeState extends State<Home> {
 
   Future login() => Navigator.pushNamed(cont, "/login");
 
-
   //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
   //    handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, Widget w, ShoppingItem s) {
@@ -179,7 +175,6 @@ class _HomeState extends State<Home> {
     var index = list.indexOf(item);
     setState(() => list.remove(item));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
-
 
     showInSnackBar('You have $action $item',
         action: new SnackBarAction(
