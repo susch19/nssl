@@ -113,7 +113,7 @@ class _HomeState extends State<Home> {
             ]),
             initialValue: x.amount.toString(),
             onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
-            itemBuilder: fromzerotoend,
+            itemBuilder: buildChangeMenuItems,
           ));
 
       return new Dismissible(
@@ -379,7 +379,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  List<PopupMenuEntry<String>> fromzerotoend(BuildContext context) {
+  List<PopupMenuEntry<String>> buildChangeMenuItems(BuildContext context) {
     var list = new List<PopupMenuEntry<String>>();
     for (int i = 1; i <= 30; i++)
       list.add(new PopupMenuItem<String>(
