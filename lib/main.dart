@@ -1,8 +1,9 @@
 //Some comment
 import 'dart:convert';
+import 'package:testProject/Pages/ProductAddToDatabase.dart';
 import 'package:testProject/Pages/Registration.dart';
 import 'package:testProject/Pages/Login.dart';
-import 'package:testProject/Pages/ProductAdd.dart';
+import 'package:testProject/Pages/ShoppingItemAdd.dart';
 import 'package:testProject/Manager/Manager.dart';
 import 'package:testProject/Models/Models.dart';
 import 'package:testProject/ServerCommunication/SC.dart';
@@ -228,7 +229,7 @@ class _HomeState extends State<Home> {
   void changeCurrentList(int index) => setState(() {
         User.currentListIndex = index;
         setState(() => User.currentList = User.shoppingLists[index]);
-        if(FileManager.fileExists("lastList.txt"))
+        if (FileManager.fileExists("lastList.txt"))
           FileManager.deleteFile("lastList.txt");
         FileManager.createFile("lastList.txt");
         FileManager.write("lastList.txt", User.currentList.id.toString());
@@ -244,15 +245,25 @@ class _HomeState extends State<Home> {
 
     if (method == "setEAN") {
       ean = methodCall.arguments;
-      var z = JSON.decode((await ProductSync.getProduct(ean)).body);
+      var firstRequest=await ProductSync.getProduct(ean);
+      var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
-      var res = await ShoppingListSync.addProduct(
-          User.currentList.id, k.name, '-', 1);
-      var p = AddListItemResult.fromJson(res.body);
-      setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
-        ..name = p.name
-        ..amount = 1
-        ..id = p.productId));
+
+      if (k.success) {
+        var res = await ShoppingListSync.addProduct(
+            User.currentList.id, k.name, '-', 1);
+        var p = AddListItemResult.fromJson(res.body);
+        setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
+          ..name = p.name
+          ..amount = 1
+          ..id = p.productId));
+        return;
+      }
+      Navigator.push(cont, new MaterialPageRoute<DismissDialogAction>(
+          builder: (BuildContext context) => new AddProductToDatabase(ean),
+          fullscreenDialog: true,
+          ));
+
     }
   }
 
