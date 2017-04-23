@@ -49,6 +49,7 @@ class _HomeState extends State<Home> {
   String ean = "";
   List mainList;
   bool performanceOverlay = false;
+  bool materialGrid = false;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +76,9 @@ class _HomeState extends State<Home> {
                             new PopupMenuItem<String>(
                                 value: 'PerformanceOverlay',
                                 child: new Text('Toggle Performance Overlay')),
+                            new PopupMenuItem<String>(
+                                value: 'materialGrid',
+                                child: new Text('Toggle Materialgrid')),
                           ])
                 ]),
             body: new Builder(builder: buildBody),
@@ -88,7 +92,9 @@ class _HomeState extends State<Home> {
           '/registration': (BuildContext context) => new Registration(),
           '/search': (BuildContext context) => new ProductAddPage()
         },
-        showPerformanceOverlay: performanceOverlay);
+        showPerformanceOverlay: performanceOverlay,
+        showSemanticsDebugger: false,
+        debugShowMaterialGrid: materialGrid);
   }
 
   Widget buildBody(BuildContext context) {
@@ -96,18 +102,24 @@ class _HomeState extends State<Home> {
 
     mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
-        title: new Row(children: [
-          new Text(x.amount.toString() + "x  " ,
-              maxLines: 2, softWrap: true),
-          new Expanded(child: new Text(x.name ,
-              maxLines: 2, softWrap: true)),
-        ]),
-      );
+          title: new Row(children: [
+            new Expanded(child: new Text(x.name, maxLines: 2, softWrap: true)),
+          ]),
+          leading: new PopupMenuButton<String>(
+            child: new Row(children: [
+              new Text(x.amount.toString() + "x"),
+              const Icon(Icons.expand_more, size: 16.0),
+              new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
+            ]),
+            initialValue: x.amount.toString(),
+            onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
+            itemBuilder: buildChangeMenu,
+          ));
 
       return new Dismissible(
         key: new ObjectKey(lt),
         child: lt,
-        onDismissed: (DismissDirection d) => handleDismissMain(d, lt, x),
+        onDismissed: (DismissDirection d) => handleDismissMain(d, x),
         direction: DismissDirection.startToEnd,
         background: new Container(
             decoration: new BoxDecoration(
@@ -145,7 +157,7 @@ class _HomeState extends State<Home> {
 
   //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
   //    handleDismiss(dir, w, drawerList.children);
-  void handleDismissMain(DismissDirection dir, Widget w, ShoppingItem s) {
+  void handleDismissMain(DismissDirection dir, ShoppingItem s) {
     final String action =
         (dir == DismissDirection.endToStart) ? 'archived' : 'deleted';
     var index = User.currentList.shoppingItems.indexOf(s);
@@ -206,6 +218,9 @@ class _HomeState extends State<Home> {
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
+        break;
+      case "materialGrid":
+        setState(() => materialGrid = !materialGrid);
         break;
     }
   }
@@ -352,4 +367,56 @@ class _HomeState extends State<Home> {
 
     return new Future<Null>.value();
   }
+
+  Future shoppingItemChange(ShoppingItem s, int change) async {
+    var res = ChangeListItemResult.fromJson((await ShoppingListSync
+            .changeProduct(User.currentList.id, s.id, change))
+        .body);
+    setState(() {
+      s.id = res.id;
+      s.amount = res.amount;
+      s.name = res.name;
+    });
+  }
+
+  List<PopupMenuEntry<String>> buildChangeMenu(BuildContext context) {
+    var list = new List<PopupMenuEntry<String>>();
+    for (int i = 1; i <= 30; i++)
+      list.add(new PopupMenuItem<String>(
+          value: i.toString(), child: new Text(i.toString())));
+    return list;
+  }
+
+/*void mainListItemMenuClicked(String value) {
+    var splitted = value.split('\u{1E}');
+    int id = int.parse(splitted[0]);
+    switch (splitted[1]) {
+      case "Remove":
+        handleDismissMain(DismissDirection.startToEnd,
+            User.currentList.shoppingItems.firstWhere((x) => x.id == id));
+        break;
+    }
+  }
+
+  trailing: new PopupMenuButton<String>(
+  padding: EdgeInsets.zero,
+  onSelected: mainListItemMenuClicked,
+  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        new PopupMenuItem<String>(
+          value: x.id.toString() + "\u{1E}" + "Change",
+          child: new ListTile(
+            leading: const Icon(Icons.mode_edit),
+            title: const Text('Change'),
+            // trailing: new FlatButton(
+            //     child: const Text("+1"), onPressed: () {}),
+          ),
+        ),
+        const PopupMenuDivider(), // ignore: list_element_type_not_assignable
+        new PopupMenuItem<String>(
+            value: x.id.toString() + "\u{1E}" + 'Remove',
+            child: new ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Remove')))
+      ]),
+  */ //TODO Save for later potential use
 }
