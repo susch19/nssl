@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:testProject/Manager/FileManager.dart';
 import 'package:testProject/Models/Models.dart';
 
@@ -10,7 +9,7 @@ class Startup {
     var dir = await FileManager.createFolder("ShoppingLists");
     FileManager.createFile("token.txt");
     FileManager.createFile("User.txt");
-    FileManager.createFile("ShoppingLists.txt");
+    FileManager.createFile("listList.txt");
 
     User.token = await FileManager.readAsString("token.txt");
 
@@ -21,21 +20,14 @@ class Startup {
         User.shoppingLists.add(await ShoppingList
             .load(int.parse(list.path.split('/').last.split('.')[0])));
 
-
-    if (User.shoppingLists.length > 0)
-      User.currentList = User.shoppingLists[0];
-    else {
+    if (User.shoppingLists.length > 0) {
+      var listId = int.parse(await FileManager.readAsString("lastList.txt"));
+      User.currentList = User.shoppingLists.firstWhere((x) => x.id == listId);
+    } else {
       User.currentList = new ShoppingList()
-        ..name = "TempList"
+        ..name = "No List yet"
         ..id = 1
         ..shoppingItems = new List<ShoppingItem>();
-      User.currentList.shoppingItems.add(new ShoppingItem()
-        ..name =
-            "Das hier soll ein sehr langer Text sein, um zu schauen, wie die App damit umgeht"
-        ..amount = 2);
-      User.currentList.shoppingItems.add(new ShoppingItem()
-        ..name = "Test"
-        ..amount = 3);
     }
     return true;
   }

@@ -228,6 +228,10 @@ class _HomeState extends State<Home> {
   void changeCurrentList(int index) => setState(() {
         User.currentListIndex = index;
         setState(() => User.currentList = User.shoppingLists[index]);
+        if(FileManager.fileExists("lastList.txt"))
+          FileManager.deleteFile("lastList.txt");
+        FileManager.createFile("lastList.txt");
+        FileManager.write("lastList.txt", User.currentList.id.toString());
       });
 
   Future<Null> _getEAN() async {
