@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:testProject/Models/Models.dart';
+import 'package:testProject/models/model_export.dart';
 import 'package:flutter/widgets.dart';
-import 'package:testProject/ServerCommunication/SC.dart';
+import 'package:testProject/server_communication//s_c.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
+import 'package:testProject/server_communication/return_classes.dart';
 
 class ProductAddPage extends StatefulWidget {
   ProductAddPage({Key key, this.title}) : super(key: key);

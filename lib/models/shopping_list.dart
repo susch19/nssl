@@ -1,5 +1,5 @@
-import 'package:testProject/Models/ShoppingItem.dart';
-import 'package:testProject/Manager/Manager.dart';
+import 'package:testProject/models/shopping_item.dart';
+import 'package:testProject/manager/manager_export.dart';
 import 'dart:async';
 
 class ShoppingList {

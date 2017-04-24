@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:testProject/Manager/FileManager.dart';
-import 'package:testProject/Models/Models.dart';
+import 'package:testProject/manager/file_manager.dart';
+import 'package:testProject/models/model_export.dart';
 
 class Startup {
   static Future<bool> initialize() async {

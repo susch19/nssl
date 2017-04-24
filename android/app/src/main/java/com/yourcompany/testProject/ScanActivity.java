@@ -82,7 +82,6 @@ public class ScanActivity extends Activity implements OnScanListener {
         // Prefer the back-facing camera, is there is any.
         settings.setCameraFacingPreference(ScanSettings.CAMERA_FACING_BACK);
 
-
         // Some Android 2.3+ devices do not support rotated camera feeds. On these devices, the
         // barcode picker emulates portrait mode by rotating the scan UI.
         boolean emulatePortraitMode = !BarcodePicker.canRunPortraitPicker();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
-import 'package:testProject/Models/Models.dart';
+import 'package:testProject/models/model_export.dart';
 
 class HelperMethods {
   static const String url = "https://susch.undo.it:443";

@@ -1,4 +1,4 @@
-import 'package:testProject/Models/ShoppingList.dart';
+import 'package:testProject/models/shopping_list.dart';
 
 class User {
   static String username;

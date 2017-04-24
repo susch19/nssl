@@ -1,9 +1,10 @@
 //Some comment
-import 'package:testProject/ServerCommunication/SC.dart';
+import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/s_c.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:testProject/Manager/FileManager.dart';
-import 'package:testProject/Models/Models.dart';
+import 'package:testProject/manager/file_manager.dart';
+import 'package:testProject/models/model_export.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key}) : super(key: key);

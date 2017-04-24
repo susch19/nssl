@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:testProject/Models/Models.dart';
-import 'package:testProject/Models/User.dart';
-import 'package:testProject/ServerCommunication/SC.dart';
+import 'package:testProject/models/model_export.dart';
+import 'package:testProject/models/user.dart';
+import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/s_c.dart';
 
 enum DismissDialogAction {
   cancel,

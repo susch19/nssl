@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:testProject/Models.dart';
+import 'package:testProject/models_json.dart';
 
 class CreateResult {
   bool success;

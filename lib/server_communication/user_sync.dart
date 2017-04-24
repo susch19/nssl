@@ -1,6 +1,6 @@
-import 'RequestClasses.dart';
+import 'request_classes.dart';
 import 'dart:async';
-import 'HelperMethods.dart';
+import 'helper_methods.dart';
 import 'package:http/http.dart';
 
 final String path = "users";

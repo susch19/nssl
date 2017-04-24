@@ -1,8 +1,13 @@
 //Some comment
-import 'package:testProject/ServerCommunication/SC.dart';
-import 'package:testProject/Manager/FileManager.dart';
-import 'package:testProject/Models/Models.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:testProject/manager/file_manager.dart';
+import 'package:testProject/models/user.dart';
+import 'package:testProject/server_communication/helper_methods.dart';
+import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/user_sync.dart';
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.scaffoldKey}) : super(key: key);
