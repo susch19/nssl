@@ -13,7 +13,9 @@ class Startup {
 
     User.token = await FileManager.readAsString("token.txt");
 
-    User.username = await FileManager.readAsString("User.txt");
+    var userData = await FileManager.readAsLines("User.txt");
+    User.username = userData[0];
+    User.eMail = userData[1];
 
     for (var list in dir.listSync())
       if (list != null)

@@ -64,7 +64,7 @@ class LoginPageState extends State<LoginPage> {
     String name = nameInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
 
-    if (_validateEmail(nameInput.textEditingController.text) == null) {
+    if (_validateEmail(nameInput.textEditingController.text) != null) {
       UserSync.login(name, password).then((res) {
         if (!HelperMethods.reactToRespone(res,
             scaffoldState: _scaffoldKey?.currentState))
@@ -90,9 +90,14 @@ class LoginPageState extends State<LoginPage> {
     }
     showInSnackBar("Login successfull.");
     FileManager.write("token.txt", res.token);
-    FileManager.write("User.txt", res.username);
+    if(FileManager.fileExists("User.txt"))
+      FileManager.deleteFile("User.txt");
+    FileManager.createFile("User.txt");
+    FileManager.writeln("User.txt", res.username);
+    FileManager.writeln("User.txt", res.eMail, append: true);
     User.token = res.token;
     User.username = res.username;
+    User.eMail = res.eMail;
     Navigator.pop(context);
   }
 

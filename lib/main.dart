@@ -246,7 +246,7 @@ class _HomeState extends State<Home> {
 
     if (method == "setEAN") {
       ean = methodCall.arguments;
-      var firstRequest=await ProductSync.getProduct(ean);
+      var firstRequest = await ProductSync.getProduct(ean);
       var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
 
@@ -260,11 +260,12 @@ class _HomeState extends State<Home> {
           ..id = p.productId));
         return;
       }
-      Navigator.push(cont, new MaterialPageRoute<DismissDialogAction>(
-          builder: (BuildContext context) => new AddProductToDatabase(ean),
-          fullscreenDialog: true,
+      Navigator.push(
+          cont,
+          new MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => new AddProductToDatabase(ean),
+            fullscreenDialog: true,
           ));
-
     }
   }
 
@@ -316,9 +317,11 @@ class _HomeState extends State<Home> {
   bool b = true;
   Widget _buildDrawer(BuildContext context) {
     var userheader = new UserAccountsDrawerHeader(
-      accountName: new Text(User.username ?? "Not logged in yer"),
+      accountName: new Text(User.username ?? "Not logged in yet"),
       accountEmail: new Text(User.eMail ?? "Not logged in yet"),
-      currentAccountPicture: new CircleAvatar(child: const Text("SH")),
+      currentAccountPicture: new CircleAvatar(
+          child: new Text(User.username.substring(0, 2).toUpperCase()),
+          backgroundColor: Theme.of(cont ?? context).accentColor),
     );
 
     var list = User.shoppingLists.isNotEmpty
