@@ -77,17 +77,21 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       return false;
     } else {
       form.save();
-
-      var res = ProductResult.fromJson((await ProductSync.addNewProduct(
-              "", "$productName $brandName $weight"))
-          .body);
+      var first = (await ProductSync.addNewProduct(
+          "$productName $brandName $weight", gtin));
+      if (first.statusCode != 200) {
+        showInSnackBar(first.reasonPhrase);
+        return false;
+      }
+      var res = ProductResult.fromJson(first.body);
       if (!res.success)
         showInSnackBar(res.error);
       else {
         if (putInList) {
-          var pres = AddListItemResult.fromJson((await ShoppingListSync
-                  .addProduct(User.currentList.id, res.name, res.gtin, 1))
-              .body);
+          var pres = AddListItemResult.fromJson(
+              (await ShoppingListSync.addProduct(User.currentList.id,
+                      "$productName $brandName $weight", gtin, 1))
+                  .body);
           if (!pres.success)
             showInSnackBar(pres.error);
           else {
@@ -157,7 +161,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                         border: new Border(
                             bottom: new BorderSide(color: theme.dividerColor))),
                     alignment: FractionalOffset.bottomLeft,
-                    child: new Text('code: ' + "4311501447482")),
+                    child: new Text('code: ' + gtin)),
                 new Container(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     alignment: FractionalOffset.bottomLeft,
