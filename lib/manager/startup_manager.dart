@@ -14,9 +14,14 @@ class Startup {
     User.token = await FileManager.readAsString("token.txt");
 
     var userData = await FileManager.readAsLines("User.txt");
-    User.username = userData[0];
-    User.eMail = userData[1];
-
+    if(userData.where((s)=> s.isNotEmpty).length == 2) {
+      User.username = userData[0];
+      User.eMail = userData[1];
+    }
+    else {
+      User.username = "Not logged in";
+      User.eMail = "Not logged in";
+    }
     for (var list in dir.listSync())
       if (list != null)
         User.shoppingLists.add(await ShoppingList
