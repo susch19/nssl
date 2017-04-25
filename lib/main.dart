@@ -86,8 +86,8 @@ class _HomeState extends State<Home> {
             body: new Builder(builder: buildBody),
             drawer: _buildDrawer(context),
             persistentFooterButtons: [
-              new FlatButton(child: new Text("Scan"), onPressed: _getEAN),
-              new FlatButton(child: new Text("Search"), onPressed: search)
+              new FlatButton(child: new Text("SCAN"), onPressed: _getEAN),
+              new FlatButton(child: new Text("SEARCH"), onPressed: search)
             ]),
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => new LoginPage(),
@@ -281,10 +281,10 @@ class _HomeState extends State<Home> {
           onSubmitted: addListServer),
       new Row(children: [
         new FlatButton(
-            child: const Text("Cancel"),
+            child: const Text("CANCEL"),
             onPressed: () => Navigator.pop(cont, "")),
         new FlatButton(
-            child: const Text("Accept"),
+            child: const Text("ACCEPT"),
             onPressed: () {
               Navigator.pop(cont, "");
               addListServer(tec.text);
@@ -342,7 +342,7 @@ class _HomeState extends State<Home> {
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
         persistentFooterButtons: [
-          new FlatButton(child: const Text("add list"), onPressed: addList)
+          new FlatButton(child: const Text("ADD LIST"), onPressed: addList)
         ]);
 
     return new Drawer(child: d);

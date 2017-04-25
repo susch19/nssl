@@ -159,7 +159,7 @@ class LoginPageState extends State<LoginPage> {
                         child: new RaisedButton(
                           key: submit.key,
                           child: new SizedBox.expand(
-                              child: new Center(child: const Text('Login'))),
+                              child: new Center(child: const Text('LOGIN'))),
                           onPressed: _handleSubmitted,
                         ),
                         padding: const EdgeInsets.only(top: 16.0)),

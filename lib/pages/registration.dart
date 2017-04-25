@@ -232,7 +232,7 @@ class RegistrationState extends State<Registration> {
                     alignment: const FractionalOffset(0.5, 0.5),
                     child: new RaisedButton(
                       key: submit.key,
-                      child: new Text('Register'),
+                      child: new Text('REGISTER'),
                       onPressed: _handleSubmitted,
                     ),
                   )
