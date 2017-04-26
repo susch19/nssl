@@ -44,6 +44,8 @@ class _HomeState extends State<Home> {
   static BuildContext cont;
   final GlobalKey<ScaffoldState> _mainScaffoldKey =
       new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _drawerScaffoldKey =
+      new GlobalKey<ScaffoldState>();
 
   static const platform =
       const MethodChannel('com.yourcompany.testProject/Scandit');
@@ -147,6 +149,14 @@ class _HomeState extends State<Home> {
   void showInSnackBar(String value,
       {Duration duration: null, SnackBarAction action}) {
     _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
+        content: new Text(value),
+        duration: duration ?? new Duration(seconds: 3),
+        action: action));
+  }
+
+  void showInDraweSnackBar(String value,
+      {Duration duration: null, SnackBarAction action}) {
+    _drawerScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),
         duration: duration ?? new Duration(seconds: 3),
         action: action));
@@ -309,7 +319,6 @@ class _HomeState extends State<Home> {
       ..name = newListRes.name;
     setState(() => User.shoppingLists.add(newList));
     User.currentListIndex = User.shoppingLists.indexOf(newList);
-    //setState(() => User.currentListId); //TODO is this needed?
     FileManager.createFile("ShoppingLists/${newList.id}.sl");
     FileManager.writeln("ShoppingLists/${newList.id}.sl", newList.name);
   }
@@ -327,8 +336,34 @@ class _HomeState extends State<Home> {
     var list = User.shoppingLists.isNotEmpty
         ? User.shoppingLists
             .map((x) => new ListTile(
-                title: new Text(x.name),
-                onTap: () => changeCurrentList(User.shoppingLists.indexOf(x))))
+                  title: new Text(x.name),
+                  onTap: () => changeCurrentList(User.shoppingLists.indexOf(x)),
+                  trailing: new PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      onSelected: drawerListItemMenuClicked,
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                            new PopupMenuItem<String>(
+                              value:
+                                  x.id.toString() + "\u{1E}" + "AddContributor",
+                              child: new ListTile(
+                                leading: const Icon(Icons.person_add),
+                                title: const Text('Add Contributor'),
+                              ),
+                            ),
+                            new PopupMenuItem<String>(
+                                value: x.id.toString() + "\u{1E}" + 'Rename',
+                                child: new ListTile(
+                                    leading: const Icon(Icons.mode_edit),
+                                    title: const Text('Rename'))),
+                            const PopupMenuDivider(), // ignore: list_element_type_not_assignable
+                            new PopupMenuItem<String>(
+                                value: x.id.toString() + "\u{1E}" + 'Remove',
+                                child: new ListTile(
+                                    leading: const Icon(Icons.delete),
+                                    title: const Text('Remove')))
+                          ]),
+                ))
             .toList()
         : [
             new ListTile(title: const Text("nothing")),
@@ -337,6 +372,7 @@ class _HomeState extends State<Home> {
     //drawerList = new MyList<ListTile>(children: list);
 
     var d = new Scaffold(
+        key: _drawerScaffoldKey,
         body: new RefreshIndicator(
             child: new ListView(children: [
               userheader,
@@ -349,6 +385,32 @@ class _HomeState extends State<Home> {
         ]);
 
     return new Drawer(child: d);
+  }
+
+  Future drawerListItemMenuClicked(String value) async {
+    var splitted = value.split('\u{1E}');
+    int id = int.parse(splitted[0]);
+    switch (splitted[1]) {
+      case "AddContributor":
+        break;
+      case "Rename":
+        /*var put = await ShoppingListSync.changeLName(id, "Demo");
+        showInDraweSnackBar("${put.statusCode}" + put.reasonPhrase);
+        var res = Result.fromJson((put.body));
+        if (!res.success) showInDraweSnackBar(res.error);*/
+        break;
+      case "Remove":
+        var res = Result.fromJson((await ShoppingListSync.deleteList(id)).body);
+        if (!res.success)
+          showInDraweSnackBar(res.error);
+        else {
+          showInDraweSnackBar("Removed ${User.shoppingLists
+                  .firstWhere((x) => x.id == id)
+                  .name}");
+          setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
+        }
+        break;
+    }
   }
 
   Future<Null> _handleDrawerRefresh() async {
