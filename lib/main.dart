@@ -127,7 +127,7 @@ class _HomeState extends State<Home> {
         direction: DismissDirection.startToEnd,
         background: new Container(
             decoration: new BoxDecoration(
-                backgroundColor: Theme.of(context).primaryColor),
+                color: Theme.of(context).primaryColor),
             child: new ListTile(
                 leading: new Icon(Icons.delete,
                     color: Theme.of(context).accentIconTheme.color,
