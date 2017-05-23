@@ -30,6 +30,7 @@ public class MainActivity extends FlutterActivity {
     private String ean;
     public static FlutterView flutterView;
     public static Context cont;
+    private boolean mPaused;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,6 @@ public class MainActivity extends FlutterActivity {
         GeneratedPluginRegistrant.registerWith(this);
 
         ScanditLicense.setAppKey(sScanditSdkAppKey);
-        // Initialize and start the bar code recognition.
 
         flutterView = getFlutterView();
 
@@ -49,8 +49,6 @@ public class MainActivity extends FlutterActivity {
                     public void onMethodCall(MethodCall call, Result result) {
                         if (call.method.equals("getEAN")) {
                             startActivity(new Intent(cont, ScanActivity.class));
-
-                            //String ean = getEAN();
 
                             if (ean != "") {
                                 result.success(ean);
@@ -74,7 +72,6 @@ public class MainActivity extends FlutterActivity {
                 this.requestPermissions(new String[]{ Manifest.permission.CAMERA },
                         CAMERA_PERMISSION_REQUEST);
             }
-
         }
     }
     @Override
@@ -91,6 +88,20 @@ public class MainActivity extends FlutterActivity {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        mPaused = false;
+        // Handle permissions for Marshmallow and onwards...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            grantCameraPermissionsThenStartScanning();
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
 }
 
