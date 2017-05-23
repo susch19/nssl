@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FileManager {
   static String applicationDocumentsDirectory;
 
   static Future initialize() async {
     applicationDocumentsDirectory =
-        (await PathProvider.getApplicationDocumentsDirectory()).path;
+        (await getApplicationDocumentsDirectory()).path;
   }
 
   static Future<File> _getFile(String filename) async =>
-      new File((await PathProvider.getApplicationDocumentsDirectory()).path +
+      new File((await getApplicationDocumentsDirectory()).path +
           '/$filename');
 
   static Future<Directory> _getDirectory(String filename) async =>
       new Directory(
-          (await PathProvider.getApplicationDocumentsDirectory()).path +
+          (await getApplicationDocumentsDirectory()).path +
               '/$filename');
 
   static Future write(String filename, String text,
