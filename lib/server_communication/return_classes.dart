@@ -61,6 +61,33 @@ class AddContributorResult {
   }
 }
 
+class ContributorResult {
+  String name;
+  int userId;
+  bool isAdmin;
+}
+
+class GetContributorsResult {
+  bool success;
+  String error;
+  List<ContributorResult> contributors;
+
+  static GetContributorsResult fromJson(String dataString) =>
+      _fromJson(JSON.decode(dataString));
+
+  static GetContributorsResult _fromJson(Map data) {
+    var r = new GetContributorsResult();
+    r.success = data["success"];
+    r.error = data["error"];
+    List<Map> unMaped = data["contributors"] ?? new List<Map>();
+    r.contributors = unMaped.map((x) => new ContributorResult()
+      ..name = x["name"]
+      ..isAdmin = x["isAdmin"]
+      ..userId = x["userId"]);
+    return r;
+  }
+}
+
 class ProductResult {
   bool success;
   String error;
@@ -161,8 +188,8 @@ class GetListResult {
     r.userId = data["userId"];
     r.owner = data["owner"];
     List<Map> unMaped = data["products"] ?? new List<Map>();
-    r.products = unMaped
-        .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+    r.products =
+        unMaped.map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
     r.contributors = data["contributors"];
     return r;
   }

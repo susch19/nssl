@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
+import 'login.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key}) : super(key: key);
@@ -15,17 +16,7 @@ class Registration extends StatefulWidget {
   RegistrationState createState() => new RegistrationState();
 }
 
-class PersonData {
-  String name = '';
-  String email = '';
-  String password = '';
-}
 
-class ForInput {
-  TextEditingController textEditingController;
-  String errorText = '';
-  GlobalKey key = new GlobalKey();
-}
 
 class RegistrationState extends State<Registration> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();

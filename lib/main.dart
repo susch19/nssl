@@ -1,9 +1,6 @@
 //Some comment
 import 'dart:convert';
-import 'package:testProject/pages/product_add_to_database.dart';
-import 'package:testProject/pages/registration.dart';
-import 'package:testProject/pages/login.dart';
-import 'package:testProject/pages/shopping_item_search.dart';
+import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/server_communication/return_classes.dart';
@@ -94,7 +91,8 @@ class _HomeState extends State<Home> {
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => new LoginPage(),
           '/registration': (BuildContext context) => new Registration(),
-          '/search': (BuildContext context) => new ProductAddPage()
+          '/search': (BuildContext context) => new ProductAddPage(),
+          '/contributors': (BuildContext context) => new ContributorsPage(),
         },
         showPerformanceOverlay: performanceOverlay,
         showSemanticsDebugger: false,
@@ -392,6 +390,7 @@ class _HomeState extends State<Home> {
     int id = int.parse(splitted[0]);
     switch (splitted[1]) {
       case "AddContributor":
+        Navigator.pushNamed(cont, "/contributors");
         break;
       case "Rename":
         /*var put = await ShoppingListSync.changeLName(id, "Demo");

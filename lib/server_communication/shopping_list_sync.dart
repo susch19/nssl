@@ -33,6 +33,10 @@ class ShoppingListSync
   static Future<Response> addContributor(int listId, String contributorName)
   => HelperMethods.post("$listpath/$listId/contributors/", new AddContributorArgs (contributorName));
 
+  static Future<Response> getContributors(int listId)
+  => HelperMethods.get("$listpath/$listId/contributors/");
+
+
   static Future<Response> transferOwnership(int listId, int newOwner) //String to ID
   => HelperMethods.put("$listpath/$listId/owners/", new TransferOwnershipArgs( newOwner));
 }
