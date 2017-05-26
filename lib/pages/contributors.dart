@@ -68,7 +68,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
     ShoppingListSync.addContributor(User.currentList.id, value).then((o) {
       AddContributorResult z = AddContributorResult.fromJson(o.body);
       if (!z.success)
-        showInSnackBar("Something went wrong!\n${o.reasonPhrase}",
+        showInSnackBar("Something went wrong!\n${z.error}",
             duration: new Duration(seconds: 10));
       else
         setState(() => conList.add(new ContributorResult()
@@ -160,7 +160,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
             }
             GetContributorsResult z = GetContributorsResult.fromJson(o.body);
             if (!z.success || z.contributors.length <= 0)
-              showInSnackBar("Something went completely wrong!\n${o.reasonPhrase}",
+              showInSnackBar("Something went completely wrong!\n${z.error}",
                   duration: new Duration(seconds: 10));
             else
               conList.clear();
