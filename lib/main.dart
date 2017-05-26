@@ -68,31 +68,30 @@ class _HomeState extends State<Home> {
                       onSelected: selectedOption,
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuItem<String>>[
-                            new PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                                 value: 'Login/Register',
-                                child: new Text('Login/Register')),
-                            new PopupMenuItem<String>(
+                                child: const Text('Login/Register')),
+                            const PopupMenuItem<String>(
                                 value: 'Options',
-                                child: new Text('Change Theme')),
-                            new PopupMenuItem<String>(
+                                child: const Text('Change Theme')),
+                            const PopupMenuItem<String>(
                                 value: 'PerformanceOverlay',
-                                child: new Text('Toggle Performance Overlay')),
-                            new PopupMenuItem<String>(
+                                child: const Text('Toggle Performance Overlay')),
+                            const PopupMenuItem<String>(
                                 value: 'materialGrid',
-                                child: new Text('Toggle Materialgrid')),
+                                child: const Text('Toggle Materialgrid')),
                           ])
                 ]),
             body: new Builder(builder: buildBody),
             drawer: _buildDrawer(context),
             persistentFooterButtons: [
-              new FlatButton(child: new Text("SCAN"), onPressed: _getEAN),
-              new FlatButton(child: new Text("SEARCH"), onPressed: search)
+              new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
+              new FlatButton(child: const Text("SEARCH"), onPressed: search)
             ]),
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => new LoginPage(),
           '/registration': (BuildContext context) => new Registration(),
           '/search': (BuildContext context) => new ProductAddPage(),
-          '/contributors': (BuildContext context) => new ContributorsPage(),
         },
         showPerformanceOverlay: performanceOverlay,
         showSemanticsDebugger: false,
@@ -343,29 +342,29 @@ class _HomeState extends State<Home> {
                           <PopupMenuEntry<String>>[
                             new PopupMenuItem<String>(
                               value:
-                                  x.id.toString() + "\u{1E}" + "AddContributor",
-                              child: new ListTile(
+                                  x.id.toString() + "\u{1E}" + "Contributors",
+                              child: const ListTile(
                                 leading: const Icon(Icons.person_add),
-                                title: const Text('Add Contributor'),
+                                title: const Text('Contributors'),
                               ),
                             ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
-                                child: new ListTile(
+                                child: const ListTile(
                                     leading: const Icon(Icons.mode_edit),
                                     title: const Text('Rename'))),
                             const PopupMenuDivider(), // ignore: list_element_type_not_assignable
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
-                                child: new ListTile(
+                                child: const ListTile(
                                     leading: const Icon(Icons.delete),
                                     title: const Text('Remove')))
                           ]),
                 ))
             .toList()
         : [
-            new ListTile(title: const Text("nothing")),
-            new ListTile(title: const Text("here"))
+            const ListTile(title: const Text("nothing")),
+            const ListTile(title: const Text("here"))
           ];
     //drawerList = new MyList<ListTile>(children: list);
 
@@ -389,8 +388,12 @@ class _HomeState extends State<Home> {
     var splitted = value.split('\u{1E}');
     int id = int.parse(splitted[0]);
     switch (splitted[1]) {
-      case "AddContributor":
-        Navigator.pushNamed(cont, "/contributors");
+      case "Contributors":
+        Navigator.push(cont,
+            new MaterialPageRoute<DismissDialogAction>(
+              builder: (BuildContext context) =>new ContributorsPage(id),
+              fullscreenDialog: true,
+            ));
         break;
       case "Rename":
         /*var put = await ShoppingListSync.changeLName(id, "Demo");

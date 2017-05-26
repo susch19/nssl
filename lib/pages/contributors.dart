@@ -7,11 +7,12 @@ import 'dart:convert';
 import 'package:testProject/server_communication/return_classes.dart';
 
 class ContributorsPage extends StatefulWidget {
-  ContributorsPage({Key key, this.title}) : super(key: key);
+  ContributorsPage(this.listId, {Key key, this.title}) : super(key: key);
   final String title;
-
+  final int listId;
   @override
-  _ContributorsPagePageState createState() => new _ContributorsPagePageState();
+  _ContributorsPagePageState createState() =>
+      new _ContributorsPagePageState(listId);
 }
 
 class _ContributorsPagePageState extends State<ContributorsPage> {
@@ -22,14 +23,15 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   TextEditingController tec = new TextEditingController();
   List<ContributorResult> conList = new List<ContributorResult>();
   int k = 1;
-
-  _ContributorsPagePageState() {
-    ShoppingListSync.getContributors(User.currentList.id).then((o) {
+  int listId;
+  _ContributorsPagePageState(int listId) {
+    this.listId = listId;
+    ShoppingListSync.getContributors(listId).then((o) {
       if (o.statusCode == 500) {
         showInSnackBar("Internal Server Error");
         return;
       }
-      GetContributorsResult z = JSON.decode(o.body);
+      GetContributorsResult z = GetContributorsResult.fromJson(o.body);
       if (!z.success || z.contributors.length <= 0)
         showInSnackBar("Something went completely wrong!\n${o.reasonPhrase}",
             duration: new Duration(seconds: 10));
@@ -64,7 +66,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
 
   Future _addContributor(String value) async {
     ShoppingListSync.addContributor(User.currentList.id, value).then((o) {
-      AddContributorResult z = JSON.decode(o.body);
+      AddContributorResult z = AddContributorResult.fromJson(o.body);
       if (!z.success)
         showInSnackBar("Something went wrong!\n${o.reasonPhrase}",
             duration: new Duration(seconds: 10));
@@ -77,18 +79,46 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   }
 
   Widget buildBody() {
+    bool isAdmin = false;
+    if (conList.length > 0)
+      isAdmin = conList.firstWhere((x) => x.name == User.username).isAdmin;
     if (conList.length > 0) {
       var listView = new ListView.builder(
           itemBuilder: (c, i) {
             return new ListTile(
                 title: new Text(conList[i].name +
                     (conList[i].isAdmin ? " - Admin" : " - User")),
+                trailing: isAdmin && conList[i].name != User.username
+                    ? new PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        onSelected: popupMenuClicked,
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                              new PopupMenuItem<String>(
+                                  value: conList[i].userId.toString() +
+                                      "\u{1E}ChangeRight", //x.id.toString() + "\u{1E}" + 'Rename',
+                                  child: new ListTile(
+                                      leading: (conList[i].isAdmin
+                                          ? const Icon(Icons.arrow_downward)
+                                          : const Icon(Icons.arrow_upward)),
+                                      title: (conList[i].isAdmin
+                                          ? const Text('Demote')
+                                          : const Text('Promote')))),
+                              const PopupMenuDivider(), // ignore: list_element_type_not_assignable
+                              new PopupMenuItem<String>(
+                                  value: conList[i].userId.toString() +
+                                      "\u{1E}Remove", //x.id.toString() + "\u{1E}" + 'Remove',
+                                  child: const ListTile(
+                                      leading: const Icon(Icons.delete),
+                                      title: const Text('Remove')))
+                            ])
+                    : const Text(""),
                 onTap: () => {});
           },
           itemCount: conList.length);
       return listView;
     } else
-      return new Text("");
+      return const Text("");
   }
 
   void showInSnackBar(String value,
@@ -98,5 +128,46 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
         content: new Text(value),
         duration: duration ?? new Duration(seconds: 3),
         action: action));
+  }
+
+  Future popupMenuClicked(String value) async {
+    var splitted = value.split("\u{1E}");
+    var command = splitted[1];
+    switch (command) {
+      case "Remove":
+        var userId = int.parse(splitted[0]);
+        var res = await ShoppingListSync.deleteContributor(listId, userId);
+        var enres = Result.fromJson(res.body);
+        if (!enres.success)
+          showInSnackBar(enres.error);
+        else {
+          showInSnackBar(conList.firstWhere((x) => x.userId == userId).name +
+              " was removed successfully");
+          setState(() => conList.removeWhere((x) => x.userId == userId));
+        }
+        break;
+      case "ChangeRight":
+        var userId = int.parse(splitted[0]);
+        var res = await ShoppingListSync.changeRight(listId, userId);
+        var enres = Result.fromJson(res.body);
+        if (!enres.success)
+          showInSnackBar(enres.error);
+        else {
+          ShoppingListSync.getContributors(listId).then((o) {
+            if (o.statusCode == 500) {
+              showInSnackBar("Internal Server Error");
+              return;
+            }
+            GetContributorsResult z = GetContributorsResult.fromJson(o.body);
+            if (!z.success || z.contributors.length <= 0)
+              showInSnackBar("Something went completely wrong!\n${o.reasonPhrase}",
+                  duration: new Duration(seconds: 10));
+            else
+              conList.clear();
+              setState(() => conList.addAll(z.contributors));
+          });
+        }
+        break;
+    }
   }
 }

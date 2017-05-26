@@ -83,7 +83,7 @@ class GetContributorsResult {
     r.contributors = unMaped.map((x) => new ContributorResult()
       ..name = x["name"]
       ..isAdmin = x["isAdmin"]
-      ..userId = x["userId"]);
+      ..userId = x["userId"]).toList();
     return r;
   }
 }
