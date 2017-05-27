@@ -7,6 +7,7 @@ class Startup {
     await FileManager.initialize();
 
     var dir = await FileManager.createFolder("ShoppingLists");
+    FileManager.createFolder("ShoppingListsCo");
     FileManager.createFile("token.txt");
     FileManager.createFile("User.txt");
     FileManager.createFile("listList.txt");

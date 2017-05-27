@@ -10,6 +10,7 @@ class ShoppingList {
   static Future<ShoppingList> load(int id) async {
     var items =
         await FileManager.readAsLines("ShoppingLists/${id.toString()}.sl");
+    var crossedOut = await loadCrossedOut(id);
     return new ShoppingList()
       ..id = id
       ..name = items[0]
@@ -18,7 +19,8 @@ class ShoppingList {
         var item = new ShoppingItem()
           ..name = split[0]
           ..amount = int.parse(split[1])
-          ..id = int.parse(split[2]);
+          ..id = int.parse(split[2])
+          ..crossedOut = crossedOut.containsKey(int.parse(split[2])) ?? false;
         return item;
       }).toList();
   }
@@ -33,5 +35,26 @@ class ShoppingList {
     for (var item in shoppingItems) {
       await FileManager.writeln(filename, item.toString(), append: true);
     }
+  }
+
+  Future saveCrossedOut() async {
+    var filename = "ShoppingListsCo/${id.toString()}co.sl";
+    if (FileManager.fileExists(filename))
+      await FileManager.deleteFile(filename);
+    await FileManager.createFile(filename);
+    for (var item in shoppingItems.where((x) => x.crossedOut)) {
+      await FileManager.writeln(filename, item.id.toString(), append: true);
+    }
+  }
+
+  static Future<Map<int, bool>> loadCrossedOut(int listId) async {
+    if (!FileManager.fileExists("ShoppingListsCo/${listId.toString()}co.sl"))
+      return new Map<int, bool>();
+    var items = await FileManager
+        .readAsLines("ShoppingListsCo/${listId.toString()}co.sl");
+    var map = new Map<int, bool>();
+    for (var item in items.where((x) => x != null && x != ""))
+      if (item != null) map.addAll({int.parse(item): true});
+    return map;
   }
 }

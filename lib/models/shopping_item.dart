@@ -2,6 +2,7 @@ class ShoppingItem {
   int amount;
   String name;
   int id;
+  bool crossedOut = false;
 
   @override
   String toString(){

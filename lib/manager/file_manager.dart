@@ -30,7 +30,7 @@ class FileManager {
       {bool append: false}) async {
     var file = await (await _getFile(filename))
         .open(mode: append ? FileMode.APPEND : FileMode.WRITE);
-    file.writeString(text + "\u{13}");
+    file.writeString((append ? "\u{13}" : "") + text);
   }
 
   static Future<String> readAsString(String filename) async =>
@@ -40,7 +40,7 @@ class FileManager {
       (await _getFile(filename)).readAsStringSync().split("\u{13}");
 
   static bool fileExists(String filename) {
-    var f = new File(applicationDocumentsDirectory + filename);
+    var f = new File(applicationDocumentsDirectory + "/" + filename);
     return f.existsSync();
   }
 

@@ -70,24 +70,82 @@ class _HomeState extends State<Home> {
         debugShowMaterialGrid: materialGrid);
   }
 
+  Scaffold mainAppHome() {
+    return new Scaffold(
+        key: _mainScaffoldKey,
+        appBar: new AppBar(
+            title: new Text(
+              User.currentList.name,
+              style: new TextStyle(fontStyle: FontStyle.italic),
+            ),
+            actions: <Widget>[
+              new PopupMenuButton<String>(
+                  onSelected: selectedOption,
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuItem<String>>[
+                        const PopupMenuItem<String>(
+                            value: 'Login/Register',
+                            child: const Text('Login/Register')),
+                        const PopupMenuItem<String>(
+                            value: 'Options',
+                            child: const Text('Change Theme')),
+                        const PopupMenuItem<String>(
+                            value: 'PerformanceOverlay',
+                            child: const Text('Toggle Performance Overlay')),
+                        const PopupMenuItem<String>(
+                            value: 'materialGrid',
+                            child: const Text('Toggle Materialgrid')),
+                      ])
+            ]),
+        body: new Builder(builder: buildBody),
+        drawer: _buildDrawer(context),
+        persistentFooterButtons: [
+          new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
+          new FlatButton(child: const Text("SEARCH"), onPressed: search)
+        ]);
+  }
+
+  Scaffold mainAppLoginRegister() => new Scaffold(
+        key: _mainScaffoldKey,
+        resizeToAvoidBottomPadding: false,
+        //appBar: new AppBar(title: new Text(User.currentList.name)),
+        body: new LoginPage(),
+      );
+
   Widget buildBody(BuildContext context) {
     cont = context;
     mainList?.clear();
+    Stopwatch s = new Stopwatch();
+    User.currentList.shoppingItems.sort((a, b) => a.id.compareTo(b.id));
+    User.currentList.shoppingItems.sort(
+        (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
+
     mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
-          title: new Row(children: [
-            new Expanded(child: new Text(x.name, maxLines: 2, softWrap: true)),
+        title: new Row(children: [
+          new Expanded(
+              child: new Text(
+            x.name,
+            maxLines: 2,
+            softWrap: true,
+            style: new TextStyle(
+                decoration: x.crossedOut
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none),
+          )),
+        ]),
+        leading: new PopupMenuButton<String>(
+          child: new Row(children: [
+            new Text(x.amount.toString() + "x"),
+            const Icon(Icons.expand_more, size: 16.0),
+            new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
           ]),
-          leading: new PopupMenuButton<String>(
-            child: new Row(children: [
-              new Text(x.amount.toString() + "x"),
-              const Icon(Icons.expand_more, size: 16.0),
-              new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
-            ]),
-            initialValue: x.amount.toString(),
-            onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
-            itemBuilder: buildChangeMenuItems,
-          ));
+          initialValue: x.amount.toString(),
+          onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
+          itemBuilder: buildChangeMenuItems,
+        ),
+        onTap: () => crossOutMainListItem(x),
+      );
 
       return new Dismissible(
         key: new ObjectKey(lt),
@@ -255,28 +313,33 @@ class _HomeState extends State<Home> {
     var tec = new TextEditingController();
 
     var sdo = new SimpleDialogOption(
-        child: new Column(children: [
-      new TextField(
-          decoration: const InputDecoration(
-              hintText: 'The name of the new list', labelText: 'listname'),
-          controller: tec,
-          autofocus: true,
-          onSubmitted: addListServer),
-      new Row(children: [
-        new FlatButton(
-            child: const Text("CANCEL"),
-            onPressed: () => Navigator.pop(cont, "")),
-        new FlatButton(
-            child: const Text("ACCEPT"),
-            onPressed: () {
-              Navigator.pop(cont, "");
-              addListServer(tec.text);
-            })
-      ], mainAxisAlignment: MainAxisAlignment.end)
-    ]));
+      child: new Column(
+        children: [
+          new TextField(
+              decoration: const InputDecoration(
+                  hintText: 'The name of the new list', labelText: 'listname'),
+              controller: tec,
+              autofocus: true,
+              onSubmitted: addListServer),
+          new Row(children: [
+            new FlatButton(
+                child: const Text("CANCEL"),
+                onPressed: () => Navigator.pop(cont, "")),
+            new FlatButton(
+                child: const Text("ACCEPT"),
+                onPressed: () {
+                  Navigator.pop(cont, "");
+                  addListServer(tec.text);
+                })
+          ], mainAxisAlignment: MainAxisAlignment.end),
+        ],
+      ),
+    );
 
     var sd = new SimpleDialog(
-      title: const Text("Add new List"),
+      title: const Text(
+        "Add new List",
+      ),
       children: [sdo],
     );
 
@@ -392,7 +455,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<Null> _handleDrawerRefresh() async {
+  Future _handleDrawerRefresh() async {
     User.shoppingLists.clear(); //TODO is there a faster way of renew a list?
     for (int id in InfoResult.fromJson((await UserSync.info()).body).listIds) {
       var res =
@@ -409,23 +472,22 @@ class _HomeState extends State<Home> {
       setState(() => User.shoppingLists.add(list));
       list.save();
     }
-    return new Future<Null>.value();
   }
 
-  Future<Null> _handleMainListRefresh() async {
+  Future _handleMainListRefresh() async {
     User.currentList.shoppingItems
         .clear(); //TODO is there a faster way of renew a list?
     var res = GetListResult
         .fromJson((await ShoppingListSync.getList(User.currentList.id)).body);
+    var crossedOut = await ShoppingList.loadCrossedOut(res.id);
     for (var item in res.products)
       User.currentList.shoppingItems.add(new ShoppingItem()
         ..name = item.name
         ..id = item.id
-        ..amount = item.amount);
+        ..amount = item.amount
+        ..crossedOut = crossedOut.containsKey(item.id) ?? false);
     setState(() {});
     User.currentList.save();
-
-    return new Future<Null>.value();
   }
 
   Future shoppingItemChange(ShoppingItem s, int change) async {
@@ -447,42 +509,10 @@ class _HomeState extends State<Home> {
     return list;
   }
 
-  Scaffold mainAppHome() => new Scaffold(
-          key: _mainScaffoldKey,
-          appBar: new AppBar(
-              title: new Text(User.currentList.name),
-              actions: <Widget>[
-                new PopupMenuButton<String>(
-                    onSelected: selectedOption,
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuItem<String>>[
-                          const PopupMenuItem<String>(
-                              value: 'Login/Register',
-                              child: const Text('Login/Register')),
-                          const PopupMenuItem<String>(
-                              value: 'Options',
-                              child: const Text('Change Theme')),
-                          const PopupMenuItem<String>(
-                              value: 'PerformanceOverlay',
-                              child: const Text('Toggle Performance Overlay')),
-                          const PopupMenuItem<String>(
-                              value: 'materialGrid',
-                              child: const Text('Toggle Materialgrid')),
-                        ])
-              ]),
-          body: new Builder(builder: buildBody),
-          drawer: _buildDrawer(context),
-          persistentFooterButtons: [
-            new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
-            new FlatButton(child: const Text("SEARCH"), onPressed: search)
-          ]);
-
-  Scaffold mainAppLoginRegister() => new Scaffold(
-        key: _mainScaffoldKey,
-        resizeToAvoidBottomPadding: false,
-        //appBar: new AppBar(title: new Text(User.currentList.name)),
-        body: new LoginPage(),
-      );
+  Future crossOutMainListItem(ShoppingItem x) async {
+    setState(() => x.crossedOut = !x.crossedOut);
+    await User.currentList.saveCrossedOut();
+  }
 
 /*void mainListItemMenuClicked(String value) {
     var splitted = value.split('\u{1E}');
