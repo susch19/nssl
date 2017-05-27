@@ -59,36 +59,7 @@ class _HomeState extends State<Home> {
         color: Colors.grey[500],
         theme: (themed ? lTheme : dTheme)
             .copyWith(platform: TargetPlatform.android),
-        home: new Scaffold(
-            key: _mainScaffoldKey,
-            appBar: new AppBar(
-                title: new Text(User.currentList.name),
-                actions: <Widget>[
-                  new PopupMenuButton<String>(
-                      onSelected: selectedOption,
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuItem<String>>[
-                            const PopupMenuItem<String>(
-                                value: 'Login/Register',
-                                child: const Text('Login/Register')),
-                            const PopupMenuItem<String>(
-                                value: 'Options',
-                                child: const Text('Change Theme')),
-                            const PopupMenuItem<String>(
-                                value: 'PerformanceOverlay',
-                                child:
-                                    const Text('Toggle Performance Overlay')),
-                            const PopupMenuItem<String>(
-                                value: 'materialGrid',
-                                child: const Text('Toggle Materialgrid')),
-                          ])
-                ]),
-            body: new Builder(builder: buildBody),
-            drawer: _buildDrawer(context),
-            persistentFooterButtons: [
-              new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
-              new FlatButton(child: const Text("SEARCH"), onPressed: search)
-            ]),
+        home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => new LoginPage(),
           '/registration': (BuildContext context) => new Registration(),
@@ -475,6 +446,43 @@ class _HomeState extends State<Home> {
           value: i.toString(), child: new Text(i.toString())));
     return list;
   }
+
+  Scaffold mainAppHome() => new Scaffold(
+          key: _mainScaffoldKey,
+          appBar: new AppBar(
+              title: new Text(User.currentList.name),
+              actions: <Widget>[
+                new PopupMenuButton<String>(
+                    onSelected: selectedOption,
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuItem<String>>[
+                          const PopupMenuItem<String>(
+                              value: 'Login/Register',
+                              child: const Text('Login/Register')),
+                          const PopupMenuItem<String>(
+                              value: 'Options',
+                              child: const Text('Change Theme')),
+                          const PopupMenuItem<String>(
+                              value: 'PerformanceOverlay',
+                              child: const Text('Toggle Performance Overlay')),
+                          const PopupMenuItem<String>(
+                              value: 'materialGrid',
+                              child: const Text('Toggle Materialgrid')),
+                        ])
+              ]),
+          body: new Builder(builder: buildBody),
+          drawer: _buildDrawer(context),
+          persistentFooterButtons: [
+            new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
+            new FlatButton(child: const Text("SEARCH"), onPressed: search)
+          ]);
+
+  Scaffold mainAppLoginRegister() => new Scaffold(
+        key: _mainScaffoldKey,
+        resizeToAvoidBottomPadding: false,
+        //appBar: new AppBar(title: new Text(User.currentList.name)),
+        body: new LoginPage(),
+      );
 
 /*void mainListItemMenuClicked(String value) {
     var splitted = value.split('\u{1E}');

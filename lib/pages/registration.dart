@@ -16,8 +16,6 @@ class Registration extends StatefulWidget {
   RegistrationState createState() => new RegistrationState();
 }
 
-
-
 class RegistrationState extends State<Registration> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   PersonData person = new PersonData();
@@ -131,14 +129,15 @@ class RegistrationState extends State<Registration> {
     return new Scaffold(
         key: _scaffoldKey,
         appBar: new AppBar(title: new Text('Registration')),
-        body:
-            new Container(
-                padding: const EdgeInsets.all(32.0),
-                child: new Column(children: [
+        body: new Container(
+            padding: const EdgeInsets.all(32.0),
+            child: new Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   new TextField(
                       decoration: new InputDecoration(
-                        hintText: 'The name to login and to be found by others',
-                        labelText: 'username',
+                        hintText: 'the name to login and to be found by others',
+                        labelText: 'Username',
                         errorText: nameInput.errorText,
                       ),
                       onChanged: (input) => setState(() {
@@ -149,14 +148,12 @@ class RegistrationState extends State<Registration> {
                       onSubmitted: (s) {
                         person.name = s;
                         //Focus.moveTo(emailInput.key);
-                      }
-                      ),
-
+                      }),
                   new TextField(
                       key: emailInput.key,
                       decoration: new InputDecoration(
                         hintText:
-                            'The email to login and to be found by others',
+                            'the email to login and to be found by others',
                         labelText: 'Email',
                         errorText: emailInput.errorText,
                       ),
@@ -170,7 +167,6 @@ class RegistrationState extends State<Registration> {
                         person.email = s;
                         //Focus.moveTo(pwInput.key);
                       }),
-
                   new Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -179,8 +175,8 @@ class RegistrationState extends State<Registration> {
                                 key: pwInput.key,
                                 decoration: new InputDecoration(
                                   hintText:
-                                      'The password to secure your account',
-                                  labelText: 'New Password',
+                                      'the password to secure your account',
+                                  labelText: 'Password',
                                   errorText: pwInput.errorText,
                                 ),
                                 onChanged: (input) => setState(() {
@@ -202,7 +198,7 @@ class RegistrationState extends State<Registration> {
                                 key: pw2Input.key,
                                 decoration: new InputDecoration(
                                   hintText:
-                                      'Re-type your password, in case of a typo',
+                                      'Re-type your password for validation',
                                   labelText: 'Re-type Password',
                                   errorText: pw2Input.errorText,
                                 ),
@@ -223,7 +219,11 @@ class RegistrationState extends State<Registration> {
                     alignment: const FractionalOffset(0.5, 0.5),
                     child: new RaisedButton(
                       key: submit.key,
-                      child: new Text('REGISTER'),
+                      child: new SizedBox.expand(
+                        child: new Center(
+                          child: new Text('REGISTER'),
+                        ),
+                      ),
                       onPressed: _handleSubmitted,
                     ),
                   )

@@ -1,13 +1,14 @@
 //Some comment
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:testProject/main.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/user.dart';
 import 'package:testProject/server_communication/helper_methods.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/user_sync.dart';
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.scaffoldKey}) : super(key: key);
@@ -83,22 +84,23 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _handleLoggedIn(LoginResult res) {
+  Future _handleLoggedIn(LoginResult res) async{
     if (!res.success) {
       showInSnackBar(res.error);
       return;
     }
     showInSnackBar("Login successfull.");
-    FileManager.write("token.txt", res.token);
-    if(FileManager.fileExists("User.txt"))
-      FileManager.deleteFile("User.txt");
-    FileManager.createFile("User.txt");
-    FileManager.writeln("User.txt", res.username);
-    FileManager.writeln("User.txt", res.eMail, append: true);
+    await FileManager.write("token.txt", res.token);
+    if (FileManager.fileExists("User.txt"))
+      await FileManager.deleteFile("User.txt");
+    await FileManager.createFile("User.txt");
+    await FileManager.writeln("User.txt", res.username);
+    await FileManager.writeln("User.txt", res.eMail, append: true);
+    bool firstBoot = User.username == null;
     User.token = res.token;
     User.username = res.username;
     User.eMail = res.eMail;
-    Navigator.pop(context);
+    firstBoot ? runApp(new NSSL()) : Navigator.pop(context);
   }
 
   String _validateName(String value) {
@@ -127,58 +129,57 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        key: _scaffoldKey,
-        appBar: new AppBar(title: const Text("Login")),
-        body: new Column(children: [
-          new Center(
-              child: new Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: new Column(children: [
-                    new TextField(
-                        decoration: new InputDecoration(
-                          hintText: 'The name or email can be used to login',
-                          labelText: 'Username or Email',
-                          errorText: nameInput.errorText,
-                        ),
-                        onChanged: (input) =>
-                            nameInput.errorText = _validateName(input),
-                        controller: nameInput.textEditingController,
-                        autofocus: true,
-                        onSubmitted: (val) {
-                          //Focus.moveTo(pwInput.key);
-                        }),
-                    new TextField(
-                        key: pwInput.key,
-                        decoration: new InputDecoration(
-                          hintText: 'The password you choose for the username',
-                          labelText: 'Password',
-                          errorText: pwInput.errorText,
-                        ),
-                        obscureText: true,
-
-                        controller: pwInput.textEditingController,
-                        onSubmitted: (val) {
-                          //Focus.moveTo(submit.key);
-                        }),
-                    new Container(
-                        child: new RaisedButton(
-                          key: submit.key,
-                          child: new SizedBox.expand(
-                              child: new Center(child: const Text('LOGIN'))),
-                          onPressed: _handleSubmitted,
-                        ),
-                        padding: const EdgeInsets.only(top: 16.0)),
-                    new Container(
-                        child: new FlatButton(
-                          onPressed: () {
-                            Navigator.popAndPushNamed(context, "/registration");
-
-                          },
-                          child: const Text(
-                              "Don't have an account? Create one now."),
-                        ),
-                        padding: const EdgeInsets.only(top: 72.0))
-                  ])))
-        ], mainAxisAlignment: MainAxisAlignment.center));
+      key: _scaffoldKey,
+      appBar: new AppBar(title: const Text("Login")),
+      body: new Container(
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child:
+            new Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          new TextField(
+              decoration: new InputDecoration(
+                hintText: 'username or email can be used to login',
+                labelText: 'Username or Email',
+                errorText: nameInput.errorText,
+              ),
+              onChanged: (input) => nameInput.errorText = _validateName(input),
+              controller: nameInput.textEditingController,
+              autofocus: true,
+              onSubmitted: (val) {
+                //Focus.moveTo(pwInput.key);
+              }),
+          new TextField(
+              key: pwInput.key,
+              decoration: new InputDecoration(
+                hintText: 'the password you have choosen',
+                labelText: 'Password',
+                errorText: pwInput.errorText,
+              ),
+              obscureText: true,
+              controller: pwInput.textEditingController,
+              onSubmitted: (val) {
+                //Focus.moveTo(submit.key);
+              }),
+          new Container(
+              child: new RaisedButton(
+                key: submit.key,
+                child: new SizedBox.expand(
+                    child: new Center(child: const Text('LOGIN'))),
+                onPressed: _handleSubmitted,
+              ),
+              padding: const EdgeInsets.only(top: 16.0)),
+          new Container(
+            child: new FlatButton(
+              onPressed: () {
+                User.username == null
+                    ? Navigator.pushNamed(context, "/registration")
+                    : Navigator.popAndPushNamed(context, "/registration");
+              },
+              child: const Text("Don't have an account? Create one now."),
+            ),
+            padding: const EdgeInsets.only(top: 72.0),
+          )
+        ]),
+      ),
+    );
   }
 }

@@ -19,8 +19,8 @@ class Startup {
       User.eMail = userData[1];
     }
     else {
-      User.username = "Not logged in";
-      User.eMail = "Not logged in";
+      User.username = null;
+      User.eMail = null;
     }
     for (var list in dir.listSync())
       if (list != null)
