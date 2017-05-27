@@ -76,7 +76,8 @@ class _HomeState extends State<Home> {
                                 child: const Text('Change Theme')),
                             const PopupMenuItem<String>(
                                 value: 'PerformanceOverlay',
-                                child: const Text('Toggle Performance Overlay')),
+                                child:
+                                    const Text('Toggle Performance Overlay')),
                             const PopupMenuItem<String>(
                                 value: 'materialGrid',
                                 child: const Text('Toggle Materialgrid')),
@@ -100,7 +101,7 @@ class _HomeState extends State<Home> {
 
   Widget buildBody(BuildContext context) {
     cont = context;
-
+    mainList?.clear();
     mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
           title: new Row(children: [
@@ -123,8 +124,8 @@ class _HomeState extends State<Home> {
         onDismissed: (DismissDirection d) => handleDismissMain(d, x),
         direction: DismissDirection.startToEnd,
         background: new Container(
-            decoration: new BoxDecoration(
-                color: Theme.of(context).primaryColor),
+            decoration:
+                new BoxDecoration(color: Theme.of(context).primaryColor),
             child: new ListTile(
                 leading: new Icon(Icons.delete,
                     color: Theme.of(context).accentIconTheme.color,
@@ -132,11 +133,13 @@ class _HomeState extends State<Home> {
       );
     }).toList(growable: true);
 
-    var lv = new ListView(
-      children: mainList.toList(),
+    var lv = new ListView.builder(
+      itemBuilder: (c, i) => mainList[i],
+      itemCount: mainList.length,
       physics: const AlwaysScrollableScrollPhysics(),
     );
 
+    //return lv;
     return new RefreshIndicator(
       child: lv,
       onRefresh: _handleMainListRefresh,
@@ -160,6 +163,7 @@ class _HomeState extends State<Home> {
   }
 
   Future register() => Navigator.pushNamed(cont, "/registration");
+
   Future search() => Navigator.pushNamed(cont, "/search");
 
   Future login() => Navigator.pushNamed(cont, "/login");
@@ -321,6 +325,7 @@ class _HomeState extends State<Home> {
   }
 
   bool b = true;
+
   Widget _buildDrawer(BuildContext context) {
     var userheader = new UserAccountsDrawerHeader(
       accountName: new Text(User.username ?? "Not logged in yet"),
@@ -389,9 +394,10 @@ class _HomeState extends State<Home> {
     int id = int.parse(splitted[0]);
     switch (splitted[1]) {
       case "Contributors":
-        Navigator.push(cont,
+        Navigator.push(
+            cont,
             new MaterialPageRoute<DismissDialogAction>(
-              builder: (BuildContext context) =>new ContributorsPage(id),
+              builder: (BuildContext context) => new ContributorsPage(id),
               fullscreenDialog: true,
             ));
         break;
@@ -407,8 +413,8 @@ class _HomeState extends State<Home> {
           showInDraweSnackBar(res.error);
         else {
           showInDraweSnackBar("Removed ${User.shoppingLists
-                  .firstWhere((x) => x.id == id)
-                  .name}");
+              .firstWhere((x) => x.id == id)
+              .name}");
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
         break;

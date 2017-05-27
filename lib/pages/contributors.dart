@@ -80,9 +80,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
 
   Widget buildBody() {
     bool isAdmin = false;
-    if (conList.length > 0)
-      isAdmin = conList.firstWhere((x) => x.name == User.username).isAdmin;
     if (conList.length > 0) {
+      isAdmin = conList.firstWhere((x) => x.name == User.username).isAdmin;
       var listView = new ListView.builder(
           itemBuilder: (c, i) {
             return new ListTile(
