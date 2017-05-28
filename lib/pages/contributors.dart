@@ -117,7 +117,18 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
           itemCount: conList.length);
       return listView;
     } else
-      return const Text("");
+      return new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Container(
+            child: new SizedBox(
+                width: 40.0,
+                height: 40.0,
+                child: new CircularProgressIndicator()),
+            padding: const EdgeInsets.only(top: 16.0),
+          )
+        ],
+      );
   }
 
   void showInSnackBar(String value,
@@ -163,7 +174,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
                   duration: new Duration(seconds: 10));
             else
               conList.clear();
-              setState(() => conList.addAll(z.contributors));
+            setState(() => conList.addAll(z.contributors));
           });
         }
         break;

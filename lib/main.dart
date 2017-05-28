@@ -392,7 +392,8 @@ class _HomeState extends State<Home> {
                                 child: const ListTile(
                                     leading: const Icon(Icons.mode_edit),
                                     title: const Text('Rename'))),
-                            const PopupMenuDivider(), // ignore: list_element_type_not_assignable
+                            const PopupMenuDivider() //ignore: list_element_type_not_assignable
+                                ,
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
                                 child: const ListTile(
@@ -513,37 +514,4 @@ class _HomeState extends State<Home> {
     setState(() => x.crossedOut = !x.crossedOut);
     await User.currentList.saveCrossedOut();
   }
-
-/*void mainListItemMenuClicked(String value) {
-    var splitted = value.split('\u{1E}');
-    int id = int.parse(splitted[0]);
-    switch (splitted[1]) {
-      case "Remove":
-        handleDismissMain(DismissDirection.startToEnd,
-            User.currentList.shoppingItems.firstWhere((x) => x.id == id));
-        break;
-    }
-  }
-
-  trailing: new PopupMenuButton<String>(
-  padding: EdgeInsets.zero,
-  onSelected: mainListItemMenuClicked,
-  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        new PopupMenuItem<String>(
-          value: x.id.toString() + "\u{1E}" + "Change",
-          child: new ListTile(
-            leading: const Icon(Icons.mode_edit),
-            title: const Text('Change'),
-            // trailing: new FlatButton(
-            //     child: const Text("+1"), onPressed: () {}),
-          ),
-        ),
-        const PopupMenuDivider(), // ignore: list_element_type_not_assignable
-        new PopupMenuItem<String>(
-            value: x.id.toString() + "\u{1E}" + 'Remove',
-            child: new ListTile(
-                leading: const Icon(Icons.delete),
-                title: const Text('Remove')))
-      ]),
-  */ //TODO Save for later potential use
 }
