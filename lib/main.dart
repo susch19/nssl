@@ -115,9 +115,8 @@ class _HomeState extends State<Home> {
   Widget buildBody(BuildContext context) {
     cont = context;
     mainList?.clear();
-    Stopwatch s = new Stopwatch();
-    User.currentList.shoppingItems.sort((a, b) => a.id.compareTo(b.id));
-    User.currentList.shoppingItems.sort(
+    User.currentList.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
+    User.currentList.shoppingItems?.sort(
         (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
 
     mainList = User.currentList.shoppingItems.map((x) {
