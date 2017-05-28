@@ -45,11 +45,12 @@ class _ProductAddPageState extends State<ProductAddPage> {
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var answer = await ShoppingListSync
-            .changeProduct(User.currentList.id, item.id, 1);
-        var p = ChangeListItemResult.fromJson((answer)
-            .body);
-        setState((){item.amount = p.amount;});
+        var answer = await ShoppingListSync.changeProduct(
+            User.currentList.id, item.id, 1);
+        var p = ChangeListItemResult.fromJson((answer).body);
+        setState(() {
+          item.amount = p.amount;
+        });
       } else {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
                 User.currentList.id, name, gtin ?? '-', 1))
@@ -58,7 +59,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
           ..name = p.name
           ..amount = 1
           ..id = p.productId;
-        setState(()=>User.currentList.shoppingItems.add(afterAdd));
+        setState(() => User.currentList.shoppingItems.add(afterAdd));
       }
 
       showInSnackBar(
@@ -68,13 +69,12 @@ class _ProductAddPageState extends State<ProductAddPage> {
           duration: new Duration(seconds: item == null ? 2 : 4),
           action: new SnackBarAction(
               label: "undo",
-              onPressed: () async{
+              onPressed: () async {
                 var res = item == null
                     ? await ShoppingListSync.deleteProduct(
                         User.currentList.id, afterAdd.id)
                     : await ShoppingListSync.changeProduct(
                         User.currentList.id, item.id, -1);
-
               }));
       User.currentList.save();
     }
@@ -104,13 +104,15 @@ class _ProductAddPageState extends State<ProductAddPage> {
                           noMoreProducts = false;
                         })))),
         floatingActionButton: new FloatingActionButton(
-            onPressed: () => {},
-            child: new IconButton(
-                key: _ib,
-                icon: new Icon(Icons.search),
-                onPressed: () {
-                  _searchProducts(tec.text, 1);
-                })),
+          onPressed: () => {},
+          child: new IconButton(
+            key: _ib,
+            icon: new Icon(Icons.search),
+            onPressed: () {
+              _searchProducts(tec.text, 1);
+            },
+          ),
+        ),
         body: buildBody());
   }
 

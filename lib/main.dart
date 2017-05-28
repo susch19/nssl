@@ -5,6 +5,7 @@ import 'package:testProject/manager/manager_export.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';
+import 'package:testProject/simple_dialog_single_input.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
@@ -100,6 +101,12 @@ class _HomeState extends State<Home> {
         body: new Builder(builder: buildBody),
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
+          new FlatButton(
+            child: const Text('DELETE CROSSED OUT'),
+            onPressed: _deleteCrossedOutItems,
+          ),
+          new FlatButton(
+              child: const Text("ADD"), onPressed: _addWithoutSearchDialog),
           new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
           new FlatButton(child: const Text("SEARCH"), onPressed: search)
         ]);
@@ -108,7 +115,6 @@ class _HomeState extends State<Home> {
   Scaffold mainAppLoginRegister() => new Scaffold(
         key: _mainScaffoldKey,
         resizeToAvoidBottomPadding: false,
-        //appBar: new AppBar(title: new Text(User.currentList.name)),
         body: new LoginPage(),
       );
 
@@ -308,42 +314,25 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void addList() {
-    var tec = new TextEditingController();
-
-    var sdo = new SimpleDialogOption(
-      child: new Column(
-        children: [
-          new TextField(
-              decoration: const InputDecoration(
-                  hintText: 'The name of the new list', labelText: 'listname'),
-              controller: tec,
-              autofocus: true,
-              onSubmitted: addListServer),
-          new Row(children: [
-            new FlatButton(
-                child: const Text("CANCEL"),
-                onPressed: () => Navigator.pop(cont, "")),
-            new FlatButton(
-                child: const Text("ACCEPT"),
-                onPressed: () {
-                  Navigator.pop(cont, "");
-                  addListServer(tec.text);
-                })
-          ], mainAxisAlignment: MainAxisAlignment.end),
-        ],
-      ),
-    );
-
-    var sd = new SimpleDialog(
-      title: const Text(
-        "Add new List",
-      ),
-      children: [sdo],
-    );
-
+  void addListDialog() {
+    var sd = SimpleDialogSingleInput.create(
+        hintText: 'The name of the new list',
+        labelText: 'listname',
+        onSubmitted: addListServer,
+        title: "Add new List",
+        context: cont);
+//rename ? (s) => renameList(listId, s)
     showDialog(child: sd, context: cont);
   }
+
+  Future renameListDialog(int listId) => showDialog(
+      context: cont,
+      child: SimpleDialogSingleInput.create(
+          hintText: 'The new name of the new list',
+          labelText: 'listname',
+          onSubmitted: (s) => renameList(listId, s),
+          title: "Rename List",
+          context: cont));
 
   Future addListServer(String listName) async {
     var res = await ShoppingListSync.addList(listName);
@@ -402,8 +391,8 @@ class _HomeState extends State<Home> {
                 ))
             .toList()
         : [
-            const ListTile(title: const Text("nothing")),
-            const ListTile(title: const Text("here"))
+            const ListTile(
+                title: const Text("here is the place for your lists")),
           ];
     //drawerList = new MyList<ListTile>(children: list);
 
@@ -417,7 +406,8 @@ class _HomeState extends State<Home> {
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
         persistentFooterButtons: [
-          new FlatButton(child: const Text("ADD LIST"), onPressed: addList)
+          new FlatButton(
+              child: const Text("ADD LIST"), onPressed: addListDialog)
         ]);
 
     return new Drawer(child: d);
@@ -436,10 +426,7 @@ class _HomeState extends State<Home> {
             ));
         break;
       case "Rename":
-        /*var put = await ShoppingListSync.changeLName(id, "Demo");
-        showInDraweSnackBar("${put.statusCode}" + put.reasonPhrase);
-        var res = Result.fromJson((put.body));
-        if (!res.success) showInDraweSnackBar(res.error);*/
+        renameListDialog(id);
         break;
       case "Remove":
         var res = Result.fromJson((await ShoppingListSync.deleteList(id)).body);
@@ -512,5 +499,46 @@ class _HomeState extends State<Home> {
   Future crossOutMainListItem(ShoppingItem x) async {
     setState(() => x.crossedOut = !x.crossedOut);
     await User.currentList.saveCrossedOut();
+  }
+
+  void _addWithoutSearchDialog() {
+    showDialog(
+        context: cont,
+        child: SimpleDialogSingleInput.create(
+            context: cont,
+            title: 'Add Product',
+            hintText:
+                'Insert the name of the product, without searching in the database',
+            labelText: 'product name',
+            onSubmitted: _addWithoutSearch));
+  }
+
+  Future renameList(int id, String text) async {
+    var put = await ShoppingListSync.changeLName(id, text);
+    showInDraweSnackBar("${put.statusCode}" + put.reasonPhrase);
+    var res = Result.fromJson((put.body));
+    if (!res.success) showInDraweSnackBar(res.error);
+  }
+
+  Future _addWithoutSearch(String value) async {
+    var res =
+        await ShoppingListSync.addProduct(User.currentList.id, value, null, 1);
+    if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
+    var product = AddListItemResult.fromJson(res.body);
+    if (!product.success) showInSnackBar(product.error);
+    setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
+      ..id = product.productId
+      ..amount = 1
+      ..name = product.name
+      ..crossedOut = false));
+  }
+
+  Future _deleteCrossedOutItems() async{
+    var sublist = User.currentList.shoppingItems.where((s)=>s.crossedOut).toList();
+    for(var item in sublist) {
+      var res = await ShoppingListSync.deleteProduct(User.currentList.id, item.id);
+      if(Result.fromJson(res.body).success)
+        setState(()=> User.currentList.shoppingItems.remove(item));
+    }
   }
 }
