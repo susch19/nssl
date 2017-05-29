@@ -533,12 +533,17 @@ class _HomeState extends State<Home> {
       ..crossedOut = false));
   }
 
-  Future _deleteCrossedOutItems() async{
-    var sublist = User.currentList.shoppingItems.where((s)=>s.crossedOut).toList();
-    for(var item in sublist) {
-      var res = await ShoppingListSync.deleteProduct(User.currentList.id, item.id);
-      if(Result.fromJson(res.body).success)
-        setState(()=> User.currentList.shoppingItems.remove(item));
-    }
+  Future _deleteCrossedOutItems() async {
+    var sublist =
+        User.currentList.shoppingItems.where((s) => s.crossedOut).toList();
+    var asd = JSON.encode(sublist.map((s) => s.id).toList());
+    var res = await ShoppingListSync.deleteProducts(User.currentList.id, sublist.map((s) => s.id).toList());
+    if (Result.fromJson(res.body).success)
+      setState(() {
+        for (var item in sublist) User.currentList.shoppingItems.remove(item);
+      });
+    /* {
+
+    }*/
   }
 }

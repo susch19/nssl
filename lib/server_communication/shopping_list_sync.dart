@@ -20,6 +20,9 @@ class ShoppingListSync {
   static Future<Response> deleteProduct(int listId, int productId) =>
       HelperMethods.delete("$listpath/$listId/products/$productId");
 
+  static Future<Response> deleteProducts(int listId, List<int> productIds) =>
+      HelperMethods.post("$listpath/$listId/products/batchaction/delete", new DeleteProductsArgs(productIds));
+
   static Future<Response> addProduct(
           int listId, String productName, String gtin, int amount) =>
       HelperMethods.post(
