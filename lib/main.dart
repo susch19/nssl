@@ -205,23 +205,24 @@ class _HomeState extends State<Home> {
   //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
   //    handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, ShoppingItem s) {
+    //TODO wait for server?
+    var list = User.currentList;
     final String action =
         (dir == DismissDirection.endToStart) ? 'archived' : 'deleted';
-    var index = User.currentList.shoppingItems.indexOf(s);
-    setState(() => User.currentList.shoppingItems.remove(s));
+    var index = list.shoppingItems.indexOf(s);
+    setState(() => list.shoppingItems.remove(s));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
-    ShoppingListSync.deleteProduct(User.currentList.id, s.id);
-    User.currentList.save();
+    ShoppingListSync.deleteProduct(list.id, s.id);
+    list.save();
     showInSnackBar('You have $action ${s.name}',
         action: new SnackBarAction(
             label: 'UNDO',
             onPressed: () {
               setState(() {
-                User.currentList.shoppingItems.insert(index, s);
-                ShoppingListSync.changeProduct(
-                    User.currentList.id, s.id, s.amount);
+                list.shoppingItems.insert(index, s);
+                ShoppingListSync.changeProduct(list.id, s.id, s.amount);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
-                User.currentList.save();
+                list.save();
               });
             }),
         duration: new Duration(seconds: 10));
@@ -290,16 +291,15 @@ class _HomeState extends State<Home> {
     String method = methodCall.method;
 
     if (method == "setEAN") {
+      var list = User.currentList;
       ean = methodCall.arguments;
       var firstRequest = await ProductSync.getProduct(ean);
       var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
-
       if (k.success) {
-        var res = await ShoppingListSync.addProduct(
-            User.currentList.id, k.name, '-', 1);
+        var res = await ShoppingListSync.addProduct(list.id, k.name, '-', 1);
         var p = AddListItemResult.fromJson(res.body);
-        setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
+        setState(() => list.shoppingItems.add(new ShoppingItem()
           ..name = p.name
           ..amount = 1
           ..id = p.productId));
@@ -462,19 +462,19 @@ class _HomeState extends State<Home> {
   }
 
   Future _handleMainListRefresh() async {
-    User.currentList.shoppingItems
-        .clear(); //TODO is there a faster way of renew a list?
-    var res = GetListResult
-        .fromJson((await ShoppingListSync.getList(User.currentList.id)).body);
+    var list = User.currentList;
+    list.shoppingItems.clear(); //TODO is there a faster way of renew a list?
+    var res =
+        GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
     var crossedOut = await ShoppingList.loadCrossedOut(res.id);
     for (var item in res.products)
-      User.currentList.shoppingItems.add(new ShoppingItem()
+      list.shoppingItems.add(new ShoppingItem()
         ..name = item.name
         ..id = item.id
         ..amount = item.amount
         ..crossedOut = crossedOut.containsKey(item.id) ?? false);
     setState(() {});
-    User.currentList.save();
+    list.save();
   }
 
   Future shoppingItemChange(ShoppingItem s, int change) async {
@@ -521,12 +521,12 @@ class _HomeState extends State<Home> {
   }
 
   Future _addWithoutSearch(String value) async {
-    var res =
-        await ShoppingListSync.addProduct(User.currentList.id, value, null, 1);
+    var list = User.currentList;
+    var res = await ShoppingListSync.addProduct(list.id, value, null, 1);
     if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
     var product = AddListItemResult.fromJson(res.body);
     if (!product.success) showInSnackBar(product.error);
-    setState(() => User.currentList.shoppingItems.add(new ShoppingItem()
+    setState(() => list.shoppingItems.add(new ShoppingItem()
       ..id = product.productId
       ..amount = 1
       ..name = product.name
@@ -534,13 +534,13 @@ class _HomeState extends State<Home> {
   }
 
   Future _deleteCrossedOutItems() async {
-    var sublist =
-        User.currentList.shoppingItems.where((s) => s.crossedOut).toList();
-    var asd = JSON.encode(sublist.map((s) => s.id).toList());
-    var res = await ShoppingListSync.deleteProducts(User.currentList.id, sublist.map((s) => s.id).toList());
+    var list = User.currentList;
+    var sublist = list.shoppingItems.where((s) => s.crossedOut).toList();
+    var res = await ShoppingListSync.deleteProducts(
+        list.id, sublist.map((s) => s.id).toList());
     if (Result.fromJson(res.body).success)
       setState(() {
-        for (var item in sublist) User.currentList.shoppingItems.remove(item);
+        for (var item in sublist) list.shoppingItems.remove(item);
       });
     /* {
 

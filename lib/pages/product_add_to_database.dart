@@ -88,15 +88,16 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
         showInSnackBar(res.error);
       else {
         if (putInList) {
+          var list = User.currentList;
           var pres = AddListItemResult.fromJson(
-              (await ShoppingListSync.addProduct(User.currentList.id,
+              (await ShoppingListSync.addProduct(list.id,
                       "$productName $brandName $weight", gtin, 1))
                   .body);
           if (!pres.success)
             showInSnackBar(pres.error);
           else {
             setState(() {
-              User.currentList.shoppingItems.add(new ShoppingItem()
+              list.shoppingItems.add(new ShoppingItem()
                 ..amount = 1
                 ..id = pres.productId
                 ..name = pres.name);

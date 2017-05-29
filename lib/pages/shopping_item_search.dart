@@ -36,30 +36,31 @@ class _ProductAddPageState extends State<ProductAddPage> {
   List<ProductResult> prList = new List<ProductResult>();
   int k = 1;
   Future _addProductToList(String name, String gtin) async {
-    if (User.currentList != null) {
-      if (User.currentList.shoppingItems == null)
-        User.currentList.shoppingItems = new List();
+    var list = User.currentList;
+    if (list != null) {
+      if (list.shoppingItems == null)
+        list.shoppingItems = new List();
 
-      var item = User.currentList
+      var item = list
           .shoppingItems //TODO Test when Shoppinglist class is completely implemented
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
         var answer = await ShoppingListSync.changeProduct(
-            User.currentList.id, item.id, 1);
+            list.id, item.id, 1);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
         });
       } else {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                User.currentList.id, name, gtin ?? '-', 1))
+                list.id, name, gtin ?? '-', 1))
             .body);
         afterAdd = new ShoppingItem()
           ..name = p.name
           ..amount = 1
           ..id = p.productId;
-        setState(() => User.currentList.shoppingItems.add(afterAdd));
+        setState(() => list.shoppingItems.add(afterAdd));
       }
 
       showInSnackBar(
@@ -72,11 +73,11 @@ class _ProductAddPageState extends State<ProductAddPage> {
               onPressed: () async {
                 var res = item == null
                     ? await ShoppingListSync.deleteProduct(
-                        User.currentList.id, afterAdd.id)
+                        list.id, afterAdd.id)
                     : await ShoppingListSync.changeProduct(
-                        User.currentList.id, item.id, -1);
+                        list.id, item.id, -1);
               }));
-      User.currentList.save();
+      list.save();
     }
   }
 
