@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
         key: _mainScaffoldKey,
         appBar: new AppBar(
             title: new Text(
-              User.currentList.name,
+              User?.currentList?.name ?? "No List Loaded",
               style: new TextStyle(fontStyle: FontStyle.italic),
             ),
             actions: <Widget>[
