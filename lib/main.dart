@@ -173,7 +173,6 @@ class _HomeState extends State<Home> {
       physics: const AlwaysScrollableScrollPhysics(),
     );
 
-    //return lv;
     return new RefreshIndicator(
       child: lv,
       onRefresh: _handleMainListRefresh,
@@ -248,21 +247,15 @@ class _HomeState extends State<Home> {
         duration: new Duration(seconds: 10));
   }
 
-  double valueStore = 0.0;
-
-  void addANewList() {
-    setState(() {
-      themed = !themed;
-    });
-  }
-
   void selectedOption(String s) {
     switch (s) {
       case "Login/Register":
         login();
         break;
       case "Options":
-        addANewList();
+        setState(() {
+          themed = !themed;
+        });
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -461,11 +454,14 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future _handleMainListRefresh() async {
-    var list = User.currentList;
+  Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
+
+
+  Future _handleListRefresh(int listId) async {
+    var list = User.shoppingLists.firstWhere((s)=>s.id == listId);
     list.shoppingItems.clear(); //TODO is there a faster way of renew a list?
     var res =
-        GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
+    GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
     var crossedOut = await ShoppingList.loadCrossedOut(res.id);
     for (var item in res.products)
       list.shoppingItems.add(new ShoppingItem()
@@ -538,12 +534,28 @@ class _HomeState extends State<Home> {
     var sublist = list.shoppingItems.where((s) => s.crossedOut).toList();
     var res = await ShoppingListSync.deleteProducts(
         list.id, sublist.map((s) => s.id).toList());
-    if (Result.fromJson(res.body).success)
-      setState(() {
-        for (var item in sublist) list.shoppingItems.remove(item);
-      });
-    /* {
-
-    }*/
+    if (!Result.fromJson(res.body).success) return;
+    setState(() {
+      for (var item in sublist) list.shoppingItems.remove(item);
+    });
+    list.save();
+    showInSnackBar("You have deleted all crossed out items",
+        duration: new Duration(seconds: 10),
+        action: new SnackBarAction(
+            label: "UNDO",
+            onPressed: () async {
+              var res = await ShoppingListSync.changeProducts(
+                  list.id,
+                  sublist.map((s) => s.id).toList(),
+                  sublist.map((s) => s.amount).toList());
+              var hashResult = HashResult.fromJson(res.body);
+              int ownHash = 0;
+              for(var item in sublist)
+                ownHash += item.id + item.amount;
+              if(ownHash == hashResult.hash)
+                setState(()=>list.shoppingItems.addAll(sublist));
+              else
+                _handleListRefresh(list.id);
+            }));
   }
 }

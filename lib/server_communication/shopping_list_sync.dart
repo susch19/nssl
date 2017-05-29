@@ -33,9 +33,14 @@ class ShoppingListSync {
             ..productName = productName);
 
   static Future<Response> changeProduct(
-          int listId, int productId, int change) =>
+      int listId, int productId, int change) =>
       HelperMethods.put("$listpath/$listId/products/$productId",
           new ChangeProductArgs(change));
+
+  static Future<Response> changeProducts(
+      int listId, List<int> productIds, List<int> amount) =>
+      HelperMethods.post("$listpath/$listId/products/batchaction/change",
+          new ChangeProductsArgs(productIds, amount));
 
   static Future<Response> deleteContributor(
           int listId, int userId) //Wenn lokal gespeichert

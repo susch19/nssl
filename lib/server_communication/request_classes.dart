@@ -31,6 +31,14 @@ class ChangeProductArgs {
   toJson() => {"change": "$change"};
 }
 
+class ChangeProductsArgs {
+  ChangeProductsArgs(this.productIds, this.change);
+  List<int> productIds;
+  List<int> change;
+  toJson
+      () => {"amount": change, "productIds" : productIds};
+}
+
 class ChangeListNameArgs {
   ChangeListNameArgs(this.name);
   String name;

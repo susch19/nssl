@@ -213,6 +213,20 @@ class InfoResult {
   }
 }
 
+class HashResult extends Result{
+  int hash;
+
+  static HashResult fromJson(String dataString) =>
+      _fromJson(JSON.decode(dataString));
+  static HashResult _fromJson(Map data) {
+    var r = new HashResult();
+    r.success = data["success"];
+    r.error = data["error"];
+    r.hash = data["hash"];
+    return r;
+  }
+}
+
 class Result {
   bool success;
   String error;
