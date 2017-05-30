@@ -436,10 +436,10 @@ class _HomeState extends State<Home> {
   }
 
   Future _handleDrawerRefresh() async {
-    User.shoppingLists.clear(); //TODO is there a faster way of renew a list?
-    for (int id in InfoResult.fromJson((await UserSync.info()).body).listIds) {
-      var res =
-          GetListResult.fromJson(((await ShoppingListSync.getList(id)).body));
+    var result =
+        GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
+    setState(() => User.shoppingLists.clear());
+    for (var res in result.shoppingLists) {
       var list = new ShoppingList()
         ..id = res.id
         ..name = res.name
@@ -456,12 +456,11 @@ class _HomeState extends State<Home> {
 
   Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
 
-
   Future _handleListRefresh(int listId) async {
-    var list = User.shoppingLists.firstWhere((s)=>s.id == listId);
-    list.shoppingItems.clear(); //TODO is there a faster way of renew a list?
+    var list = User.shoppingLists.firstWhere((s) => s.id == listId);
+    setState(() => list.shoppingItems.clear());
     var res =
-    GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
+        GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
     var crossedOut = await ShoppingList.loadCrossedOut(res.id);
     for (var item in res.products)
       list.shoppingItems.add(new ShoppingItem()
@@ -550,10 +549,9 @@ class _HomeState extends State<Home> {
                   sublist.map((s) => s.amount).toList());
               var hashResult = HashResult.fromJson(res.body);
               int ownHash = 0;
-              for(var item in sublist)
-                ownHash += item.id + item.amount;
-              if(ownHash == hashResult.hash)
-                setState(()=>list.shoppingItems.addAll(sublist));
+              for (var item in sublist) ownHash += item.id + item.amount;
+              if (ownHash == hashResult.hash)
+                setState(() => list.shoppingItems.addAll(sublist));
               else
                 _handleListRefresh(list.id);
             }));

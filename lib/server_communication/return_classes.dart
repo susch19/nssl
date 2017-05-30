@@ -80,10 +80,12 @@ class GetContributorsResult {
     r.success = data["success"];
     r.error = data["error"];
     List<Map> unMaped = data["contributors"] ?? new List<Map>();
-    r.contributors = unMaped.map((x) => new ContributorResult()
-      ..name = x["name"]
-      ..isAdmin = x["isAdmin"]
-      ..userId = x["userId"]).toList();
+    r.contributors = unMaped
+        .map((x) => new ContributorResult()
+          ..name = x["name"]
+          ..isAdmin = x["isAdmin"]
+          ..userId = x["userId"])
+        .toList();
     return r;
   }
 }
@@ -195,6 +197,25 @@ class GetListResult {
   }
 }
 
+class GetListsResult {
+  Iterable<ShoppingList> shoppingLists;
+
+  static GetListsResult fromJson(String dataString) =>
+      _fromJson(JSON.decode(dataString));
+
+  static GetListsResult _fromJson(Map data) {
+    var r = new GetListsResult();
+    List<Map> unmappedShoppingLists = data["lists"];
+    r.shoppingLists = unmappedShoppingLists.map((s) => new ShoppingList()
+      ..products = s["products"]
+          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"])).toList()
+      ..id = s["id"]
+      ..name = s["name"]);
+
+    return r;
+  }
+}
+
 class InfoResult {
   int id;
   String username;
@@ -213,7 +234,7 @@ class InfoResult {
   }
 }
 
-class HashResult extends Result{
+class HashResult extends Result {
   int hash;
 
   static HashResult fromJson(String dataString) =>

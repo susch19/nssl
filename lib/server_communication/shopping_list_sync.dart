@@ -8,6 +8,9 @@ class ShoppingListSync {
   static Future<Response> getList(int listId) =>
       HelperMethods.get("$listpath/$listId");
 
+  static Future<Response> getLists() =>
+      HelperMethods.get("$listpath/batchaction/");
+
   static Future<Response> deleteList(int listId) =>
       HelperMethods.delete("$listpath/$listId");
 
