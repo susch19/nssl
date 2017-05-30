@@ -1,5 +1,6 @@
 //Some comment
 import 'dart:convert';
+import 'package:testProject/localization/nssl_messages_all.dart';
 import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
 import 'package:testProject/models/model_export.dart';
@@ -9,6 +10,8 @@ import 'package:testProject/simple_dialog_single_input.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
@@ -68,7 +71,14 @@ class _HomeState extends State<Home> {
         },
         showPerformanceOverlay: performanceOverlay,
         showSemanticsDebugger: false,
-        debugShowMaterialGrid: materialGrid);
+        debugShowMaterialGrid: materialGrid,
+        onLocaleChanged: onLocaleChanged,);
+  }
+  Future<LocaleQueryData> onLocaleChanged(Locale locale) async {
+    final String localeString = locale.toString();
+    await initializeMessages(localeString);
+    Intl.defaultLocale = localeString;
+    return NSSLStrings.instance;
   }
 
   Scaffold mainAppHome() {
@@ -87,9 +97,9 @@ class _HomeState extends State<Home> {
                         const PopupMenuItem<String>(
                             value: 'Login/Register',
                             child: const Text('Login/Register')),
-                        const PopupMenuItem<String>(
+                        new PopupMenuItem<String>(
                             value: 'Options',
-                            child: const Text('Change Theme')),
+                            child: new Text(NSSLStrings.instance.options())),
                         const PopupMenuItem<String>(
                             value: 'PerformanceOverlay',
                             child: const Text('Toggle Performance Overlay')),
@@ -102,13 +112,13 @@ class _HomeState extends State<Home> {
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
           new FlatButton(
-            child: const Text('DELETE CROSSED OUT'),
+            child: new Text(NSSLStrings.instance.deletecrossedoutPB()),
             onPressed: _deleteCrossedOutItems,
           ),
           new FlatButton(
-              child: const Text("ADD"), onPressed: _addWithoutSearchDialog),
-          new FlatButton(child: const Text("SCAN"), onPressed: _getEAN),
-          new FlatButton(child: const Text("SEARCH"), onPressed: search)
+              child: new Text(NSSLStrings.instance.addPB()), onPressed: _addWithoutSearchDialog),
+          new FlatButton(child: new Text(NSSLStrings.instance.scanPB()), onPressed: _getEAN),
+          new FlatButton(child: new Text(NSSLStrings.instance.searchPB()), onPressed: search)
         ]);
   }
 
@@ -363,23 +373,23 @@ class _HomeState extends State<Home> {
                             new PopupMenuItem<String>(
                               value:
                                   x.id.toString() + "\u{1E}" + "Contributors",
-                              child: const ListTile(
+                              child: new ListTile(
                                 leading: const Icon(Icons.person_add),
-                                title: const Text('Contributors'),
+                                title: new Text(NSSLStrings.instance.contributors()),
                               ),
                             ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
-                                child: const ListTile(
+                                child: new ListTile(
                                     leading: const Icon(Icons.mode_edit),
-                                    title: const Text('Rename'))),
+                                    title: new Text(NSSLStrings.instance.rename()))),
                             const PopupMenuDivider() //ignore: list_element_type_not_assignable
                                 ,
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
-                                child: const ListTile(
+                                child: new ListTile(
                                     leading: const Icon(Icons.delete),
-                                    title: const Text('Remove')))
+                                    title: new Text(NSSLStrings.instance.remove())))
                           ]),
                 ))
             .toList()
@@ -400,7 +410,7 @@ class _HomeState extends State<Home> {
             displacement: 1.0),
         persistentFooterButtons: [
           new FlatButton(
-              child: const Text("ADD LIST"), onPressed: addListDialog)
+              child: new Text(NSSLStrings.instance.addlistPB()), onPressed: addListDialog)
         ]);
 
     return new Drawer(child: d);
@@ -556,4 +566,6 @@ class _HomeState extends State<Home> {
                 _handleListRefresh(list.id);
             }));
   }
+
+
 }
