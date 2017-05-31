@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 
 class SimpleDialogSingleInput {
   static SimpleDialog create(
@@ -23,10 +24,10 @@ class SimpleDialogSingleInput {
               }),
           new Row(children: [
             new FlatButton(
-                child: const Text("CANCEL"),
+                child: new Text(NSSLStrings.instance.cancelButton()),
                 onPressed: () => Navigator.pop(context, "")),
             new FlatButton(
-                child: const Text("ACCEPT"),
+                child: new Text(NSSLStrings.instance.acceptButton()),
                 onPressed: () {
                   Navigator.pop(context, "");
                   onSubmitted(tec.text);

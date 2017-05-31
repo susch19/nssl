@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:flutter/widgets.dart';
 import 'package:testProject/server_communication//s_c.dart';
@@ -24,6 +25,9 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   List<ContributorResult> conList = new List<ContributorResult>();
   int k = 1;
   int listId;
+  NSSLStrings loc = NSSLStrings.instance;
+
+
   _ContributorsPagePageState(int listId) {
     this.listId = listId;
     ShoppingListSync.getContributors(listId).then((o) {
@@ -33,7 +37,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
       }
       GetContributorsResult z = GetContributorsResult.fromJson(o.body);
       if (!z.success || z.contributors.length <= 0)
-        showInSnackBar("Something went completely wrong!\n${o.reasonPhrase}",
+        showInSnackBar(loc.genericErrorMessageSnackbar() + o.reasonPhrase,
             duration: new Duration(seconds: 10));
       else
         setState(() => conList.addAll(z.contributors));
@@ -48,8 +52,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
             title: new Form(
                 child: new TextField(
                     key: _iff,
-                    decoration: const InputDecoration(
-                        hintText: "Name of new Contributor"),
+                    decoration: new InputDecoration(
+                        hintText: loc.nameOfNewContributorHint()),
                     onSubmitted: (x) => _addContributor(x),
                     autofocus: true,
                     controller: tec))),
@@ -68,7 +72,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
     ShoppingListSync.addContributor(User.currentList.id, value).then((o) {
       AddContributorResult z = AddContributorResult.fromJson(o.body);
       if (!z.success)
-        showInSnackBar("Something went wrong!\n${z.error}",
+        showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
             duration: new Duration(seconds: 10));
       else
         setState(() => conList.add(new ContributorResult()
@@ -86,7 +90,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
           itemBuilder: (c, i) {
             return new ListTile(
                 title: new Text(conList[i].name +
-                    (conList[i].isAdmin ? " - Admin" : " - User")),
+                    (conList[i].isAdmin ? loc.contributorAdmin() : loc.contributorUser())),
                 trailing: isAdmin && conList[i].name != User.username
                     ? new PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
@@ -101,15 +105,15 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
                                           ? const Icon(Icons.arrow_downward)
                                           : const Icon(Icons.arrow_upward)),
                                       title: (conList[i].isAdmin
-                                          ? const Text('Demote')
-                                          : const Text('Promote')))),
+                                          ? new Text(loc.demoteMenu())
+                                          : new Text(loc.promoteMenu())))),
                               const PopupMenuDivider(), // ignore: list_element_type_not_assignable
                               new PopupMenuItem<String>(
                                   value: conList[i].userId.toString() +
                                       "\u{1E}Remove", //x.id.toString() + "\u{1E}" + 'Remove',
-                                  child: const ListTile(
+                                  child: new ListTile(
                                       leading: const Icon(Icons.delete),
-                                      title: const Text('Remove')))
+                                      title: new Text(loc.remove())))
                             ])
                     : const Text(""),
                 onTap: () => {});
@@ -170,7 +174,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
             }
             GetContributorsResult z = GetContributorsResult.fromJson(o.body);
             if (!z.success || z.contributors.length <= 0)
-              showInSnackBar("Something went completely wrong!\n${z.error}",
+              showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
                   duration: new Duration(seconds: 10));
             else
               conList.clear();

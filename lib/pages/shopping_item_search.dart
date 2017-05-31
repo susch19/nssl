@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:flutter/widgets.dart';
 import 'package:testProject/server_communication//s_c.dart';
@@ -35,27 +36,27 @@ class _ProductAddPageState extends State<ProductAddPage> {
   TextEditingController tec = new TextEditingController();
   List<ProductResult> prList = new List<ProductResult>();
   int k = 1;
+
+  NSSLStrings loc = NSSLStrings.instance;
+
   Future _addProductToList(String name, String gtin) async {
     var list = User.currentList;
     if (list != null) {
-      if (list.shoppingItems == null)
-        list.shoppingItems = new List();
+      if (list.shoppingItems == null) list.shoppingItems = new List();
 
-      var item = list
-          .shoppingItems //TODO Test when Shoppinglist class is completely implemented
+      var item = list.shoppingItems
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var answer = await ShoppingListSync.changeProduct(
-            list.id, item.id, 1);
+        var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
         });
       } else {
-        var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                list.id, name, gtin ?? '-', 1))
-            .body);
+        var p = AddListItemResult.fromJson(
+            (await ShoppingListSync.addProduct(list.id, name, gtin ?? '-', 1))
+                .body);
         afterAdd = new ShoppingItem()
           ..name = p.name
           ..amount = 1
@@ -65,17 +66,22 @@ class _ProductAddPageState extends State<ProductAddPage> {
 
       showInSnackBar(
           item == null
-              ? 'Added "$name"'
-              : '"$name" was already in list. The amount was increased by 1',
+              ? loc.addedProduct() + "$name"
+              : "$name" + loc.productWasAlreadyInList(),
           duration: new Duration(seconds: item == null ? 2 : 4),
           action: new SnackBarAction(
-              label: "undo",
+              label: loc.undo(),
               onPressed: () async {
                 var res = item == null
-                    ? await ShoppingListSync.deleteProduct(
-                        list.id, afterAdd.id)
+                    ? await ShoppingListSync.deleteProduct(list.id, afterAdd.id)
                     : await ShoppingListSync.changeProduct(
                         list.id, item.id, -1);
+                if (Result.fromJson(res.body).success) {
+                  if(item == null)
+                    list.shoppingItems.remove(afterAdd);
+                  else
+                    item.amount--;
+                }
               }));
       list.save();
     }
@@ -94,7 +100,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
                 child: new TextField(
                     key: _iff,
                     decoration:
-                        const InputDecoration(hintText: "Search Product"),
+                        new InputDecoration(hintText: loc.searchProductHint()),
                     onSubmitted: (x) => _searchProducts(x, 1),
                     autofocus: true,
                     controller: tec,
@@ -125,7 +131,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
     List<Map> z = JSON.decode(o.body);
     if (!noMoreProducts && z.length <= 0) {
       noMoreProducts = true;
-      showInSnackBar("No more products found! ${o.reasonPhrase}",
+      showInSnackBar(loc.noMoreProductsMessage(),
           duration: new Duration(seconds: 3));
     } else
       setState(() => prList.addAll(z.map(ProductAddPage.fromJson).toList()));

@@ -1,4 +1,5 @@
 //Some comment
+import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';
 import 'dart:convert';
@@ -25,6 +26,8 @@ class RegistrationState extends State<Registration> {
   var pw2Input = new ForInput();
   var submit = new ForInput();
 
+  NSSLStrings loc = NSSLStrings.instance;
+
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value), duration: new Duration(seconds: 3)));
@@ -33,33 +36,33 @@ class RegistrationState extends State<Registration> {
   void _handleSubmitted() {
     if (nameInput.textEditingController == null ||
         nameInput.textEditingController.text.isEmpty) {
-      showInSnackBar("username has to be filled in");
+      showInSnackBar(loc.usernameEmptyError());
       return;
     }
     if (emailInput.textEditingController == null ||
         emailInput.textEditingController.text.isEmpty) {
-      showInSnackBar("email has to be filled in");
+      showInSnackBar(loc.emailEmptyError());
       return;
     }
     if (pwInput.textEditingController == null ||
         pw2Input.textEditingController == null ||
         pwInput.textEditingController != pw2Input.textEditingController ||
         pwInput.textEditingController.text.isEmpty) {
-      showInSnackBar("passwords doesn't match or are empty");
+      showInSnackBar(loc.reenterPasswordError());
       return;
     }
     if (_validateName(nameInput.textEditingController.text) != null) {
-      showInSnackBar("There is something wrong with your username");
+      showInSnackBar(loc.unknownUsernameError());
       return;
     } else if (_validateEmail(emailInput.textEditingController.text) != null) {
-      showInSnackBar("There is something wrong with your email");
+      showInSnackBar(loc.unknownEmailError());
       return;
     } else if (_validatePassword(pwInput.textEditingController.text) != null) {
-      showInSnackBar("There is something wrong with your password");
+      showInSnackBar(loc.unknownPasswordError());
       return;
     } else if (_validatePassword2(pw2Input.textEditingController.text) !=
         null) {
-      showInSnackBar("There is something wrong with your password validation");
+      showInSnackBar(loc.unknownReenterPasswordError());
       return;
     }
 
@@ -80,7 +83,7 @@ class RegistrationState extends State<Registration> {
           showInSnackBar(response.error);
           return;
         }
-        showInSnackBar("Registration successfull.");
+        showInSnackBar(loc.registrationSuccessfulMessage());
         Navigator.pop(_scaffoldKey.currentContext);
 
         FileManager.write("token.txt", response.token);
@@ -93,34 +96,34 @@ class RegistrationState extends State<Registration> {
 
   String _validateName(String value) {
     if (value.isEmpty)
-      return 'Name is required.';
+      return loc.nameEmptyError();
     else if (value.length < 4)
-      return 'Your username has to be at least 4 characters long';
+      return loc.usernameToShortError();
     return null;
   }
 
   String _validateEmail(String value) {
-    if (value.isEmpty) return 'EMail is required.';
+    if (value.isEmpty) return loc.emailEmptyError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value))
-      return 'The email seems to be in the incorrect format.';
+      return loc.emailIncorrectFormatError();
     return null;
   }
 
   String _validatePassword(String value) {
     if (pwInput.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty)
-      return 'Please choose a password.';
+      return loc.chooseAPasswordPrompt();
     return null;
   }
 
   String _validatePassword2(String value) {
     if (pw2Input.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty)
-      return 'Please reenter your password.';
+      return loc.reenterPasswordPrompt();
     if (pwInput.textEditingController.text != value)
-      return 'Passwords don\'t match';
+      return loc.passwordsDontMatchError();
     return null;
   }
 
@@ -128,7 +131,7 @@ class RegistrationState extends State<Registration> {
   Widget build(BuildContext context) {
     return new Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(title: new Text('Registration')),
+        appBar: new AppBar(title: new Text(loc.registrationTitle())),
         body: new Container(
             padding: const EdgeInsets.all(32.0),
             child: new Column(
@@ -136,8 +139,8 @@ class RegistrationState extends State<Registration> {
                 children: [
                   new TextField(
                       decoration: new InputDecoration(
-                        hintText: 'the name to login and to be found by others',
-                        labelText: 'Username',
+                        hintText: loc.usernameRegisterHint(),
+                        labelText: loc.username(),
                         errorText: nameInput.errorText,
                       ),
                       onChanged: (input) => setState(() {
@@ -152,9 +155,8 @@ class RegistrationState extends State<Registration> {
                   new TextField(
                       key: emailInput.key,
                       decoration: new InputDecoration(
-                        hintText:
-                            'the email to login and to be found by others',
-                        labelText: 'Email',
+                        hintText: loc.emailRegisterHint(),
+                        labelText: loc.emailTitle(),
                         errorText: emailInput.errorText,
                       ),
                       onChanged: (input) => setState(() {
@@ -174,9 +176,8 @@ class RegistrationState extends State<Registration> {
                             child: new TextField(
                                 key: pwInput.key,
                                 decoration: new InputDecoration(
-                                  hintText:
-                                      'the password to secure your account',
-                                  labelText: 'Password',
+                                  hintText: loc.passwordRegisterHint(),
+                                  labelText: loc.password(),
                                   errorText: pwInput.errorText,
                                 ),
                                 onChanged: (input) => setState(() {
@@ -197,9 +198,8 @@ class RegistrationState extends State<Registration> {
                             child: new TextField(
                                 key: pw2Input.key,
                                 decoration: new InputDecoration(
-                                  hintText:
-                                      'Re-type your password for validation',
-                                  labelText: 'Re-type Password',
+                                  hintText: loc.retypePasswordHint(),
+                                  labelText: loc.retypePasswordTitle(),
                                   errorText: pw2Input.errorText,
                                 ),
                                 controller: pw2Input.textEditingController,
@@ -221,7 +221,7 @@ class RegistrationState extends State<Registration> {
                       key: submit.key,
                       child: new SizedBox.expand(
                         child: new Center(
-                          child: new Text('REGISTER'),
+                          child: new Text(loc.registerButton()),
                         ),
                       ),
                       onPressed: _handleSubmitted,

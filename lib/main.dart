@@ -55,6 +55,8 @@ class _HomeState extends State<Home> {
   List mainList;
   bool performanceOverlay = false;
   bool materialGrid = false;
+  NSSLStrings loc = NSSLStrings.instance;
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +114,7 @@ class _HomeState extends State<Home> {
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
           new FlatButton(
-            child: new Text(NSSLStrings.instance.deletecrossedoutPB()),
+            child: new Text(NSSLStrings.instance.deleteCrossedOutPB()),
             onPressed: _deleteCrossedOutItems,
           ),
           new FlatButton(
@@ -217,15 +219,15 @@ class _HomeState extends State<Home> {
     //TODO wait for server?
     var list = User.currentList;
     final String action =
-        (dir == DismissDirection.endToStart) ? 'archived' : 'deleted';
+        (dir == DismissDirection.endToStart) ? loc.archived() : loc.deleted();
     var index = list.shoppingItems.indexOf(s);
     setState(() => list.shoppingItems.remove(s));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
     ShoppingListSync.deleteProduct(list.id, s.id);
     list.save();
-    showInSnackBar('You have $action ${s.name}',
+    showInSnackBar(loc.youHaveActionItemMessage() + "${s.name} $action",
         action: new SnackBarAction(
-            label: 'UNDO',
+            label: loc.undo(),
             onPressed: () {
               setState(() {
                 list.shoppingItems.insert(index, s);
@@ -240,14 +242,14 @@ class _HomeState extends State<Home> {
   Future handleDismiss(
       DismissDirection direction, Widget item, List list) async {
     final String action =
-        (direction == DismissDirection.endToStart) ? 'archived' : 'deleted';
+        (direction == DismissDirection.endToStart) ? loc.archived() : loc.deleted();
     var index = list.indexOf(item);
     setState(() => list.remove(item));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
 
-    showInSnackBar('You have $action $item',
+    showInSnackBar(loc.youHaveActionItemMessage() + "$item $action" /*'You have $action $item'*/,
         action: new SnackBarAction(
-            label: 'UNDO',
+            label: loc.undo(),
             onPressed: () {
               setState(() {
                 list.insert(index, item);
@@ -319,10 +321,10 @@ class _HomeState extends State<Home> {
 
   void addListDialog() {
     var sd = SimpleDialogSingleInput.create(
-        hintText: 'The name of the new list',
-        labelText: 'listname',
+        hintText: loc.newNameOfListHint(),
+        labelText: loc.listName(),
         onSubmitted: addListServer,
-        title: "Add new List",
+        title: loc.addNewListTitle(),
         context: cont);
 //rename ? (s) => renameList(listId, s)
     showDialog(child: sd, context: cont);
@@ -331,10 +333,10 @@ class _HomeState extends State<Home> {
   Future renameListDialog(int listId) => showDialog(
       context: cont,
       child: SimpleDialogSingleInput.create(
-          hintText: 'The new name of the new list',
-          labelText: 'listname',
+          hintText: loc.renameListHint(),
+          labelText: loc.listName(),
           onSubmitted: (s) => renameList(listId, s),
-          title: "Rename List",
+          title: loc.renameListTitle(),
           context: cont));
 
   Future addListServer(String listName) async {
@@ -353,8 +355,8 @@ class _HomeState extends State<Home> {
 
   Widget _buildDrawer(BuildContext context) {
     var userheader = new UserAccountsDrawerHeader(
-      accountName: new Text(User.username ?? "Not logged in yet"),
-      accountEmail: new Text(User.eMail ?? "Not logged in yet"),
+      accountName: new Text(User.username ?? loc.notLoggedInYet()),
+      accountEmail: new Text(User.eMail ?? loc.notLoggedInYet()),
       currentAccountPicture: new CircleAvatar(
           child: new Text(User.username.substring(0, 2).toUpperCase()),
           backgroundColor: Theme.of(cont ?? context).accentColor),
@@ -394,8 +396,8 @@ class _HomeState extends State<Home> {
                 ))
             .toList()
         : [
-            const ListTile(
-                title: const Text("here is the place for your lists")),
+            new ListTile(
+                title: new Text(loc.noListsInDrawerMessage())),
           ];
     //drawerList = new MyList<ListTile>(children: list);
 
@@ -410,7 +412,7 @@ class _HomeState extends State<Home> {
             displacement: 1.0),
         persistentFooterButtons: [
           new FlatButton(
-              child: new Text(NSSLStrings.instance.addlistPB()), onPressed: addListDialog)
+              child: new Text(NSSLStrings.instance.addListPB()), onPressed: addListDialog)
         ]);
 
     return new Drawer(child: d);
@@ -436,9 +438,9 @@ class _HomeState extends State<Home> {
         if (!res.success)
           showInDraweSnackBar(res.error);
         else {
-          showInDraweSnackBar("Removed ${User.shoppingLists
+          showInDraweSnackBar(User.shoppingLists
               .firstWhere((x) => x.id == id)
-              .name}");
+              .name + loc.removed());
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
         break;
@@ -511,10 +513,9 @@ class _HomeState extends State<Home> {
         context: cont,
         child: SimpleDialogSingleInput.create(
             context: cont,
-            title: 'Add Product',
-            hintText:
-                'Insert the name of the product, without searching in the database',
-            labelText: 'product name',
+            title:loc.addProduct(),
+            hintText:loc.addProductWithoutSearch(),
+            labelText: loc.productName(),
             onSubmitted: _addWithoutSearch));
   }
 
@@ -548,10 +549,10 @@ class _HomeState extends State<Home> {
       for (var item in sublist) list.shoppingItems.remove(item);
     });
     list.save();
-    showInSnackBar("You have deleted all crossed out items",
+    showInSnackBar(loc.messageDeleteAllCrossedOut(),
         duration: new Duration(seconds: 10),
         action: new SnackBarAction(
-            label: "UNDO",
+            label: loc.undo(),
             onPressed: () async {
               var res = await ShoppingListSync.changeProducts(
                   list.id,

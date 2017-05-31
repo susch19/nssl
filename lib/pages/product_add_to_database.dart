@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/models/user.dart';
 import 'package:testProject/server_communication/return_classes.dart';
@@ -37,6 +38,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
   String brandName;
   String weight;
 
+  NSSLStrings loc = NSSLStrings.instance;
+
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
 
@@ -48,15 +51,15 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             context: context,
             child: new AlertDialog(
                 content:
-                    new Text('Discard new product?', style: dialogTextStyle),
+                    new Text(loc.discardNewProduct(), style: dialogTextStyle),
                 actions: <Widget>[
                   new FlatButton(
-                      child: const Text('CANCEL'),
+                      child: new Text(loc.cancelButton()),
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       }),
                   new FlatButton(
-                      child: const Text('DISCARD'),
+                      child: new Text(loc.discardButton()),
                       onPressed: () {
                         Navigator.of(context).pop(true);
                       })
@@ -73,7 +76,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
       _autovalidate = true;
-      showInSnackBar('Please fix the errors in red before submitting.');
+      showInSnackBar(loc.fixErrorsBeforeSubmittingPrompt());
       return false;
     } else {
       form.save();
@@ -116,9 +119,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(title: const Text('New Product'), actions: <Widget>[
+      appBar: new AppBar(title: new Text(loc.newProductTitle()), actions: <Widget>[
         new FlatButton(
-            child: new Text('SAVE',
+            child: new Text(loc.saveButton(),
                 style: theme.textTheme.body1.copyWith(color: Colors.white)),
             onPressed: () => _handleSubmitted())
       ]),
@@ -131,9 +134,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
               children: <Widget>[
                 new Container(
                     child: new TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Product Name *",
-                          hintText: "How is this product called?",
+                        decoration: new InputDecoration(
+                          labelText: loc.newProductName(),
+                          hintText: loc.newProductNameHint(),
                         ),
                         autofocus: true,
                         controller: tecProductName,
@@ -141,18 +144,18 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                         validator: _validateName)),
                 new Container(
                     child: new TextFormField(
-                        decoration: const InputDecoration(
-                            labelText: "Brand Name *",
-                            hintText: "Which company sells this product?"),
+                        decoration: new InputDecoration(
+                            labelText: loc.newProductBrandName(),
+                            hintText: loc.newProductBrandNameHint()),
                         autofocus: false,
                         controller: tecBrandName,
                         onSaved: (s) => brandName = s,
                         validator: _validateName)),
                 new Container(
                     child: new TextFormField(
-                        decoration: const InputDecoration(
-                            labelText: "Weight",
-                            hintText: "What is the normal packaging size?"),
+                        decoration: new InputDecoration(
+                            labelText: loc.newProductWeight(),
+                            hintText: loc.newProductWeightHint()),
                         autofocus: false,
                         onSaved: (s) => weight = s,
                         controller: tecPackagingSize)),
@@ -162,12 +165,12 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                         border: new Border(
                             bottom: new BorderSide(color: theme.dividerColor))),
                     alignment: FractionalOffset.bottomLeft,
-                    child: new Text('code: ' + gtin)),
+                    child: new Text(loc.codeText() + gtin)),
                 new Container(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     alignment: FractionalOffset.bottomLeft,
                     child: new Row(children: [
-                      const Text("Add to current list"),
+                      new Text(loc.newProductAddToList()),
                       new Checkbox(
                           value: putInList,
                           onChanged: (b) =>
@@ -175,7 +178,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                     ])),
                 new Container(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: new Text('* indicates required field',
+                  child: new Text(loc.newProductStarExplanation(),
                       style: Theme.of(context).textTheme.caption),
                 ),
               ])),
@@ -184,8 +187,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
   String _validateName(String value) {
     _saveNeeded = true;
-    if (value.isEmpty) return "This field is required!";
-    if (value.length < 3) return "This name seems to be to short";
+    if (value.isEmpty) return loc.fieldRequiredError();
+    if (value.length < 3) return loc.newProductNameToShort();
     return null;
   }
 }

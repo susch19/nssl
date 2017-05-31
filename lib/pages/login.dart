@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/main.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/user.dart';
@@ -37,6 +38,8 @@ class LoginPageState extends State<LoginPage> {
   var pwInput = new ForInput();
   var submit = new ForInput();
 
+  NSSLStrings loc = NSSLStrings.instance;
+
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value), duration: new Duration(seconds: 3)));
@@ -45,20 +48,20 @@ class LoginPageState extends State<LoginPage> {
   void _handleSubmitted() {
     if (nameInput.textEditingController == null ||
         nameInput.textEditingController.text.isEmpty) {
-      showInSnackBar("username has to be filled in");
+      showInSnackBar(loc.usernameEmptyError());
       return;
     }
 
     if (pwInput.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty) {
-      showInSnackBar("password can't be left empty");
+      showInSnackBar(loc.passwordEmptyError());
       return;
     }
     if (_validateName(nameInput.textEditingController.text) != null) {
-      showInSnackBar("There is something wrong with your username");
+      showInSnackBar(loc.unknownUsernameError());
       return;
     } else if (_validatePassword(pwInput.textEditingController.text) != null) {
-      showInSnackBar("There is something wrong with your password");
+      showInSnackBar(loc.unknownPasswordError());
       return;
     }
 
@@ -89,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
       showInSnackBar(res.error);
       return;
     }
-    showInSnackBar("Login successfull.");
+    showInSnackBar(loc.loginSuccessfulMessage());
     await FileManager.write("token.txt", res.token);
     if (FileManager.fileExists("User.txt"))
       await FileManager.deleteFile("User.txt");
@@ -104,25 +107,25 @@ class LoginPageState extends State<LoginPage> {
   }
 
   String _validateName(String value) {
-    if (value.isEmpty) return 'Name or Email is required.';
+    if (value.isEmpty) return loc.nameEmailRequiredError();
     if (value.length < 4)
-      return 'Your username has to be at least 4 characters long';
+      return loc.usernameToShortError();
     return null;
   }
 
   String _validateEmail(String value) {
-    if (value.isEmpty) return 'EMail is required.';
+    if (value.isEmpty) return loc.emailRequiredError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value))
-      return 'The email seems to be in the incorrect format.';
+      return loc.emailIncorrectFormatError();
     return null;
   }
 
   String _validatePassword(String value) {
     if (pwInput.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty)
-      return 'Please choose a password.';
+      return loc.chooseAPasswordPrompt();
     return null;
   }
 
@@ -130,15 +133,15 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(title: const Text("Login")),
+      appBar: new AppBar(title: new Text(loc.login())),
       body: new Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
             new Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           new TextField(
               decoration: new InputDecoration(
-                hintText: 'username or email can be used to login',
-                labelText: 'Username or Email',
+                hintText: loc.usernameOrEmailForLoginHint(),
+                labelText: loc.usernameOrEmailTitle(),
                 errorText: nameInput.errorText,
               ),
               onChanged: (input) => nameInput.errorText = _validateName(input),
@@ -150,8 +153,8 @@ class LoginPageState extends State<LoginPage> {
           new TextField(
               key: pwInput.key,
               decoration: new InputDecoration(
-                hintText: 'the password you have choosen',
-                labelText: 'Password',
+                hintText: loc.choosenPasswordHint(),
+                labelText: loc.password(),
                 errorText: pwInput.errorText,
               ),
               obscureText: true,
@@ -163,7 +166,7 @@ class LoginPageState extends State<LoginPage> {
               child: new RaisedButton(
                 key: submit.key,
                 child: new SizedBox.expand(
-                    child: new Center(child: const Text('LOGIN'))),
+                    child: new Center(child: new Text(loc.loginButton()))),
                 onPressed: _handleSubmitted,
               ),
               padding: const EdgeInsets.only(top: 16.0)),
@@ -174,7 +177,7 @@ class LoginPageState extends State<LoginPage> {
                     ? Navigator.pushNamed(context, "/registration")
                     : Navigator.popAndPushNamed(context, "/registration");
               },
-              child: const Text("Don't have an account? Create one now."),
+              child: new Text(loc.registerTextOnLogin()),
             ),
             padding: const EdgeInsets.only(top: 72.0),
           )
