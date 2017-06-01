@@ -80,6 +80,7 @@ class _HomeState extends State<Home> {
     final String localeString = locale.toString();
     await initializeMessages(localeString);
     Intl.defaultLocale = localeString;
+    setState((){}); //Refresh for new language
     return NSSLStrings.instance;
   }
 
