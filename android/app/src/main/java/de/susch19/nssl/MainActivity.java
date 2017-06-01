@@ -1,4 +1,4 @@
-package com.yourcompany.testProject;
+package de.susch19.nssl;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;

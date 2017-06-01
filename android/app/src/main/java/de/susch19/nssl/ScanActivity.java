@@ -1,4 +1,4 @@
-package com.yourcompany.testProject;
+package de.susch19.nssl;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
