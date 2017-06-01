@@ -69,7 +69,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   }
 
   Future _addContributor(String value) async {
-    ShoppingListSync.addContributor(User.currentList.id, value).then((o) {
+    ShoppingListSync.addContributor(listId, value).then((o) {
       AddContributorResult z = AddContributorResult.fromJson(o.body);
       if (!z.success)
         showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
