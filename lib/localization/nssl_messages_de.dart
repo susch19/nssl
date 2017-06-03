@@ -11,6 +11,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => {
     "options" : MessageLookupByLibrary.simpleMessage("Optionen"),
+    "changeTheme" : MessageLookupByLibrary.simpleMessage("Theme ändern"),
     "scanPB" : MessageLookupByLibrary.simpleMessage("SCANNEN"),
     "addPB" : MessageLookupByLibrary.simpleMessage("ADD"), //TODO find good german word
     "searchPB" : MessageLookupByLibrary.simpleMessage("SUCHEN"),
@@ -67,7 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "unknownPasswordError" : MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit deinem Passwort nicht"),
     "unknownReenterPasswordError" : MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit dem wiederholten Passwort nicht"),
     "registrationSuccessfulMessage" : MessageLookupByLibrary.simpleMessage("Registrierung erfolgreich"),
-    "registrationTitle" : MessageLookupByLibrary.simpleMessage("Registrierung."),
+    "registrationTitle" : MessageLookupByLibrary.simpleMessage("Registrierung"),
     "nameEmptyError" : MessageLookupByLibrary.simpleMessage("Name ist erforderlich"),
     "chooseAPasswordPrompt" : MessageLookupByLibrary.simpleMessage("Bitte gib ein Passwort ein"),
     "reenterPasswordPrompt" : MessageLookupByLibrary.simpleMessage("Bitte gib dein Passwort erneut ein"),

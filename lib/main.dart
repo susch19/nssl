@@ -1,6 +1,7 @@
 //Some comment
 import 'dart:convert';
 import 'package:testProject/localization/nssl_messages_all.dart';
+import 'package:testProject/options/themes.dart';
 import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
 import 'package:testProject/models/model_export.dart';
@@ -17,15 +18,7 @@ void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
 }
 
-ThemeData dTheme = new ThemeData(
-    primarySwatch: Colors.teal,
-    accentColor: Colors.teal[600],
-    brightness: Brightness.dark);
-ThemeData lTheme = new ThemeData(
-    primarySwatch: Colors.blue,
-    accentColor: Colors.teal[600],
-    brightness: Brightness.light);
-bool themed = true;
+int themed = 0;
 
 class NSSL extends StatelessWidget {
   @override
@@ -62,8 +55,8 @@ class _HomeState extends State<Home> {
     return new MaterialApp(
       title: 'NSSL',
       color: Colors.grey[500],
-      theme:
-          (themed ? lTheme : dTheme).copyWith(platform: TargetPlatform.android),
+      theme: Themes.themes[themed],
+      //(themed ? lTheme : dTheme).copyWith(),
       home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
       routes: <String, WidgetBuilder>{
         '/login': (BuildContext context) => new LoginPage(),
@@ -103,7 +96,8 @@ class _HomeState extends State<Home> {
                             child: const Text('Login/Register')),
                         new PopupMenuItem<String>(
                             value: 'Options',
-                            child: new Text(NSSLStrings.instance.options())),
+                            child:
+                                new Text(NSSLStrings.instance.changeTheme())),
                         const PopupMenuItem<String>(
                             value: 'PerformanceOverlay',
                             child: const Text('Toggle Performance Overlay')),
@@ -276,8 +270,9 @@ class _HomeState extends State<Home> {
         break;
       case "Options":
         setState(() {
-          themed = !themed;
+          themed = themed + 1 == Themes.themes.length ? 0 : themed + 1;
         });
+        setState(() {});
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -367,9 +362,14 @@ class _HomeState extends State<Home> {
     var userheader = new UserAccountsDrawerHeader(
       accountName: new Text(User.username ?? loc.notLoggedInYet()),
       accountEmail: new Text(User.eMail ?? loc.notLoggedInYet()),
-      currentAccountPicture: new CircleAvatar(
-          child: new Text(User.username.substring(0, 2).toUpperCase()),
-          backgroundColor: Theme.of(cont ?? context).accentColor),
+      currentAccountPicture: new FloatingActionButton(
+        child: new CircleAvatar(
+            child: new Text(User.username.substring(0, 2).toUpperCase()),
+            backgroundColor: Themes.themes[themed].accentColor),
+        backgroundColor: Themes.themes[themed].accentColor,
+        onPressed: null,
+        highlightElevation: 0.0,
+      ),
     );
 
     var list = User.shoppingLists.isNotEmpty

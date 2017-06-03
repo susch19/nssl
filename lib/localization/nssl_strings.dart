@@ -21,6 +21,7 @@ class NSSLStrings extends LocaleQueryData {
   static final NSSLStrings instance = new NSSLStrings();
 
   String options() => Intl.message('Options', name: 'options');
+  String changeTheme() => Intl.message('Change Theme', name: 'changeTheme');
   String scanPB() => Intl.message('SCAN', name: 'scanPB');
   String addPB() => Intl.message('ADD', name: 'addPB');
   String searchPB() => Intl.message('SEARCH', name: 'searchPB');
