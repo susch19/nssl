@@ -6,7 +6,8 @@ dependencies:
     sdk: flutter
   path_provider:
   intl:
-  jwt: "^0.1.4"
+  jwt:
+    git: git://github.com/susch19/dart-json_web_token.git
   crypto: "^2.0.1"
   cryptoutils:
 

@@ -57,30 +57,31 @@ class _HomeState extends State<Home> {
   bool materialGrid = false;
   NSSLStrings loc = NSSLStrings.instance;
 
-
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: 'NSSL',
-        color: Colors.grey[500],
-        theme: (themed ? lTheme : dTheme)
-            .copyWith(platform: TargetPlatform.android),
-        home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
-        routes: <String, WidgetBuilder>{
-          '/login': (BuildContext context) => new LoginPage(),
-          '/registration': (BuildContext context) => new Registration(),
-          '/search': (BuildContext context) => new ProductAddPage(),
-        },
-        showPerformanceOverlay: performanceOverlay,
-        showSemanticsDebugger: false,
-        debugShowMaterialGrid: materialGrid,
-        onLocaleChanged: onLocaleChanged,);
+      title: 'NSSL',
+      color: Colors.grey[500],
+      theme:
+          (themed ? lTheme : dTheme).copyWith(platform: TargetPlatform.android),
+      home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
+      routes: <String, WidgetBuilder>{
+        '/login': (BuildContext context) => new LoginPage(),
+        '/registration': (BuildContext context) => new Registration(),
+        '/search': (BuildContext context) => new ProductAddPage(),
+      },
+      showPerformanceOverlay: performanceOverlay,
+      showSemanticsDebugger: false,
+      debugShowMaterialGrid: materialGrid,
+      onLocaleChanged: onLocaleChanged,
+    );
   }
+
   Future<LocaleQueryData> onLocaleChanged(Locale locale) async {
     final String localeString = locale.toString();
     await initializeMessages(localeString);
     Intl.defaultLocale = localeString;
-    setState((){}); //Refresh for new language
+    setState(() {}); //Refresh for new language
     return NSSLStrings.instance;
   }
 
@@ -119,9 +120,14 @@ class _HomeState extends State<Home> {
             onPressed: _deleteCrossedOutItems,
           ),
           new FlatButton(
-              child: new Text(NSSLStrings.instance.addPB()), onPressed: _addWithoutSearchDialog),
-          new FlatButton(child: new Text(NSSLStrings.instance.scanPB()), onPressed: _getEAN),
-          new FlatButton(child: new Text(NSSLStrings.instance.searchPB()), onPressed: search)
+              child: new Text(NSSLStrings.instance.addPB()),
+              onPressed: _addWithoutSearchDialog),
+          new FlatButton(
+              child: new Text(NSSLStrings.instance.scanPB()),
+              onPressed: _getEAN),
+          new FlatButton(
+              child: new Text(NSSLStrings.instance.searchPB()),
+              onPressed: search)
         ]);
   }
 
@@ -242,13 +248,16 @@ class _HomeState extends State<Home> {
 
   Future handleDismiss(
       DismissDirection direction, Widget item, List list) async {
-    final String action =
-        (direction == DismissDirection.endToStart) ? loc.archived() : loc.deleted();
+    final String action = (direction == DismissDirection.endToStart)
+        ? loc.archived()
+        : loc.deleted();
     var index = list.indexOf(item);
     setState(() => list.remove(item));
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
 
-    showInSnackBar(loc.youHaveActionItemMessage() + "$item $action" /*'You have $action $item'*/,
+    showInSnackBar(
+        loc.youHaveActionItemMessage() +
+            "$item $action" /*'You have $action $item'*/,
         action: new SnackBarAction(
             label: loc.undo(),
             onPressed: () {
@@ -378,27 +387,29 @@ class _HomeState extends State<Home> {
                                   x.id.toString() + "\u{1E}" + "Contributors",
                               child: new ListTile(
                                 leading: const Icon(Icons.person_add),
-                                title: new Text(NSSLStrings.instance.contributors()),
+                                title: new Text(
+                                    NSSLStrings.instance.contributors()),
                               ),
                             ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
                                 child: new ListTile(
                                     leading: const Icon(Icons.mode_edit),
-                                    title: new Text(NSSLStrings.instance.rename()))),
+                                    title: new Text(
+                                        NSSLStrings.instance.rename()))),
                             const PopupMenuDivider() //ignore: list_element_type_not_assignable
                                 ,
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
                                 child: new ListTile(
                                     leading: const Icon(Icons.delete),
-                                    title: new Text(NSSLStrings.instance.remove())))
+                                    title: new Text(
+                                        NSSLStrings.instance.remove())))
                           ]),
                 ))
             .toList()
         : [
-            new ListTile(
-                title: new Text(loc.noListsInDrawerMessage())),
+            new ListTile(title: new Text(loc.noListsInDrawerMessage())),
           ];
     //drawerList = new MyList<ListTile>(children: list);
 
@@ -413,7 +424,8 @@ class _HomeState extends State<Home> {
             displacement: 1.0),
         persistentFooterButtons: [
           new FlatButton(
-              child: new Text(NSSLStrings.instance.addListPB()), onPressed: addListDialog)
+              child: new Text(NSSLStrings.instance.addListPB()),
+              onPressed: addListDialog)
         ]);
 
     return new Drawer(child: d);
@@ -439,9 +451,9 @@ class _HomeState extends State<Home> {
         if (!res.success)
           showInDraweSnackBar(res.error);
         else {
-          showInDraweSnackBar(User.shoppingLists
-              .firstWhere((x) => x.id == id)
-              .name + loc.removed());
+          showInDraweSnackBar(
+              User.shoppingLists.firstWhere((x) => x.id == id).name +
+                  loc.removed());
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
         break;
@@ -471,11 +483,19 @@ class _HomeState extends State<Home> {
 
   Future _handleListRefresh(int listId) async {
     var list = User.shoppingLists.firstWhere((s) => s.id == listId);
-    setState(() => list.shoppingItems.clear());
-    var res =
-        GetListResult.fromJson((await ShoppingListSync.getList(list.id)).body);
-    var crossedOut = await ShoppingList.loadCrossedOut(res.id);
-    for (var item in res.products)
+    var res = await ShoppingListSync.getList(list.id);
+    if (res.statusCode == 401) {
+      showInSnackBar(loc.notLoggedInYet() + res.reasonPhrase);
+      return;
+    }
+    if (res.statusCode != 200) {
+      showInSnackBar(loc.genericErrorMessageSnackbar());
+      return;
+    }
+    var newList = GetListResult.fromJson(res.body);
+    var crossedOut = await ShoppingList.loadCrossedOut(newList.id);
+    list.shoppingItems.clear();
+    for (var item in newList.products)
       list.shoppingItems.add(new ShoppingItem()
         ..name = item.name
         ..id = item.id
@@ -514,8 +534,8 @@ class _HomeState extends State<Home> {
         context: cont,
         child: SimpleDialogSingleInput.create(
             context: cont,
-            title:loc.addProduct(),
-            hintText:loc.addProductWithoutSearch(),
+            title: loc.addProduct(),
+            hintText: loc.addProductWithoutSearch(),
             labelText: loc.productName(),
             onSubmitted: _addWithoutSearch));
   }
@@ -568,6 +588,4 @@ class _HomeState extends State<Home> {
                 _handleListRefresh(list.id);
             }));
   }
-
-
 }
