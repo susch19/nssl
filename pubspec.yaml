@@ -6,6 +6,9 @@ dependencies:
     sdk: flutter
   path_provider:
   intl:
+  jwt: "^0.1.4"
+  crypto: "^2.0.1"
+  cryptoutils:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
