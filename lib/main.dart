@@ -18,8 +18,6 @@ void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
 }
 
-int themed = 0;
-
 class NSSL extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -28,6 +26,13 @@ class NSSL extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
+  static ThemeData theme = new ThemeData(
+      primarySwatch: Colors.blue,
+      accentColor: Colors.teal,
+      accentColorBrightness: Brightness.dark,
+      brightness: Brightness.light);
+  static MaterialColor swatch = Colors.blue;
+
   Home({Key key}) : super(key: key);
 
   @override
@@ -35,7 +40,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  static BuildContext cont;
+  BuildContext cont;
+
   final GlobalKey<ScaffoldState> _mainScaffoldKey =
       new GlobalKey<ScaffoldState>();
   final GlobalKey<ScaffoldState> _drawerScaffoldKey =
@@ -55,7 +61,12 @@ class _HomeState extends State<Home> {
     return new MaterialApp(
       title: 'NSSL',
       color: Colors.grey[500],
-      theme: Themes.themes[themed],
+      theme: Themes.themes.first,
+//      theme: new ThemeData(
+//          primarySwatch: Home.swatch,
+//          accentColorBrightness: Home.theme.accentColorBrightness,
+//          primaryColorBrightness: Home.theme.primaryColorBrightness,
+//          accentColor: Home.theme.accentColor),
       //(themed ? lTheme : dTheme).copyWith(),
       home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
       routes: <String, WidgetBuilder>{
@@ -269,10 +280,17 @@ class _HomeState extends State<Home> {
         login();
         break;
       case "Options":
-        setState(() {
-          themed = themed + 1 == Themes.themes.length ? 0 : themed + 1;
-        });
-        setState(() {});
+        Navigator
+            .push(
+                cont,
+                new MaterialPageRoute<DismissDialogAction>(
+                  builder: (BuildContext context) => new CustomThemePage(),
+                  fullscreenDialog: true,
+                ))
+            .then((x) => setState(() {
+                  Home.theme = Home.theme;
+                }));
+
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -365,8 +383,8 @@ class _HomeState extends State<Home> {
       currentAccountPicture: new FloatingActionButton(
         child: new CircleAvatar(
             child: new Text(User.username.substring(0, 2).toUpperCase()),
-            backgroundColor: Themes.themes[themed].accentColor),
-        backgroundColor: Themes.themes[themed].accentColor,
+            backgroundColor: Themes.themes.first.accentColor),
+        backgroundColor: Themes.themes.first.accentColor,
         onPressed: null,
         highlightElevation: 0.0,
       ),

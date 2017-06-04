@@ -32,8 +32,8 @@ class HelperMethods {
     return res;
   }
 
-  static Future<http.Response> put(String path, [Object body = null]) async {
-    await handleTokenRefresh();
+  static Future<http.Response> put(String path, [Object body = null, bool skipTokenRefresh = false]) async {
+    if(!skipTokenRefresh) await handleTokenRefresh();
     var g = http.put("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token

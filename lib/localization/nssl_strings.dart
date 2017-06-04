@@ -116,6 +116,9 @@ class NSSLStrings extends LocaleQueryData {
   String searchProductHint() => Intl.message('Search Product', name: 'searchProductHint');
   String noMoreProductsMessage() => Intl.message('No more products found!', name: 'noMoreProductsMessage');
   String codeText() => Intl.message('Code: ', name: 'codeText');
-
   String removed() => Intl.message('removed', name: 'removed');
+  String changePrimaryColor() => Intl.message('Primary Color', name: 'changePrimaryColor');
+  String changeAccentColor() => Intl.message('Accent Color', name: 'changeAccentColor');
+  String changeDarkTheme() => Intl.message('Dark Theme', name: 'changeDarkTheme');
+  String changeAccentTextColor() => Intl.message('Dark Icons', name: 'changeAccentTextColor');
 }

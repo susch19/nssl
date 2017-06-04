@@ -21,10 +21,10 @@ class UserSync {
 
   static Future<Response> info() => HelperMethods.get(path);
 
-  static Future<Response> refreshToken() => HelperMethods.put(path2);
+  static Future<Response> refreshToken() =>
+      HelperMethods.put(path2, null, true);
 
   static Future<Response> changePassword(
           int userId, String oldPassword, String newPassword, String token) =>
       HelperMethods.put(path, new ChangePasswordArgs(oldPassword, newPassword));
-
 }

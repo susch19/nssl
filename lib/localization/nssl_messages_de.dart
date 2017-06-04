@@ -103,5 +103,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "noMoreProductsMessage" : MessageLookupByLibrary.simpleMessage("Es konnten keine weiteren Produkte mit dem Namen gefunden werden"),
     "codeText" : MessageLookupByLibrary.simpleMessage("Code: "),
     "removed" : MessageLookupByLibrary.simpleMessage("entfernt"),
+    "changePrimaryColor" : MessageLookupByLibrary.simpleMessage("Hauptfarbe"),
+    "changeAccentColor" : MessageLookupByLibrary.simpleMessage("Akzentfarbe"),
+    "changeDarkTheme" : MessageLookupByLibrary.simpleMessage("Dunkles Design"),
+    "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Helle Icons"),
   };
 }

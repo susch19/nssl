@@ -102,6 +102,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "noMoreProductsMessage" : MessageLookupByLibrary.simpleMessage("No more products found!}"),
     "codeText" : MessageLookupByLibrary.simpleMessage("Code: "),
     "removed" : MessageLookupByLibrary.simpleMessage("removed"),
+    "changePrimaryColor" : MessageLookupByLibrary.simpleMessage("Primary Color"),
+    "changeAccentColor" : MessageLookupByLibrary.simpleMessage("Accent Color"),
+    "changeDarkTheme" : MessageLookupByLibrary.simpleMessage("Dark Theme"),
+    "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Bright Icons"),
+
 
   };
 }

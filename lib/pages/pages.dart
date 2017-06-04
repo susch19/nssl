@@ -5,3 +5,4 @@ export 'product_add_to_database.dart';
 export 'registration.dart';
 export 'settings.dart';
 export 'shopping_item_search.dart';
+export 'options.dart';
