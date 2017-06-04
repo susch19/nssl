@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/main.dart';
 import 'package:testProject/options/themes.dart';
-import 'package:testProject/pages/pages.dart';
-import 'package:testProject/simple_dialog_single_input.dart';
 
 class CustomThemePage extends StatefulWidget {
   CustomThemePage();
@@ -38,7 +35,7 @@ class CustomThemePageState extends State<CustomThemePage> {
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
   bool primaryColorCheckbox = false;
-  bool accentColorCheckbox = false;
+  bool accentColorCheckbox = true;
 
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
@@ -69,10 +66,9 @@ class CustomThemePageState extends State<CustomThemePage> {
 
   void _handleSubmitted() {
     Themes.themes.clear();
+    Themes.saveTheme(td, primary, accent);
     setState(() {
       Themes.themes.add(td);
-      Home.theme = td;
-      Home.swatch = primary;
     });
     Navigator.of(context).pop();
   }

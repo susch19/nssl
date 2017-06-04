@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
+import 'package:testProject/options/themes.dart';
 
 class Startup {
   static Future<bool> initialize() async {
@@ -27,6 +28,8 @@ class Startup {
       if (list != null)
         User.shoppingLists.add(await ShoppingList
             .load(int.parse(list.path.split('/').last.split('.')[0])));
+
+    await Themes.loadTheme();
 
     if (User.shoppingLists.length > 0) {
       var listId = int.parse(await FileManager.readAsString("lastList.txt"));
