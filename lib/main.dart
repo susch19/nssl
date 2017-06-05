@@ -325,12 +325,26 @@ class _HomeState extends State<Home> {
       var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
       if (k.success) {
-        var res = await ShoppingListSync.addProduct(list.id, k.name, '-', 1);
-        var p = AddListItemResult.fromJson(res.body);
-        setState(() => list.shoppingItems.add(new ShoppingItem()
-          ..name = p.name
-          ..amount = 1
-          ..id = p.productId));
+        var item = list.shoppingItems
+            .firstWhere((x) => x.name == k.name, orElse: () => null);
+        ShoppingItem afterAdd;
+        if (item != null) {
+          var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1);
+          var p = ChangeListItemResult.fromJson((answer).body);
+          setState(() {
+            item.amount = p.amount;
+          });
+        } else {
+          var p = AddListItemResult.fromJson(
+              (await ShoppingListSync.addProduct(list.id, k.name, '-', 1))
+                  .body);
+          afterAdd = new ShoppingItem()
+            ..name = p.name
+            ..amount = 1
+            ..id = p.productId;
+          setState(() => list.shoppingItems.add(afterAdd));
+        }
+        list.save();
         return;
       }
       Navigator.push(
