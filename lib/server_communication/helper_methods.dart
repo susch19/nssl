@@ -10,8 +10,8 @@ import 'user_sync.dart';
 class HelperMethods {
   static const String url = "https://susch.undo.it:443";
 
-  static Future<http.Response> post(String path, [Object body = null]) async {
-    await handleTokenRefresh();
+  static Future<http.Response> post(String path, [Object body = null, skipTokenRefresh = false]) async {
+    if(!skipTokenRefresh) await handleTokenRefresh();
     var g = http.post("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token

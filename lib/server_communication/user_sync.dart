@@ -10,14 +10,14 @@ class UserSync {
   static Future<Response> create(
           String username, String email, String password) =>
       HelperMethods.post("registration",
-          new LoginArgs(username: username, pwHash: password, eMail: email));
+          new LoginArgs(username: username, pwHash: password, eMail: email), true);
 
   static Future<Response> login(String username, String password) =>
       HelperMethods.post(
-          path2, new LoginArgs(username: username, pwHash: password));
+          path2, new LoginArgs(username: username, pwHash: password), true);
 
   static Future<Response> loginEmail(String email, String password) =>
-      HelperMethods.post(path2, new LoginArgs(eMail: email, pwHash: password));
+      HelperMethods.post(path2, new LoginArgs(eMail: email, pwHash: password), true);
 
   static Future<Response> info() => HelperMethods.get(path);
 

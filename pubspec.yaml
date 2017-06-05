@@ -10,6 +10,7 @@ dependencies:
     git: git://github.com/susch19/dart-json_web_token.git
   crypto: "^2.0.1"
   cryptoutils:
+  cipher:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
