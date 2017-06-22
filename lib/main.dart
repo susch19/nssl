@@ -51,7 +51,6 @@ class _HomeState extends State<Home> {
       const MethodChannel('com.yourcompany.testProject/Scandit');
 
   String ean = "";
-  List mainList;
   bool performanceOverlay = false;
   bool materialGrid = false;
   NSSLStrings loc = NSSLStrings.instance;
@@ -144,12 +143,16 @@ class _HomeState extends State<Home> {
 
   Widget buildBody(BuildContext context) {
     cont = context;
-    mainList?.clear();
-    User.currentList.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
-    User.currentList.shoppingItems?.sort(
+
+    if (User.currentList == null ||
+        User.currentList.shoppingItems == null ||
+        User.currentList.shoppingItems.length == 0) return const Text("");
+
+    User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
+    User.currentList?.shoppingItems?.sort(
         (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
 
-    mainList = User.currentList.shoppingItems.map((x) {
+    var mainList = User.currentList.shoppingItems.map((x) {
       var lt = new ListTile(
         title: new Row(children: [
           new Expanded(
@@ -177,7 +180,7 @@ class _HomeState extends State<Home> {
       );
 
       return new Dismissible(
-        key: new ObjectKey(lt),
+        key: new ValueKey(x),
         child: lt,
         onDismissed: (DismissDirection d) => handleDismissMain(d, x),
         direction: DismissDirection.startToEnd,
@@ -191,9 +194,8 @@ class _HomeState extends State<Home> {
       );
     }).toList(growable: true);
 
-    var lv = new ListView.builder(
-      itemBuilder: (c, i) => mainList[i],
-      itemCount: mainList.length,
+    var lv = new ListView(
+      children: mainList,
       physics: const AlwaysScrollableScrollPhysics(),
     );
 
@@ -329,7 +331,8 @@ class _HomeState extends State<Home> {
             .firstWhere((x) => x.name == k.name, orElse: () => null);
         ShoppingItem afterAdd;
         if (item != null) {
-          var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1);
+          var answer =
+              await ShoppingListSync.changeProduct(list.id, item.id, 1);
           var p = ChangeListItemResult.fromJson((answer).body);
           setState(() {
             item.amount = p.amount;
