@@ -194,8 +194,18 @@ class _HomeState extends State<Home> {
       );
     }).toList(growable: true);
 
-    var lv = new ListView(
-      children: mainList,
+    var lv = new CustomScrollView(
+      slivers: [
+        new SliverFixedExtentList(
+            delegate: new SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+              return new Container(
+                alignment: FractionalOffset.center,
+                child: mainList[index],
+              );
+            }, childCount: mainList.length),
+            itemExtent: 50.0)
+      ],
       physics: const AlwaysScrollableScrollPhysics(),
     );
 
@@ -410,6 +420,7 @@ class _HomeState extends State<Home> {
     var list = User.shoppingLists.isNotEmpty
         ? User.shoppingLists
             .map((x) => new ListTile(
+                  key: new ValueKey(x),
                   title: new Text(x.name),
                   onTap: () => changeCurrentList(User.shoppingLists.indexOf(x)),
                   trailing: new PopupMenuButton<String>(
