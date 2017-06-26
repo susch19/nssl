@@ -13,6 +13,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:testProject/localization/nssl_strings.dart';
+import 'package:testProject/firebase/cloud_messsaging.dart';
+
 
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
@@ -223,7 +225,7 @@ class _HomeState extends State<Home> {
         action: action));
   }
 
-  void showInDraweSnackBar(String value,
+  void showInDrawerSnackBar(String value,
       {Duration duration: null, SnackBarAction action}) {
     _drawerScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),
@@ -246,7 +248,7 @@ class _HomeState extends State<Home> {
         (dir == DismissDirection.endToStart) ? loc.archived() : loc.deleted();
     var index = list.shoppingItems.indexOf(s);
     setState(() => list.shoppingItems.remove(s));
-    _mainScaffoldKey.currentState.removeCurrentSnackBar();
+//    _mainScaffoldKey.currentState.removeCurrentSnackBar();
     ShoppingListSync.deleteProduct(list.id, s.id);
     list.save();
     showInSnackBar(loc.youHaveActionItemMessage() + "${s.name} $action",
@@ -258,29 +260,6 @@ class _HomeState extends State<Home> {
                 ShoppingListSync.changeProduct(list.id, s.id, s.amount);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
                 list.save();
-              });
-            }),
-        duration: new Duration(seconds: 10));
-  }
-
-  Future handleDismiss(
-      DismissDirection direction, Widget item, List list) async {
-    final String action = (direction == DismissDirection.endToStart)
-        ? loc.archived()
-        : loc.deleted();
-    var index = list.indexOf(item);
-    setState(() => list.remove(item));
-    _mainScaffoldKey.currentState.removeCurrentSnackBar();
-
-    showInSnackBar(
-        loc.youHaveActionItemMessage() +
-            "$item $action" /*'You have $action $item'*/,
-        action: new SnackBarAction(
-            label: loc.undo(),
-            onPressed: () {
-              setState(() {
-                list.insert(index, item);
-                _mainScaffoldKey.currentState.removeCurrentSnackBar();
               });
             }),
         duration: new Duration(seconds: 10));
@@ -495,10 +474,10 @@ class _HomeState extends State<Home> {
       case "Remove":
         var res = Result.fromJson((await ShoppingListSync.deleteList(id)).body);
         if (!res.success)
-          showInDraweSnackBar(res.error);
+          showInDrawerSnackBar(res.error);
         else {
-          showInDraweSnackBar(
-              User.shoppingLists.firstWhere((x) => x.id == id).name +
+          showInDrawerSnackBar(
+              User.shoppingLists.firstWhere((x) => x.id == id).name + " " +
                   loc.removed());
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
@@ -588,9 +567,9 @@ class _HomeState extends State<Home> {
 
   Future renameList(int id, String text) async {
     var put = await ShoppingListSync.changeLName(id, text);
-    showInDraweSnackBar("${put.statusCode}" + put.reasonPhrase);
+    showInDrawerSnackBar("${put.statusCode}" + put.reasonPhrase);
     var res = Result.fromJson((put.body));
-    if (!res.success) showInDraweSnackBar(res.error);
+    if (!res.success) showInDrawerSnackBar(res.error);
   }
 
   Future _addWithoutSearch(String value) async {
@@ -633,5 +612,14 @@ class _HomeState extends State<Home> {
               else
                 _handleListRefresh(list.id);
             }));
+  }
+
+  @override
+  initState(){
+    super.initState();
+    firebaseMessaging.configure(onMessage: (x) => CloudMessaging.onMessage(x, setState));
+
+    /*firebaseMessaging.getToken().then((String token) {
+    });*/
   }
 }
