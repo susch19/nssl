@@ -1,6 +1,9 @@
+import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/models/shopping_item.dart';
 import 'package:testProject/manager/manager_export.dart';
 import 'dart:async';
+import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/shopping_list_sync.dart';
 
 class ShoppingList {
   int id;
@@ -29,6 +32,8 @@ class ShoppingList {
     var filename = "ShoppingLists/${id.toString()}.sl";
     if (FileManager.fileExists(filename))
       await FileManager.deleteFile(filename);
+    else
+      subscribeForFirebaseMessaging();
     await FileManager.createFile(filename);
     await FileManager.writeln(filename, name);
 
@@ -57,4 +62,32 @@ class ShoppingList {
       if (item != null) map.addAll({int.parse(item): true});
     return map;
   }
+
+  Future refresh() async {
+    var res = await ShoppingListSync.getList(id);
+//    if (res.statusCode == 401) {
+//      showInSnackBar(loc.notLoggedInYet() + res.reasonPhrase);
+//      return;
+//    }
+//    if (res.statusCode != 200) {
+//      showInSnackBar(loc.genericErrorMessageSnackbar());
+//      return;
+//    }
+    var newList = GetListResult.fromJson(res.body);
+    var crossedOut = await ShoppingList.loadCrossedOut(newList.id);
+    shoppingItems.clear();
+    for (var item in newList.products)
+      shoppingItems.add(new ShoppingItem()
+        ..name = item.name
+        ..id = item.id
+        ..amount = item.amount
+        ..crossedOut = crossedOut.containsKey(item.id) ?? false);
+    save();
+  }
+
+  void subscribeForFirebaseMessaging() =>
+      firebaseMessaging.subscribeToTopic(id.toString() + "shoppingListTopic");
+
+  void unsubscribeFromFirebaseMessaging() => firebaseMessaging
+      .unsubscribeFromTopic(id.toString() + "shoppingListTopic");
 }

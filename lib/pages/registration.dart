@@ -1,4 +1,3 @@
-//Some comment
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';

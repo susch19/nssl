@@ -1,4 +1,3 @@
-//Some comment
 import 'dart:convert';
 import 'package:testProject/localization/nssl_messages_all.dart';
 import 'package:testProject/options/themes.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
-
 
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSL()));
@@ -352,7 +350,7 @@ class _HomeState extends State<Home> {
     var sd = SimpleDialogSingleInput.create(
         hintText: loc.newNameOfListHint(),
         labelText: loc.listName(),
-        onSubmitted: addListServer,
+        onSubmitted: createNewList,
         title: loc.addNewListTitle(),
         context: cont);
 //rename ? (s) => renameList(listId, s)
@@ -368,7 +366,7 @@ class _HomeState extends State<Home> {
           title: loc.renameListTitle(),
           context: cont));
 
-  Future addListServer(String listName) async {
+  Future createNewList(String listName) async {
     var res = await ShoppingListSync.addList(listName);
     var newListRes = AddListResult.fromJson(res.body);
     var newList = new ShoppingList()
@@ -376,6 +374,8 @@ class _HomeState extends State<Home> {
       ..name = newListRes.name;
     setState(() => User.shoppingLists.add(newList));
     User.currentListIndex = User.shoppingLists.indexOf(newList);
+    firebaseMessaging
+        .subscribeToTopic(newList.id.toString() + "shoppingListTopic");
     FileManager.createFile("ShoppingLists/${newList.id}.sl");
     FileManager.writeln("ShoppingLists/${newList.id}.sl", newList.name);
   }
@@ -477,7 +477,8 @@ class _HomeState extends State<Home> {
           showInDrawerSnackBar(res.error);
         else {
           showInDrawerSnackBar(
-              User.shoppingLists.firstWhere((x) => x.id == id).name + " " +
+              User.shoppingLists.firstWhere((x) => x.id == id).name +
+                  " " +
                   loc.removed());
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
@@ -507,27 +508,8 @@ class _HomeState extends State<Home> {
   Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
 
   Future _handleListRefresh(int listId) async {
-    var list = User.shoppingLists.firstWhere((s) => s.id == listId);
-    var res = await ShoppingListSync.getList(list.id);
-    if (res.statusCode == 401) {
-      showInSnackBar(loc.notLoggedInYet() + res.reasonPhrase);
-      return;
-    }
-    if (res.statusCode != 200) {
-      showInSnackBar(loc.genericErrorMessageSnackbar());
-      return;
-    }
-    var newList = GetListResult.fromJson(res.body);
-    var crossedOut = await ShoppingList.loadCrossedOut(newList.id);
-    list.shoppingItems.clear();
-    for (var item in newList.products)
-      list.shoppingItems.add(new ShoppingItem()
-        ..name = item.name
-        ..id = item.id
-        ..amount = item.amount
-        ..crossedOut = crossedOut.containsKey(item.id) ?? false);
+    await User.shoppingLists.firstWhere((s) => s.id == listId).refresh();
     setState(() {});
-    list.save();
   }
 
   Future shoppingItemChange(ShoppingItem s, int change) async {
@@ -615,9 +597,10 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  initState(){
+  initState() {
     super.initState();
-    firebaseMessaging.configure(onMessage: (x) => CloudMessaging.onMessage(x, setState));
+    firebaseMessaging.configure(
+        onMessage: (x) => CloudMessaging.onMessage(x, setState));
 
     /*firebaseMessaging.getToken().then((String token) {
     });*/

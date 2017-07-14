@@ -1,8 +1,7 @@
-//Some comment
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/main.dart';
 import 'package:testProject/manager/file_manager.dart';
@@ -103,6 +102,7 @@ class LoginPageState extends State<LoginPage> {
     User.token = res.token;
     User.username = res.username;
     User.eMail = res.eMail;
+    firebaseMessaging.subscribeToTopic(res.username + "userTopic");
     firstBoot ? runApp(new NSSL()) : Navigator.pop(context);
   }
 
