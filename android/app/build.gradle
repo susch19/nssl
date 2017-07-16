@@ -25,6 +25,7 @@ android {
 
     defaultConfig {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId 'de.susch19.nssl'
     }
 
     buildTypes {
