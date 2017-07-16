@@ -47,7 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "wasRemovedSuccessfullyMessage" : MessageLookupByLibrary.simpleMessage(" wurde erfolgreich gelöscht"),
     "loginSuccessfulMessage" : MessageLookupByLibrary.simpleMessage("Login erfolgreich"),
     "nameEmailRequiredError" : MessageLookupByLibrary.simpleMessage("Name oder EMail wird benötigt."),
-    "usernameToShortError" : MessageLookupByLibrary.simpleMessage("Der Benutzername muss auf mindestens 4 Zeichen bestehen"),
+    "usernameToShortError" : MessageLookupByLibrary.simpleMessage("Der Benutzername muss aus mindestens 4 Zeichen bestehen"),
     "emailRequiredError" : MessageLookupByLibrary.simpleMessage("EMail ist erforderlich"),
     "emailIncorrectFormatError" : MessageLookupByLibrary.simpleMessage("Die EMail-Adresse scheint ein falsches Format zu haben"),
     "chooseAPassword" : MessageLookupByLibrary.simpleMessage("Bitte ein Passwort eingeben"),

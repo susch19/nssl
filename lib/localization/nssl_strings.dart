@@ -51,7 +51,7 @@ class NSSLStrings extends LocaleQueryData {
   String usernameToShortError() => Intl.message('Your username has to be at least 4 characters long', name: 'usernameToShortError');
   String emailRequiredError() => Intl.message('EMail is required.', name: 'emailRequiredError');
   String emailIncorrectFormatError() => Intl.message('The email seems to be in the incorrect format.', name: 'emailIncorrectFormatError');
-  String chooseAPassword() => Intl.message('Please choose a password.', name: 'chosseAPassword');
+  String chooseAPassword() => Intl.message('Please choose a password.', name: 'chooseAPassword');
   String login() => Intl.message('Login', name: 'login');
   String usernameOrEmailForLoginHint() => Intl.message('username or email can be used to login', name: 'usernameOrEmailForLoginHint');
   String usernameOrEmailTitle() => Intl.message('Username or Email', name: 'usernameOrEmailTitle');

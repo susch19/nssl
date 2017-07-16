@@ -18,7 +18,6 @@ class Registration extends StatefulWidget {
 
 class RegistrationState extends State<Registration> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  PersonData person = new PersonData();
   var nameInput = new ForInput();
   var emailInput = new ForInput();
   var pwInput = new ForInput();
@@ -33,44 +32,55 @@ class RegistrationState extends State<Registration> {
   }
 
   void _handleSubmitted() {
-    if (nameInput.textEditingController == null ||
-        nameInput.textEditingController.text.isEmpty) {
-      showInSnackBar(loc.usernameEmptyError());
-      return;
+    bool error = false;
+    _resetInput();
+
+    String ni = _validateName(nameInput.textEditingController.text);
+    String ei = _validateEmail(emailInput.textEditingController.text);
+    String pi = _validatePassword(pwInput.textEditingController.text);
+    String p2i = _validatePassword2(pw2Input.textEditingController.text);
+    if (ni != null) {
+      nameInput.decoration = new InputDecoration(
+          labelText: nameInput.decoration.labelText,
+          helperText: nameInput.decoration.helperText,
+          errorText: ni);
+      error = true;
     }
-    if (emailInput.textEditingController == null ||
-        emailInput.textEditingController.text.isEmpty) {
-      showInSnackBar(loc.emailEmptyError());
-      return;
+    if (ei != null) {
+      emailInput.decoration = new InputDecoration(
+          labelText: emailInput.decoration.labelText,
+          helperText: emailInput.decoration.helperText,
+          errorText: ei);
+      error = true;
     }
-    if (pwInput.textEditingController == null ||
-        pw2Input.textEditingController == null ||
-        pwInput.textEditingController != pw2Input.textEditingController ||
-        pwInput.textEditingController.text.isEmpty) {
-      showInSnackBar(loc.reenterPasswordError());
-      return;
+    if (pi != null) {
+      pwInput.decoration = new InputDecoration(
+          labelText: pwInput.decoration.labelText,
+          helperText: pwInput.decoration.helperText,
+          errorText: pi);
+      error = true;
     }
-    if (_validateName(nameInput.textEditingController.text) != null) {
-      showInSnackBar(loc.unknownUsernameError());
-      return;
-    } else if (_validateEmail(emailInput.textEditingController.text) != null) {
-      showInSnackBar(loc.unknownEmailError());
-      return;
-    } else if (_validatePassword(pwInput.textEditingController.text) != null) {
-      showInSnackBar(loc.unknownPasswordError());
-      return;
-    } else if (_validatePassword2(pw2Input.textEditingController.text) !=
-        null) {
-      showInSnackBar(loc.unknownReenterPasswordError());
-      return;
+    if (p2i != null) {
+      pw2Input.decoration = new InputDecoration(
+          labelText: pw2Input.decoration.labelText,
+          helperText: pw2Input.decoration.helperText,
+          errorText: p2i);
+      error = true;
+    }
+    if (pwInput.textEditingController.text != pw2Input.textEditingController.text) {
+      pw2Input.decoration = new InputDecoration(
+          labelText: pw2Input.decoration.labelText,
+          helperText: pw2Input.decoration.helperText,
+          errorText: loc.passwordsDontMatchError());
+      error = true;
     }
 
+    setState(() => {});
+    if (error == true) return;
     String name = nameInput.textEditingController.text;
     String email = emailInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
 
-    print(JSON
-        .encode(new LoginArgs(username: name, eMail: email, pwHash: password)));
 
     UserSync.create(name, email, password).then((res) {
       if (!HelperMethods.reactToRespone(res,
@@ -95,9 +105,8 @@ class RegistrationState extends State<Registration> {
 
   String _validateName(String value) {
     if (value.isEmpty)
-      return loc.nameEmptyError();
-    else if (value.length < 4)
-      return loc.usernameToShortError();
+      return loc.usernameEmptyError();
+    else if (value.length < 4) return loc.usernameToShortError();
     return null;
   }
 
@@ -105,8 +114,7 @@ class RegistrationState extends State<Registration> {
     if (value.isEmpty) return loc.emailEmptyError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value))
-      return loc.emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return loc.emailIncorrectFormatError();
     return null;
   }
 
@@ -137,36 +145,22 @@ class RegistrationState extends State<Registration> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   new TextField(
-                      decoration: new InputDecoration(
-                        hintText: loc.usernameRegisterHint(),
-                        labelText: loc.username(),
-                        errorText: nameInput.errorText,
-                      ),
-                      onChanged: (input) => setState(() {
-                            nameInput.errorText = _validateName(input);
-                          }),
+                      decoration: nameInput.decoration,
                       controller: nameInput.textEditingController,
                       autofocus: true,
                       onSubmitted: (s) {
-                        person.name = s;
-                        //Focus.moveTo(emailInput.key);
+                        FocusScope
+                            .of(context)
+                            .requestFocus(emailInput.focusNode);
                       }),
                   new TextField(
                       key: emailInput.key,
-                      decoration: new InputDecoration(
-                        hintText: loc.emailRegisterHint(),
-                        labelText: loc.emailTitle(),
-                        errorText: emailInput.errorText,
-                      ),
-                      onChanged: (input) => setState(() {
-                            emailInput.errorText = _validateEmail(input);
-                            emailInput.textEditingController.text = input;
-                          }),
+                      decoration: emailInput.decoration,
                       controller: emailInput.textEditingController,
-                      keyboardType: TextInputType.text,
+                      focusNode: emailInput.focusNode,
+                      keyboardType: TextInputType.emailAddress,
                       onSubmitted: (s) {
-                        person.email = s;
-                        //Focus.moveTo(pwInput.key);
+                        FocusScope.of(context).requestFocus(pwInput.focusNode);
                       }),
                   new Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,43 +168,25 @@ class RegistrationState extends State<Registration> {
                         new Flexible(
                             child: new TextField(
                                 key: pwInput.key,
-                                decoration: new InputDecoration(
-                                  hintText: loc.passwordRegisterHint(),
-                                  labelText: loc.password(),
-                                  errorText: pwInput.errorText,
-                                ),
-                                onChanged: (input) => setState(() {
-                                      pwInput.errorText =
-                                          _validatePassword(input);
-                                      pwInput.textEditingController.text =
-                                          input;
-                                      pw2Input.errorText = _validatePassword2(
-                                          pw2Input.textEditingController.text);
-                                    }),
+                                decoration: pwInput.decoration,
                                 controller: pwInput.textEditingController,
+                                focusNode: pwInput.focusNode,
+                                obscureText: true,
                                 onSubmitted: (s) {
-                                  person.password = s;
-                                  //Focus.moveTo(pw2Input.key);
+                                  FocusScope
+                                      .of(context)
+                                      .requestFocus(pw2Input.focusNode);
                                 })),
                         new SizedBox(width: 16.0),
                         new Flexible(
                             child: new TextField(
                                 key: pw2Input.key,
-                                decoration: new InputDecoration(
-                                  hintText: loc.retypePasswordHint(),
-                                  labelText: loc.retypePasswordTitle(),
-                                  errorText: pw2Input.errorText,
-                                ),
+                                decoration: pw2Input.decoration,
                                 controller: pw2Input.textEditingController,
-                                onChanged: (input) => setState(() {
-                                      pw2Input.errorText =
-                                          _validatePassword2(input);
-                                      pw2Input.textEditingController.text =
-                                          input;
-                                    }),
+                                focusNode: pw2Input.focusNode,
+                                obscureText: true,
                                 onSubmitted: (s) {
-                                  person.password = s;
-                                  //Focus.moveTo(submit.key);
+                                  _handleSubmitted();
                                 })),
                       ]),
                   new Container(
@@ -227,5 +203,26 @@ class RegistrationState extends State<Registration> {
                     ),
                   )
                 ])));
+  }
+
+  _resetInput() {
+    nameInput.decoration = new InputDecoration(
+        helperText: loc.usernameRegisterHint(), labelText: loc.username());
+
+    emailInput.decoration = new InputDecoration(
+        helperText: loc.emailRegisterHint(), labelText: loc.emailTitle());
+
+    pwInput.decoration = new InputDecoration(
+        helperText: loc.passwordRegisterHint(), labelText: loc.password());
+
+    pw2Input.decoration = new InputDecoration(
+        helperText: loc.retypePasswordHint(),
+        labelText: loc.retypePasswordTitle());
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _resetInput();
   }
 }

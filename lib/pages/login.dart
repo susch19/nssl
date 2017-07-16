@@ -30,6 +30,8 @@ class ForInput {
   TextEditingController textEditingController = new TextEditingController();
   String errorText = '';
   GlobalKey key = new GlobalKey();
+  InputDecoration decoration;
+  FocusNode focusNode = new FocusNode();
 }
 
 class LoginPageState extends State<LoginPage> {
@@ -47,24 +49,26 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void _handleSubmitted() {
-    if (nameInput.textEditingController == null ||
-        nameInput.textEditingController.text.isEmpty) {
-      showInSnackBar(loc.usernameEmptyError());
-      return;
-    }
+    bool error = false;
+    _resetInput();
 
-    if (pwInput.textEditingController == null ||
-        pwInput.textEditingController.text.isEmpty) {
-      showInSnackBar(loc.passwordEmptyError());
-      return;
+    var validate = _validateName(nameInput.textEditingController.text);
+    if (validate != null) {
+      nameInput.decoration = new InputDecoration(
+          labelText: nameInput.decoration.labelText,
+          helperText: nameInput.decoration.helperText,
+          errorText: validate);
+      error = true;
     }
-    if (_validateName(nameInput.textEditingController.text) != null) {
-      showInSnackBar(loc.unknownUsernameError());
-      return;
-    } else if (_validatePassword(pwInput.textEditingController.text) != null) {
-      showInSnackBar(loc.unknownPasswordError());
-      return;
+    if (_validatePassword(pwInput.textEditingController.text) != null) {
+      pwInput.decoration = new InputDecoration(
+          labelText: pwInput.decoration.labelText,
+          helperText: pwInput.decoration.helperText,
+          errorText: _validatePassword(pwInput.textEditingController.text));
+      error = true;
     }
+    setState(() => {});
+    if (error == true) return;
 
     String name = nameInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
@@ -88,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future _handleLoggedIn(LoginResult res) async{
+  Future _handleLoggedIn(LoginResult res) async {
     if (!res.success) {
       showInSnackBar(res.error);
       return;
@@ -105,18 +109,18 @@ class LoginPageState extends State<LoginPage> {
     User.username = res.username;
     User.eMail = res.eMail;
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
-    if(firstBoot) {
+    if (firstBoot) {
       await _getAllListsInit();
-      if(User.shoppingLists?.length > 0)
+      if (User.shoppingLists?.length > 0)
         User.currentList = User.shoppingLists.first;
       runApp(new NSSL());
-    }
-    else
+    } else
       Navigator.pop(context);
   }
+
   Future _getAllListsInit() async {
     var result =
-    GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
+        GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
     setState(() => User.shoppingLists.clear());
     for (var res in result.shoppingLists) {
       var list = new ShoppingList()
@@ -133,11 +137,10 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-
   String _validateName(String value) {
     if (value.isEmpty) return loc.nameEmailRequiredError();
-    if (value.length < 4)
-      return loc.usernameToShortError();
+    if (value.length < 4) return loc.usernameToShortError();
+
     return null;
   }
 
@@ -145,16 +148,30 @@ class LoginPageState extends State<LoginPage> {
     if (value.isEmpty) return loc.emailRequiredError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value))
-      return loc.emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return loc.emailIncorrectFormatError();
     return null;
   }
 
   String _validatePassword(String value) {
     if (pwInput.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty)
-      return loc.chooseAPasswordPrompt();
+      return loc.passwordEmptyError();
     return null;
+  }
+
+  _resetInput() {
+    nameInput.decoration = new InputDecoration(
+        helperText: loc.usernameOrEmailForLoginHint(),
+        labelText: loc.usernameOrEmailTitle());
+
+    pwInput.decoration = new InputDecoration(
+        helperText: loc.choosenPasswordHint(), labelText: loc.password());
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _resetInput();
   }
 
   @override
@@ -167,28 +184,21 @@ class LoginPageState extends State<LoginPage> {
         child:
             new Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           new TextField(
-              decoration: new InputDecoration(
-                hintText: loc.usernameOrEmailForLoginHint(),
-                labelText: loc.usernameOrEmailTitle(),
-                errorText: nameInput.errorText,
-              ),
-              onChanged: (input) => nameInput.errorText = _validateName(input),
+              decoration: nameInput.decoration,
+              //onChanged: (input) => nameInput.errorText = _validateName(input),
               controller: nameInput.textEditingController,
               autofocus: true,
               onSubmitted: (val) {
-                //Focus.moveTo(pwInput.key);
+                FocusScope.of(context).requestFocus(pwInput.focusNode);
               }),
           new TextField(
               key: pwInput.key,
-              decoration: new InputDecoration(
-                hintText: loc.choosenPasswordHint(),
-                labelText: loc.password(),
-                errorText: pwInput.errorText,
-              ),
+              decoration: pwInput.decoration,
+              focusNode: pwInput.focusNode,
               obscureText: true,
               controller: pwInput.textEditingController,
               onSubmitted: (val) {
-                //Focus.moveTo(submit.key);
+                _handleSubmitted();
               }),
           new Container(
               child: new RaisedButton(
