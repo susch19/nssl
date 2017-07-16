@@ -61,12 +61,6 @@ class _HomeState extends State<Home> {
       title: 'NSSL',
       color: Colors.grey[500],
       theme: Themes.themes.first,
-//      theme: new ThemeData(
-//          primarySwatch: Home.swatch,
-//          accentColorBrightness: Home.theme.accentColorBrightness,
-//          primaryColorBrightness: Home.theme.primaryColorBrightness,
-//          accentColor: Home.theme.accentColor),
-      //(themed ? lTheme : dTheme).copyWith(),
       home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
       routes: <String, WidgetBuilder>{
         '/login': (BuildContext context) => new LoginPage(),
@@ -111,18 +105,19 @@ class _HomeState extends State<Home> {
                         const PopupMenuItem<String>(
                             value: 'PerformanceOverlay',
                             child: const Text('Toggle Performance Overlay')),
-                        const PopupMenuItem<String>(
-                            value: 'materialGrid',
-                            child: const Text('Toggle Materialgrid')),
+                        new PopupMenuItem<String>(
+                            value: 'deleteCrossedOut',
+                            child: new Text(
+                                NSSLStrings.instance.deleteCrossedOutPB())),
                       ])
             ]),
         body: new Builder(builder: buildBody),
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
-          new FlatButton(
+          /*new FlatButton(
             child: new Text(NSSLStrings.instance.deleteCrossedOutPB()),
             onPressed: _deleteCrossedOutItems,
-          ),
+          ),*/
           new FlatButton(
               child: new Text(NSSLStrings.instance.addPB()),
               onPressed: _addWithoutSearchDialog),
@@ -279,10 +274,12 @@ class _HomeState extends State<Home> {
             .then((x) => setState(() {
                   Home.theme = Home.theme;
                 }));
-
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
+        break;
+      case "deleteCrossedOut":
+        _deleteCrossedOutItems();
         break;
       case "materialGrid":
         setState(() => materialGrid = !materialGrid);

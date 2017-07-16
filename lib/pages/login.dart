@@ -5,9 +5,11 @@ import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/main.dart';
 import 'package:testProject/manager/file_manager.dart';
+import 'package:testProject/models/model_export.dart';
 import 'package:testProject/models/user.dart';
 import 'package:testProject/server_communication/helper_methods.dart';
 import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/s_c.dart';
 import 'package:testProject/server_communication/user_sync.dart';
 
 class LoginPage extends StatefulWidget {
@@ -103,8 +105,34 @@ class LoginPageState extends State<LoginPage> {
     User.username = res.username;
     User.eMail = res.eMail;
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
-    firstBoot ? runApp(new NSSL()) : Navigator.pop(context);
+    if(firstBoot) {
+      await _getAllListsInit();
+      if(User.shoppingLists?.length > 0)
+        User.currentList = User.shoppingLists.first;
+      runApp(new NSSL());
+    }
+    else
+      Navigator.pop(context);
   }
+  Future _getAllListsInit() async {
+    var result =
+    GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
+    setState(() => User.shoppingLists.clear());
+    for (var res in result.shoppingLists) {
+      var list = new ShoppingList()
+        ..id = res.id
+        ..name = res.name
+        ..shoppingItems = new List<ShoppingItem>();
+      for (var item in res.products)
+        list.shoppingItems.add(new ShoppingItem()
+          ..name = item.name
+          ..id = item.id
+          ..amount = item.amount);
+      setState(() => User.shoppingLists.add(list));
+      list.save();
+    }
+  }
+
 
   String _validateName(String value) {
     if (value.isEmpty) return loc.nameEmailRequiredError();
