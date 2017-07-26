@@ -80,8 +80,10 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       return false;
     } else {
       form.save();
+      double realWeight = recursivPasing(weight);
+      String unit = weight.substring(realWeight?.toString()?.length-1);
       var first = (await ProductSync.addNewProduct(
-          "$productName $brandName $weight", gtin));
+          "$productName $brandName", gtin, realWeight, unit));
       if (first.statusCode != 200) {
         showInSnackBar(first.reasonPhrase);
         return false;
@@ -190,5 +192,11 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     if (value.isEmpty) return loc.fieldRequiredError();
     if (value.length < 3) return loc.newProductNameToShort();
     return null;
+  }
+
+  double recursivPasing(String source) {
+    if(source.length == 0)
+      return null;
+    return double.parse(source.substring(0, source.length-1), recursivPasing);
   }
 }

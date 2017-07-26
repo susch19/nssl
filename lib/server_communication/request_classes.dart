@@ -35,8 +35,7 @@ class ChangeProductsArgs {
   ChangeProductsArgs(this.productIds, this.change);
   List<int> productIds;
   List<int> change;
-  toJson
-      () => {"amount": change, "productIds" : productIds};
+  toJson() => {"amount": change, "productIds": productIds};
 }
 
 class ChangeListNameArgs {
@@ -67,10 +66,17 @@ class AddProductArgs {
 }
 
 class AddNewProductArgs {
-  AddNewProductArgs(this.name, this.gtin);
+  AddNewProductArgs(this.name, this.gtin, this.unit, this.quantity);
   String name;
   String gtin;
-  toJson() => {"name": "$name", "gtin": "$gtin"};
+  String unit;
+  double quantity;
+  toJson() => {
+        "name": "$name",
+        "gtin": "$gtin",
+        "unit": "$unit",
+        "quantity": "$quantity"
+      };
 }
 
 class GetProductsArgs {
