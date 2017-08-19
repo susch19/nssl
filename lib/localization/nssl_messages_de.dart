@@ -15,7 +15,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "scanPB" : MessageLookupByLibrary.simpleMessage("SCANNEN"),
     "addPB" : MessageLookupByLibrary.simpleMessage("ADD"), //TODO find good german word
     "searchPB" : MessageLookupByLibrary.simpleMessage("SUCHEN"),
-    "deleteCrossedOutPB" : MessageLookupByLibrary.simpleMessage("LÖSCHE MAKIERTE"),
+    "deleteCrossedOutPB" : MessageLookupByLibrary.simpleMessage("Lösche Markierte"),
     "addListPB" : MessageLookupByLibrary.simpleMessage("LISTE HINZUFÜGEN"),
     "contributors" : MessageLookupByLibrary.simpleMessage("Teilnehmer"),
     "rename" : MessageLookupByLibrary.simpleMessage("Umbenennen"),
@@ -107,5 +107,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeAccentColor" : MessageLookupByLibrary.simpleMessage("Akzentfarbe"),
     "changeDarkTheme" : MessageLookupByLibrary.simpleMessage("Dunkles Design"),
     "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Helle Icons"),
+    "autoSync" : MessageLookupByLibrary.simpleMessage("Auto-Sync"),
+    "changePasswordButton" : MessageLookupByLibrary.simpleMessage("ÄNDERE PASSWORT"),
+    "currentPassword" : MessageLookupByLibrary.simpleMessage("aktuelles passwort"),
+    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("das aktuelle passwort, dass geändert werden soll"),
+    "newPassword" : MessageLookupByLibrary.simpleMessage("neues passwort"),
+    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("das neue gewählte passwort"),
+    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("neues passwort wiederholen"),
+    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("wiederholung des neu gewählten passworts"),
+    "changePasswordPD" : MessageLookupByLibrary.simpleMessage("Ändere Passwort"),
+    "successful" : MessageLookupByLibrary.simpleMessage("Erfolgreich"),
+    "passwordSet" : MessageLookupByLibrary.simpleMessage("Dein Passwort wurde erfolgreich geändert"),
   };
 }

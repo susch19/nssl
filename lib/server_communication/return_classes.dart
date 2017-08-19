@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:testProject/models_json.dart';
 
-class CreateResult {
+class BaseResult {
   bool success;
   String error;
+}
+
+class CreateResult extends BaseResult {
   int id;
   String username;
   String eMail;
@@ -22,9 +25,7 @@ class CreateResult {
   }
 }
 
-class LoginResult {
-  bool success;
-  String error;
+class LoginResult extends BaseResult {
   int id;
   String username;
   String eMail;
@@ -43,9 +44,7 @@ class LoginResult {
   }
 }
 
-class AddContributorResult {
-  bool success;
-  String error;
+class AddContributorResult extends BaseResult {
   String name;
   int id;
   static AddContributorResult fromJson(String dataString) =>
@@ -67,9 +66,7 @@ class ContributorResult {
   bool isAdmin;
 }
 
-class GetContributorsResult {
-  bool success;
-  String error;
+class GetContributorsResult extends BaseResult {
   List<ContributorResult> contributors;
 
   static GetContributorsResult fromJson(String dataString) =>
@@ -90,12 +87,10 @@ class GetContributorsResult {
   }
 }
 
-class ProductResult {
-  bool success;
-  String error;
+class ProductResult extends BaseResult{
   String name;
   String gtin;
-  int quantity;
+  double quantity;
   String unit;
   static ProductResult fromJson(String dataString) =>
       _fromJson(JSON.decode(dataString));
@@ -112,9 +107,7 @@ class ProductResult {
   }
 }
 
-class AddListItemResult {
-  bool success;
-  String error;
+class AddListItemResult extends BaseResult{
   int productId;
   String name;
   String gtin;
@@ -132,9 +125,7 @@ class AddListItemResult {
   }
 }
 
-class ChangeListItemResult {
-  bool success;
-  String error;
+class ChangeListItemResult extends BaseResult{
   String name;
   int id;
   int amount;
@@ -154,9 +145,7 @@ class ChangeListItemResult {
   }
 }
 
-class AddListResult {
-  bool success;
-  String error;
+class AddListResult extends BaseResult{
   int id;
   String name;
   static AddListResult fromJson(String dataString) =>
@@ -208,7 +197,8 @@ class GetListsResult {
     List<Map> unmappedShoppingLists = data["lists"];
     r.shoppingLists = unmappedShoppingLists.map((s) => new ShoppingList()
       ..products = s["products"]
-          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"])).toList()
+          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]))
+          .toList()
       ..id = s["id"]
       ..name = s["name"]);
 
@@ -248,9 +238,7 @@ class HashResult extends Result {
   }
 }
 
-class Result {
-  bool success;
-  String error;
+class Result extends BaseResult{
   static Result fromJson(String dataString) =>
       _fromJson(JSON.decode(dataString));
 

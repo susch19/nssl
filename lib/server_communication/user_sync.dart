@@ -24,7 +24,6 @@ class UserSync {
   static Future<Response> refreshToken() =>
       HelperMethods.put(path2, null, true);
 
-  static Future<Response> changePassword(
-          int userId, String oldPassword, String newPassword, String token) =>
+  static Future<Response> changePassword(String oldPassword, String newPassword, String token) =>
       HelperMethods.put(path, new ChangePasswordArgs(oldPassword, newPassword));
 }

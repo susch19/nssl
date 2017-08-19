@@ -20,7 +20,7 @@ class ProductAddPage extends StatefulWidget {
     r.success = data["success"];
     r.error = data["error"];
     r.gtin = data["gtin"];
-    r.quantity = data["quantitity"];
+    r.quantity = data["quantity"];
     r.unit = data["unit"];
     r.name = data["name"];
 

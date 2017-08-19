@@ -8,16 +8,18 @@ import 'package:testProject/server_communication/jwt.dart';
 import 'user_sync.dart';
 
 class HelperMethods {
-  static const String url = "https://susch.undo.it:443";
+  static const String url = "http://192.168.49.28:4344";
 
-  static Future<http.Response> post(String path, [Object body = null, skipTokenRefresh = false]) async {
-    if(!skipTokenRefresh) await handleTokenRefresh();
+  static Future<http.Response> post(String path,
+      [Object body = null, skipTokenRefresh = false]) async {
+    if (!skipTokenRefresh) await handleTokenRefresh();
     var g = http.post("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
+    reactToRespone(res);
     return res;
   }
 
@@ -29,17 +31,20 @@ class HelperMethods {
     });
     http.Response res;
     await g.then((x) => res = x);
+    reactToRespone(res);
     return res;
   }
 
-  static Future<http.Response> put(String path, [Object body = null, bool skipTokenRefresh = false]) async {
-    if(!skipTokenRefresh) await handleTokenRefresh();
+  static Future<http.Response> put(String path,
+      [Object body = null, bool skipTokenRefresh = false]) async {
+    if (!skipTokenRefresh) await handleTokenRefresh();
     var g = http.put("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
+    reactToRespone(res);
     return res;
   }
 
@@ -51,6 +56,7 @@ class HelperMethods {
     });
     http.Response res;
     await g.then((x) => res = x);
+    reactToRespone(res);
     return res;
   }
 
@@ -61,10 +67,10 @@ class HelperMethods {
 
   static bool reactToRespone(http.Response respone,
       {BuildContext context, ScaffoldState scaffoldState}) {
-    if (respone.statusCode != 200) {
-      scaffoldState
-          .showSnackBar(new SnackBar(content: new Text(respone.reasonPhrase)));
-      return false;
+    if (respone.statusCode == 500) {
+      throw new Exception();
+    } else if (respone.statusCode == 401) {
+      throw new Exception();
     }
     return true;
   }
@@ -76,7 +82,6 @@ class HelperMethods {
       var to = m["token"];
       FileManager.write("token.txt", to);
       User.token = to;
-
     }
   }
 }

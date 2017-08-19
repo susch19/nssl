@@ -15,7 +15,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "scanPB" : MessageLookupByLibrary.simpleMessage("SCAN"),
     "addPB" : MessageLookupByLibrary.simpleMessage("ADD"),
     "searchPB" : MessageLookupByLibrary.simpleMessage("SEARCH"),
-    "deleteCrossedOutPB" : MessageLookupByLibrary.simpleMessage("DELETE CROSSED OUT"),
+    "deleteCrossedOutPB" : MessageLookupByLibrary.simpleMessage("Delete crossed out"),
     "addListPB" : MessageLookupByLibrary.simpleMessage("ADD LIST"),
     "contributors" : MessageLookupByLibrary.simpleMessage("Contributors"),
     "rename" : MessageLookupByLibrary.simpleMessage("Rename"),
@@ -106,6 +106,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeAccentColor" : MessageLookupByLibrary.simpleMessage("Accent Color"),
     "changeDarkTheme" : MessageLookupByLibrary.simpleMessage("Dark Theme"),
     "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Bright Icons"),
+    "autoSync" : MessageLookupByLibrary.simpleMessage("Auto-Sync"),
+    "changePasswordButton" : MessageLookupByLibrary.simpleMessage("CHANGE PASSWORD"),
+    "currentPassword" : MessageLookupByLibrary.simpleMessage("current password"),
+    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("current password that should be changed"),
+    "newPassword" : MessageLookupByLibrary.simpleMessage("new password"),
+    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("the new password you have chosen"),
+    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("repeat new password"),
+    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("repeat the new password you have chosen"),
+    "changePasswordPD" : MessageLookupByLibrary.simpleMessage("Change Password"),
+    "successful" : MessageLookupByLibrary.simpleMessage("Successful"),
+    "passwordSet" : MessageLookupByLibrary.simpleMessage("Your password has been set"),
 
 
   };

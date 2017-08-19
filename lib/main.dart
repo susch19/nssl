@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
   static ThemeData theme = new ThemeData(
       primarySwatch: Colors.blue,
       accentColor: Colors.teal,
-      accentColorBrightness: Brightness.dark,
+      accentColorBrightness: Brightness.light,
       brightness: Brightness.light);
   static MaterialColor swatch = Colors.blue;
 
@@ -102,9 +102,13 @@ class _HomeState extends State<Home> {
                             value: 'Options',
                             child:
                                 new Text(NSSLStrings.instance.changeTheme())),
-                        const PopupMenuItem<String>(
-                            value: 'PerformanceOverlay',
-                            child: const Text('Toggle Performance Overlay')),
+                        new PopupMenuItem<String>(
+                            value: 'ChangePassword',
+                            child:
+                            new Text(NSSLStrings.instance.changePasswordPD())),
+//                        const PopupMenuItem<String>(
+//                            value: 'PerformanceOverlay',
+//                            child: const Text('Toggle Performance Overlay')),
                         new PopupMenuItem<String>(
                             value: 'deleteCrossedOut',
                             child: new Text(
@@ -114,10 +118,6 @@ class _HomeState extends State<Home> {
         body: new Builder(builder: buildBody),
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
-          /*new FlatButton(
-            child: new Text(NSSLStrings.instance.deleteCrossedOutPB()),
-            onPressed: _deleteCrossedOutItems,
-          ),*/
           new FlatButton(
               child: new Text(NSSLStrings.instance.addPB()),
               onPressed: _addWithoutSearchDialog),
@@ -126,7 +126,10 @@ class _HomeState extends State<Home> {
               onPressed: _getEAN),
           new FlatButton(
               child: new Text(NSSLStrings.instance.searchPB()),
-              onPressed: search)
+              onPressed: search),
+//          new FlatButton(
+//              child: const Text("NewProduct"),
+//              onPressed: () => setEAN(new MethodCall("setEAN", "11111111"))),
         ]);
   }
 
@@ -211,7 +214,7 @@ class _HomeState extends State<Home> {
   }
 
   void showInSnackBar(String value,
-      {Duration duration: null, SnackBarAction action}) {
+      {Duration duration, SnackBarAction action}) {
     _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),
         duration: duration ?? new Duration(seconds: 3),
@@ -219,7 +222,7 @@ class _HomeState extends State<Home> {
   }
 
   void showInDrawerSnackBar(String value,
-      {Duration duration: null, SnackBarAction action}) {
+      {Duration duration, SnackBarAction action}) {
     _drawerScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),
         duration: duration ?? new Duration(seconds: 3),
@@ -284,6 +287,15 @@ class _HomeState extends State<Home> {
       case "materialGrid":
         setState(() => materialGrid = !materialGrid);
         break;
+      case "ChangePassword":
+        Navigator
+            .push(
+            cont,
+            new MaterialPageRoute<DismissDialogAction>(
+              builder: (BuildContext context) => new ChangePasswordPage(),
+              fullscreenDialog: true,
+            ));
+        break;
     }
   }
 
@@ -322,11 +334,11 @@ class _HomeState extends State<Home> {
             item.amount = p.amount;
           });
         } else {
-          var p = AddListItemResult.fromJson(
-              (await ShoppingListSync.addProduct(list.id, k.name, '-', 1))
-                  .body);
+          var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
+                  list.id, "${k.name} ${k.quantity}${k.unit}", '-', 1))
+              .body);
           afterAdd = new ShoppingItem()
-            ..name = p.name
+            ..name = "${p.name}"
             ..amount = 1
             ..id = p.productId;
           setState(() => list.shoppingItems.add(afterAdd));
@@ -351,6 +363,7 @@ class _HomeState extends State<Home> {
         title: loc.addNewListTitle(),
         context: cont);
 //rename ? (s) => renameList(listId, s)
+
     showDialog(child: sd, context: cont);
   }
 
@@ -419,6 +432,14 @@ class _HomeState extends State<Home> {
                                     leading: const Icon(Icons.mode_edit),
                                     title: new Text(
                                         NSSLStrings.instance.rename()))),
+                            new PopupMenuItem<String>(
+                                value: x.id.toString() + "\u{1E}" + 'Auto-Sync',
+                                child: new ListTile(
+                                    leading: new Icon(x.messagingEnabled
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank),
+                                    title: new Text(
+                                        NSSLStrings.instance.autoSync()))),
                             const PopupMenuDivider() //ignore: list_element_type_not_assignable
                                 ,
                             new PopupMenuItem<String>(
@@ -479,6 +500,13 @@ class _HomeState extends State<Home> {
                   loc.removed());
           setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
         }
+        break;
+      case "Auto-Sync":
+        var list = User.shoppingLists.firstWhere((x) => x.id == id);
+        list.messagingEnabled
+            ? list.unsubscribeFromFirebaseMessaging()
+            : list.subscribeForFirebaseMessaging();
+        list.messagingEnabled = !list.messagingEnabled;
         break;
     }
   }

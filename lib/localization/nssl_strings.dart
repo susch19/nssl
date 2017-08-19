@@ -110,4 +110,18 @@ class NSSLStrings extends LocaleQueryData {
   String changeAccentColor() => Intl.message('Accent Color', name: 'changeAccentColor');
   String changeDarkTheme() => Intl.message('Dark Theme', name: 'changeDarkTheme');
   String changeAccentTextColor() => Intl.message('Dark Icons', name: 'changeAccentTextColor');
+  String autoSync() => Intl.message('Auto-Sync', name: 'autoSync');
+  String changePasswordButton() => Intl.message('CHANGE PASSWORD', name: 'changePasswordButton');
+  String oldPassword() => Intl.message('current password', name: 'currentPassword');
+  String oldPasswordHint() => Intl.message('current password that should be changed', name: 'currentPasswordHint');
+  String newPassword() => Intl.message('new password', name: 'newPassword');
+  String newPasswordHint() => Intl.message('the new password you have chosen', name: 'newPasswordHint');
+  String new2Password() => Intl.message('repeat new password', name: 'repeatNewPassword');
+  String new2PasswordHint() => Intl.message('repeat the new password you have chosen', name: 'repeatNewPasswordHint');
+  String changePasswordPD() => Intl.message('Change Password', name: 'changePasswordPD');
+  String successful() => Intl.message('Successful', name: 'successful');
+  String passwordSet() => Intl.message('Your password has been set', name: 'passwordSet');
+
+
+
 }

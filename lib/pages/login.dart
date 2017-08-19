@@ -178,47 +178,58 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldKey,
+      resizeToAvoidBottomPadding: true,
       appBar: new AppBar(title: new Text(loc.login())),
       body: new Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
             new Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          new TextField(
-              decoration: nameInput.decoration,
-              //onChanged: (input) => nameInput.errorText = _validateName(input),
-              controller: nameInput.textEditingController,
-              autofocus: true,
-              onSubmitted: (val) {
-                FocusScope.of(context).requestFocus(pwInput.focusNode);
-              }),
-          new TextField(
-              key: pwInput.key,
-              decoration: pwInput.decoration,
-              focusNode: pwInput.focusNode,
-              obscureText: true,
-              controller: pwInput.textEditingController,
-              onSubmitted: (val) {
-                _handleSubmitted();
-              }),
-          new Container(
-              child: new RaisedButton(
-                key: submit.key,
-                child: new SizedBox.expand(
-                    child: new Center(child: new Text(loc.loginButton()))),
-                onPressed: _handleSubmitted,
-              ),
-              padding: const EdgeInsets.only(top: 16.0)),
-          new Container(
-            child: new FlatButton(
-              onPressed: () {
-                User.username == null
-                    ? Navigator.pushNamed(context, "/registration")
-                    : Navigator.popAndPushNamed(context, "/registration");
-              },
-              child: new Text(loc.registerTextOnLogin()),
+          new Flexible(
+              child: new TextField(
+                  decoration: nameInput.decoration,
+                  //onChanged: (input) => nameInput.errorText = _validateName(input),
+                  controller: nameInput.textEditingController,
+                  autofocus: true,
+                  onSubmitted: (val) {
+                    FocusScope.of(context).requestFocus(pwInput.focusNode);
+                  })),
+          new Flexible(
+              child: new TextField(
+                  key: pwInput.key,
+                  decoration: pwInput.decoration,
+                  focusNode: pwInput.focusNode,
+                  obscureText: true,
+                  controller: pwInput.textEditingController,
+                  onSubmitted: (val) {
+                    _handleSubmitted();
+                  })),
+          new Flexible(
+            child: new Container(
+                child: new RaisedButton(
+                  key: submit.key,
+                  child: new SizedBox.expand(
+                      child: new Center(child: new Text(loc.loginButton()))),
+                  onPressed: _handleSubmitted,
+                ),
+                padding: const EdgeInsets.only(top: 16.0)
             ),
-            padding: const EdgeInsets.only(top: 72.0),
-          )
+          ),
+          new Flexible(
+              child: new Column(
+            children: [
+              new FlatButton(
+                onPressed: () {
+                  User.username == null
+                      ? Navigator.pushNamed(context, "/registration")
+                      : Navigator.popAndPushNamed(context, "/registration");
+                },
+                child: new Text(loc.registerTextOnLogin()),
+              )
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            //padding: new EdgeInsets.only(
+            //    top: MediaQuery.of(context).size.height / 5),
+          ))
         ]),
       ),
     );

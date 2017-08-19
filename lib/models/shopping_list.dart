@@ -9,6 +9,7 @@ class ShoppingList {
   int id;
   String name;
   List<ShoppingItem> shoppingItems;
+  bool messagingEnabled = true;
 
   static Future<ShoppingList> load(int id) async {
     var items =

@@ -1,7 +1,6 @@
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
@@ -140,7 +139,7 @@ class RegistrationState extends State<Registration> {
         key: _scaffoldKey,
         appBar: new AppBar(title: new Text(loc.registrationTitle())),
         body: new Container(
-            padding: const EdgeInsets.all(32.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

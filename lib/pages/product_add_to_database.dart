@@ -80,8 +80,15 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       return false;
     } else {
       form.save();
-      double realWeight = recursivPasing(weight);
-      String unit = weight.substring(realWeight?.toString()?.length-1);
+      //double realWeight = recursiveParsing(weight);
+      var numberReg = new RegExp('(?:\\d*[\\.\\,])?\\d+');
+      var unitReg = new RegExp('[a-z]+', caseSensitive: false);
+      var match = numberReg.firstMatch(weight);
+      double realWeight = double.parse(weight.substring(match.start, match.end));
+
+//      String unit = weight.substring(realWeight?.toString()?.length - 1);
+      match = unitReg.firstMatch(weight);
+      String unit = weight.substring(match.start, match.end);
       var first = (await ProductSync.addNewProduct(
           "$productName $brandName", gtin, realWeight, unit));
       if (first.statusCode != 200) {
@@ -95,8 +102,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
         if (putInList) {
           var list = User.currentList;
           var pres = AddListItemResult.fromJson(
-              (await ShoppingListSync.addProduct(list.id,
-                      "$productName $brandName $weight", gtin, 1))
+              (await ShoppingListSync.addProduct(
+                      list.id, "$productName $brandName $weight", gtin, 1))
                   .body);
           if (!pres.success)
             showInSnackBar(pres.error);
@@ -107,7 +114,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 ..id = pres.productId
                 ..name = pres.name);
             });
-            Navigator.pop(context, DismissDialogAction.save);
+            Navigator.of(context).pop();
           }
         }
       }
@@ -121,7 +128,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(title: new Text(loc.newProductTitle()), actions: <Widget>[
+      appBar:
+          new AppBar(title: new Text(loc.newProductTitle()), actions: <Widget>[
         new FlatButton(
             child: new Text(loc.saveButton(),
                 style: theme.textTheme.body1.copyWith(color: Colors.white)),
@@ -194,9 +202,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     return null;
   }
 
-  double recursivPasing(String source) {
-    if(source.length == 0)
-      return null;
-    return double.parse(source.substring(0, source.length-1), recursivPasing);
+  double recursiveParsing(String source) {
+    if (source.length == 0) return null;
+    return double.parse(
+        source.substring(0, source.length - 1), recursiveParsing);
   }
 }
