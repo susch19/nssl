@@ -29,7 +29,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
 
   _ContributorsPagePageState(int listId) {
     this.listId = listId;
-    ShoppingListSync.getContributors(listId).then((o) {
+    ShoppingListSync.getContributors(listId, context).then((o) {
       if (o.statusCode == 500) {
         showInSnackBar("Internal Server Error");
         return;
@@ -68,7 +68,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   }
 
   Future _addContributor(String value) async {
-    ShoppingListSync.addContributor(listId, value).then((o) {
+    ShoppingListSync.addContributor(listId, value, context).then((o) {
       AddContributorResult z = AddContributorResult.fromJson(o.body);
       if (!z.success)
         showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
@@ -135,7 +135,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   }
 
   void showInSnackBar(String value,
-      {Duration duration: null, SnackBarAction action}) {
+      {Duration duration, SnackBarAction action}) {
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
     _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),
@@ -149,7 +149,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
     switch (command) {
       case "Remove":
         var userId = int.parse(splitted[0]);
-        var res = await ShoppingListSync.deleteContributor(listId, userId);
+        var res = await ShoppingListSync.deleteContributor(listId, userId, context);
         var enres = Result.fromJson(res.body);
         if (!enres.success)
           showInSnackBar(enres.error);
@@ -161,12 +161,12 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
         break;
       case "ChangeRight":
         var userId = int.parse(splitted[0]);
-        var res = await ShoppingListSync.changeRight(listId, userId);
+        var res = await ShoppingListSync.changeRight(listId, userId, context);
         var enres = Result.fromJson(res.body);
         if (!enres.success)
           showInSnackBar(enres.error);
         else {
-          ShoppingListSync.getContributors(listId).then((o) {
+          ShoppingListSync.getContributors(listId, context).then((o) {
             if (o.statusCode == 500) {
               showInSnackBar("Internal Server Error");
               return;

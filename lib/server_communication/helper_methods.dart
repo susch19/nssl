@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:testProject/localization/nssl_strings.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:testProject/manager/file_manager.dart';
@@ -8,55 +9,56 @@ import 'package:testProject/server_communication/jwt.dart';
 import 'user_sync.dart';
 
 class HelperMethods {
-  static const String url = "http://192.168.49.28:4344";
+  static const String url = "https://susch.undo.it";
+  static NSSLStrings loc = NSSLStrings.instance;
 
-  static Future<http.Response> post(String path,
-      [Object body = null, skipTokenRefresh = false]) async {
-    if (!skipTokenRefresh) await handleTokenRefresh();
+  static Future<http.Response> post(String path, BuildContext context,
+      [Object body, skipTokenRefresh = false]) async {
+    if (!skipTokenRefresh) await handleTokenRefresh(context);
     var g = http.post("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
-    reactToRespone(res);
+    reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> get(String path) async {
-    await handleTokenRefresh();
+  static Future<http.Response> get(String path, BuildContext context) async {
+    await handleTokenRefresh(context);
     var g = http.get("$url/$path", headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
-    reactToRespone(res);
+    reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> put(String path,
-      [Object body = null, bool skipTokenRefresh = false]) async {
-    if (!skipTokenRefresh) await handleTokenRefresh();
+  static Future<http.Response> put(String path, BuildContext context,
+      [Object body, bool skipTokenRefresh = false]) async {
+    if (!skipTokenRefresh) await handleTokenRefresh(context);
     var g = http.put("$url/$path", body: JSON.encode(body), headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
-    reactToRespone(res);
+    reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> delete(String path) async {
-    await handleTokenRefresh();
+  static Future<http.Response> delete(String path, BuildContext context) async {
+    await handleTokenRefresh(context);
     var g = http.delete("$url/$path", headers: {
       "Content-Type": "application/json",
       User.token == null ? "X-foo" : "X-Token": User.token
     });
     http.Response res;
     await g.then((x) => res = x);
-    reactToRespone(res);
+    reactToRespone(res, context);
     return res;
   }
 
@@ -65,23 +67,35 @@ class HelperMethods {
     print(jsonString);
   }
 
-  static bool reactToRespone(http.Response respone,
-      {BuildContext context, ScaffoldState scaffoldState}) {
+  static bool reactToRespone(http.Response respone, BuildContext context,
+      {ScaffoldState scaffoldState}) {
     if (respone.statusCode == 500) {
       throw new Exception();
     } else if (respone.statusCode == 401) {
-      throw new Exception();
+      var ad = new AlertDialog(
+        title: new Text(loc.tokenExpired()),
+        content: new Text(loc.tokenExpiredExplanation()),
+        actions: [
+          new MaterialButton(
+            onPressed: () async {
+              Navigator.pushReplacementNamed(context, "/login");
+            },
+            child: const Text("OK"),
+          )
+        ],
+      );
+      showDialog(child: ad, context: context);
     }
     return true;
   }
 
-  static handleTokenRefresh() async {
+  static handleTokenRefresh(BuildContext context) async {
     if (await JWT.newToken()) {
-      var t = await UserSync.refreshToken();
+      var t = await UserSync.refreshToken(context);
       var m = JSON.decode(t.body);
       var to = m["token"];
-      FileManager.write("token.txt", to);
       User.token = to;
+      User.save();
     }
   }
 }

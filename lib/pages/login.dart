@@ -74,16 +74,16 @@ class LoginPageState extends State<LoginPage> {
     String password = pwInput.textEditingController.text;
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
-      UserSync.login(name, password).then((res) {
-        if (!HelperMethods.reactToRespone(res,
+      UserSync.login(name, password, context).then((res) {
+        if (!HelperMethods.reactToRespone(res, context,
             scaffoldState: _scaffoldKey?.currentState))
           return;
         else
           _handleLoggedIn(LoginResult.fromJson(res.body));
       });
     } else {
-      UserSync.loginEmail(name, password).then((res) {
-        if (!HelperMethods.reactToRespone(res,
+      UserSync.loginEmail(name, password, context).then((res) {
+        if (!HelperMethods.reactToRespone(res,context,
             scaffoldState: _scaffoldKey?.currentState))
           return;
         else
@@ -98,16 +98,11 @@ class LoginPageState extends State<LoginPage> {
       return;
     }
     showInSnackBar(loc.loginSuccessfulMessage());
-    await FileManager.write("token.txt", res.token);
-    if (FileManager.fileExists("User.txt"))
-      await FileManager.deleteFile("User.txt");
-    await FileManager.createFile("User.txt");
-    await FileManager.writeln("User.txt", res.username);
-    await FileManager.writeln("User.txt", res.eMail, append: true);
     bool firstBoot = User.username == null;
     User.token = res.token;
     User.username = res.username;
     User.eMail = res.eMail;
+    await User.save();
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
@@ -120,7 +115,7 @@ class LoginPageState extends State<LoginPage> {
 
   Future _getAllListsInit() async {
     var result =
-        GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
+        GetListsResult.fromJson((await ShoppingListSync.getLists(context)).body);
     setState(() => User.shoppingLists.clear());
     for (var res in result.shoppingLists) {
       var list = new ShoppingList()

@@ -81,8 +81,8 @@ class RegistrationState extends State<Registration> {
     String password = pwInput.textEditingController.text;
 
 
-    UserSync.create(name, email, password).then((res) {
-      if (!HelperMethods.reactToRespone(res,
+    UserSync.create(name, email, password, context).then((res) {
+      if (!HelperMethods.reactToRespone(res,context,
           scaffoldState: _scaffoldKey.currentState))
         return;
       else {
@@ -93,11 +93,11 @@ class RegistrationState extends State<Registration> {
         }
         showInSnackBar(loc.registrationSuccessfulMessage());
         Navigator.pop(_scaffoldKey.currentContext);
-
-        FileManager.write("token.txt", response.token);
-        FileManager.write("User.txt", response.username);
         User.token = response.token;
         User.username = response.username;
+        User.eMail = response.eMail;
+
+        User.save();
       }
     });
   }

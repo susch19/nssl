@@ -95,17 +95,17 @@ class _HomeState extends State<Home> {
                   onSelected: selectedOption,
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuItem<String>>[
-                        const PopupMenuItem<String>(
-                            value: 'Login/Register',
-                            child: const Text('Login/Register')),
+                        //const PopupMenuItem<String>(
+                        //    value: 'Login/Register',
+                        //    child: const Text('Login/Register')),
                         new PopupMenuItem<String>(
                             value: 'Options',
                             child:
                                 new Text(NSSLStrings.instance.changeTheme())),
                         new PopupMenuItem<String>(
                             value: 'ChangePassword',
-                            child:
-                            new Text(NSSLStrings.instance.changePasswordPD())),
+                            child: new Text(
+                                NSSLStrings.instance.changePasswordPD())),
 //                        const PopupMenuItem<String>(
 //                            value: 'PerformanceOverlay',
 //                            child: const Text('Toggle Performance Overlay')),
@@ -238,14 +238,13 @@ class _HomeState extends State<Home> {
   //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
   //    handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, ShoppingItem s) {
-    //TODO wait for server?
     var list = User.currentList;
     final String action =
         (dir == DismissDirection.endToStart) ? loc.archived() : loc.deleted();
     var index = list.shoppingItems.indexOf(s);
     setState(() => list.shoppingItems.remove(s));
 //    _mainScaffoldKey.currentState.removeCurrentSnackBar();
-    ShoppingListSync.deleteProduct(list.id, s.id);
+    ShoppingListSync.deleteProduct(list.id, s.id, context);
     list.save();
     showInSnackBar(loc.youHaveActionItemMessage() + "${s.name} $action",
         action: new SnackBarAction(
@@ -253,7 +252,7 @@ class _HomeState extends State<Home> {
             onPressed: () {
               setState(() {
                 list.shoppingItems.insert(index, s);
-                ShoppingListSync.changeProduct(list.id, s.id, s.amount);
+                ShoppingListSync.changeProduct(list.id, s.id, s.amount, context);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
                 list.save();
               });
@@ -288,8 +287,7 @@ class _HomeState extends State<Home> {
         setState(() => materialGrid = !materialGrid);
         break;
       case "ChangePassword":
-        Navigator
-            .push(
+        Navigator.push(
             cont,
             new MaterialPageRoute<DismissDialogAction>(
               builder: (BuildContext context) => new ChangePasswordPage(),
@@ -302,10 +300,8 @@ class _HomeState extends State<Home> {
   void changeCurrentList(int index) => setState(() {
         User.currentListIndex = index;
         setState(() => User.currentList = User.shoppingLists[index]);
-        if (FileManager.fileExists("lastList.txt"))
-          FileManager.deleteFile("lastList.txt");
-        FileManager.createFile("lastList.txt");
-        FileManager.write("lastList.txt", User.currentList.id.toString());
+        User.currentListIndex = User.shoppingLists[index].id;
+        User.save();
       });
 
   Future<Null> _getEAN() async {
@@ -319,7 +315,7 @@ class _HomeState extends State<Home> {
     if (method == "setEAN") {
       var list = User.currentList;
       ean = methodCall.arguments;
-      var firstRequest = await ProductSync.getProduct(ean);
+      var firstRequest = await ProductSync.getProduct(ean, cont);
       var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
       if (k.success) {
@@ -328,14 +324,14 @@ class _HomeState extends State<Home> {
         ShoppingItem afterAdd;
         if (item != null) {
           var answer =
-              await ShoppingListSync.changeProduct(list.id, item.id, 1);
+              await ShoppingListSync.changeProduct(list.id, item.id, 1, cont);
           var p = ChangeListItemResult.fromJson((answer).body);
           setState(() {
             item.amount = p.amount;
           });
         } else {
           var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                  list.id, "${k.name} ${k.quantity}${k.unit}", '-', 1))
+                  list.id, "${k.name} ${k.quantity}${k.unit}", '-', 1, cont))
               .body);
           afterAdd = new ShoppingItem()
             ..name = "${p.name}"
@@ -377,7 +373,7 @@ class _HomeState extends State<Home> {
           context: cont));
 
   Future createNewList(String listName) async {
-    var res = await ShoppingListSync.addList(listName);
+    var res = await ShoppingListSync.addList(listName, cont);
     var newListRes = AddListResult.fromJson(res.body);
     var newList = new ShoppingList()
       ..id = newListRes.id
@@ -386,8 +382,7 @@ class _HomeState extends State<Home> {
     User.currentListIndex = User.shoppingLists.indexOf(newList);
     firebaseMessaging
         .subscribeToTopic(newList.id.toString() + "shoppingListTopic");
-    FileManager.createFile("ShoppingLists/${newList.id}.sl");
-    FileManager.writeln("ShoppingLists/${newList.id}.sl", newList.name);
+    newList.save();
   }
 
   bool b = true;
@@ -490,7 +485,7 @@ class _HomeState extends State<Home> {
         renameListDialog(id);
         break;
       case "Remove":
-        var res = Result.fromJson((await ShoppingListSync.deleteList(id)).body);
+        var res = Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
         if (!res.success)
           showInDrawerSnackBar(res.error);
         else {
@@ -513,18 +508,26 @@ class _HomeState extends State<Home> {
 
   Future _handleDrawerRefresh() async {
     var result =
-        GetListsResult.fromJson((await ShoppingListSync.getLists()).body);
-    setState(() => User.shoppingLists.clear());
+        GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
+    User.shoppingLists.clear();
+    var crossedOut = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
     for (var res in result.shoppingLists) {
       var list = new ShoppingList()
         ..id = res.id
         ..name = res.name
         ..shoppingItems = new List<ShoppingItem>();
+
       for (var item in res.products)
         list.shoppingItems.add(new ShoppingItem()
           ..name = item.name
           ..id = item.id
-          ..amount = item.amount);
+          ..amount = item.amount
+          ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
+                      orElse: () => {"crossed": 0})["crossed"] ==
+                  0
+              ? false
+              : true));
       setState(() => User.shoppingLists.add(list));
       list.save();
     }
@@ -533,13 +536,13 @@ class _HomeState extends State<Home> {
   Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
 
   Future _handleListRefresh(int listId) async {
-    await User.shoppingLists.firstWhere((s) => s.id == listId).refresh();
+    await User.shoppingLists.firstWhere((s) => s.id == listId).refresh(cont);
     setState(() {});
   }
 
   Future shoppingItemChange(ShoppingItem s, int change) async {
     var res = ChangeListItemResult.fromJson((await ShoppingListSync
-            .changeProduct(User.currentList.id, s.id, change))
+            .changeProduct(User.currentList.id, s.id, change, cont))
         .body);
     setState(() {
       s.id = res.id;
@@ -558,7 +561,7 @@ class _HomeState extends State<Home> {
 
   Future crossOutMainListItem(ShoppingItem x) async {
     setState(() => x.crossedOut = !x.crossedOut);
-    await User.currentList.saveCrossedOut();
+    await User.currentList.save();
   }
 
   void _addWithoutSearchDialog() {
@@ -573,7 +576,7 @@ class _HomeState extends State<Home> {
   }
 
   Future renameList(int id, String text) async {
-    var put = await ShoppingListSync.changeLName(id, text);
+    var put = await ShoppingListSync.changeLName(id, text, cont);
     showInDrawerSnackBar("${put.statusCode}" + put.reasonPhrase);
     var res = Result.fromJson((put.body));
     if (!res.success) showInDrawerSnackBar(res.error);
@@ -581,7 +584,7 @@ class _HomeState extends State<Home> {
 
   Future _addWithoutSearch(String value) async {
     var list = User.currentList;
-    var res = await ShoppingListSync.addProduct(list.id, value, null, 1);
+    var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
     if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
     var product = AddListItemResult.fromJson(res.body);
     if (!product.success) showInSnackBar(product.error);
@@ -596,7 +599,7 @@ class _HomeState extends State<Home> {
     var list = User.currentList;
     var sublist = list.shoppingItems.where((s) => s.crossedOut).toList();
     var res = await ShoppingListSync.deleteProducts(
-        list.id, sublist.map((s) => s.id).toList());
+        list.id, sublist.map((s) => s.id).toList(), cont);
     if (!Result.fromJson(res.body).success) return;
     setState(() {
       for (var item in sublist) list.shoppingItems.remove(item);
@@ -610,7 +613,7 @@ class _HomeState extends State<Home> {
               var res = await ShoppingListSync.changeProducts(
                   list.id,
                   sublist.map((s) => s.id).toList(),
-                  sublist.map((s) => s.amount).toList());
+                  sublist.map((s) => s.amount).toList(), cont);
               var hashResult = HashResult.fromJson(res.body);
               int ownHash = 0;
               for (var item in sublist) ownHash += item.id + item.amount;

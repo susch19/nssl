@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/models/shopping_item.dart';
 import 'package:testProject/manager/manager_export.dart';
@@ -11,61 +12,50 @@ class ShoppingList {
   List<ShoppingItem> shoppingItems;
   bool messagingEnabled = true;
 
-  static Future<ShoppingList> load(int id) async {
-    var items =
-        await FileManager.readAsLines("ShoppingLists/${id.toString()}.sl");
-    var crossedOut = await loadCrossedOut(id);
-    return new ShoppingList()
-      ..id = id
-      ..name = items[0]
-      ..shoppingItems = items.sublist(1).where((s) => s != "").map((s) {
-        var split = s.split("\u{1F}");
-        var item = new ShoppingItem()
-          ..name = split[0]
-          ..amount = int.parse(split[1])
-          ..id = int.parse(split[2])
-          ..crossedOut = crossedOut.containsKey(int.parse(split[2])) ?? false;
-        return item;
-      }).toList();
-  }
-
   Future save() async {
-    var filename = "ShoppingLists/${id.toString()}.sl";
-    if (FileManager.fileExists(filename))
-      await FileManager.deleteFile(filename);
-    else
-      subscribeForFirebaseMessaging();
-    await FileManager.createFile(filename);
-    await FileManager.writeln(filename, name);
+    await DatabaseManager.database.inTransaction(() async {
+      int count = await DatabaseManager.database.rawUpdate(
+          'UPDATE ShoppingLists SET name = ?, messaging = ? WHERE id = ?',
+          [name, messagingEnabled ? 1 : 0, id]);
+      if (count == 0)
+        await DatabaseManager.database.rawInsert(
+            'INSERT INTO ShoppingLists(id, name, messaging) VALUES(?, ?, ?)',
+            [id, name, messagingEnabled ? 1 : 0]);
 
-    for (var item in shoppingItems) {
-      await FileManager.writeln(filename, item.toString(), append: true);
-    }
+      await DatabaseManager.database
+          .rawDelete("DELETE FROM ShoppingItems WHERE res_list_id = ?", [id]);
+      for (var item in shoppingItems) {
+        await DatabaseManager.database.rawInsert(
+            "INSERT INTO ShoppingItems(id, name, amount, crossed, res_list_id) VALUES (?, ?, ?, ?, ?)",
+            [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, id]);
+      }
+    });
   }
 
-  Future saveCrossedOut() async {
-    var filename = "ShoppingListsCo/${id.toString()}co.sl";
-    if (FileManager.fileExists(filename))
-      await FileManager.deleteFile(filename);
-    await FileManager.createFile(filename);
-    for (var item in shoppingItems.where((x) => x.crossedOut)) {
-      await FileManager.writeln(filename, item.id.toString(), append: true);
-    }
+  static Future<List<ShoppingList>> load() async {
+    var items =
+        await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingItems");
+    var lists =
+        await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingLists");
+
+    return lists
+        .map((x) => new ShoppingList()
+          ..id = x["id"]
+          ..messagingEnabled = x["messaging"] == 0 ? false : true
+          ..name = x["name"]
+          ..shoppingItems = items
+              .where((y) => y["res_list_id"] == x["id"])
+              .map((y) => new ShoppingItem()
+                ..amount = y["amount"]
+                ..crossedOut = y["crossed"] == 0 ? false : true
+                ..id = y["id"]
+                ..name = y["name"])
+              .toList())
+        .toList();
   }
 
-  static Future<Map<int, bool>> loadCrossedOut(int listId) async {
-    if (!FileManager.fileExists("ShoppingListsCo/${listId.toString()}co.sl"))
-      return new Map<int, bool>();
-    var items = await FileManager
-        .readAsLines("ShoppingListsCo/${listId.toString()}co.sl");
-    var map = new Map<int, bool>();
-    for (var item in items.where((x) => x != null && x != ""))
-      if (item != null) map.addAll({int.parse(item): true});
-    return map;
-  }
-
-  Future refresh() async {
-    var res = await ShoppingListSync.getList(id);
+  Future refresh([BuildContext context]) async {
+    var res = await ShoppingListSync.getList(id, context);
 //    if (res.statusCode == 401) {
 //      showInSnackBar(loc.notLoggedInYet() + res.reasonPhrase);
 //      return;
@@ -75,14 +65,20 @@ class ShoppingList {
 //      return;
 //    }
     var newList = GetListResult.fromJson(res.body);
-    var crossedOut = await ShoppingList.loadCrossedOut(newList.id);
+    var crossedOut = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed FROM ShoppingItems WHERE res_list_id = ?", [id]));
+
     shoppingItems.clear();
     for (var item in newList.products)
       shoppingItems.add(new ShoppingItem()
         ..name = item.name
         ..id = item.id
         ..amount = item.amount
-        ..crossedOut = crossedOut.containsKey(item.id) ?? false);
+        ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
+                    orElse: () => {"crossed": 0})["crossed"] ==
+                0
+            ? false
+            : true));
     save();
   }
 

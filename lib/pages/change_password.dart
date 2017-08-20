@@ -74,7 +74,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     var res = await UserSync.changePassword(
         oldPwInput.textEditingController.text,
         newPwInput.textEditingController.text,
-        User.token);
+        User.token, context);
     if (res.statusCode != 200) {
       _scaffoldKey.currentState.showSnackBar(new SnackBar(
           content: new Text(res.reasonPhrase),

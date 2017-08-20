@@ -90,7 +90,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       match = unitReg.firstMatch(weight);
       String unit = weight.substring(match.start, match.end);
       var first = (await ProductSync.addNewProduct(
-          "$productName $brandName", gtin, realWeight, unit));
+          "$productName $brandName", gtin, realWeight, unit, context));
       if (first.statusCode != 200) {
         showInSnackBar(first.reasonPhrase);
         return false;
@@ -103,7 +103,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
           var list = User.currentList;
           var pres = AddListItemResult.fromJson(
               (await ShoppingListSync.addProduct(
-                      list.id, "$productName $brandName $weight", gtin, 1))
+                      list.id, "$productName $brandName $weight", gtin, 1, context))
                   .body);
           if (!pres.success)
             showInSnackBar(pres.error);

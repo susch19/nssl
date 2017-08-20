@@ -48,14 +48,14 @@ class _ProductAddPageState extends State<ProductAddPage> {
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1);
+        var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1, context);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
         });
       } else {
         var p = AddListItemResult.fromJson(
-            (await ShoppingListSync.addProduct(list.id, name, gtin ?? '-', 1))
+            (await ShoppingListSync.addProduct(list.id, name, gtin ?? '-', 1, context))
                 .body);
         afterAdd = new ShoppingItem()
           ..name = p.name
@@ -73,9 +73,9 @@ class _ProductAddPageState extends State<ProductAddPage> {
               label: loc.undo(),
               onPressed: () async {
                 var res = item == null
-                    ? await ShoppingListSync.deleteProduct(list.id, afterAdd.id)
+                    ? await ShoppingListSync.deleteProduct(list.id, afterAdd.id, context)
                     : await ShoppingListSync.changeProduct(
-                        list.id, item.id, -1);
+                        list.id, item.id, -1, context);
                 if (Result.fromJson(res.body).success) {
                   if(item == null)
                     list.shoppingItems.remove(afterAdd);
@@ -126,7 +126,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
   Future continueList() => _searchProducts(tec.text, ++k);
 
   Future _searchProducts(String value, int page) async {
-    Response o = await ProductSync.getProducts(value, page);
+    Response o = await ProductSync.getProducts(value, page, context);
 
     List<Map> z = JSON.decode(o.body);
     if (!noMoreProducts && z.length <= 0) {
@@ -156,7 +156,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
   }
 
   void showInSnackBar(String value,
-      {Duration duration: null, SnackBarAction action}) {
+      {Duration duration, SnackBarAction action}) {
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
     _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value),

@@ -117,6 +117,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "changePasswordPD" : MessageLookupByLibrary.simpleMessage("Change Password"),
     "successful" : MessageLookupByLibrary.simpleMessage("Successful"),
     "passwordSet" : MessageLookupByLibrary.simpleMessage("Your password has been set"),
+    "tokenExpired" : MessageLookupByLibrary.simpleMessage("Token expired"),
+    "tokenExpiredExplanation" : MessageLookupByLibrary.simpleMessage("Your token has expired. Login is required. If this happends multiple times per month, please contact us."),
 
 
   };

@@ -8,61 +8,36 @@ class Themes {
         primarySwatch: Colors.blue,
         accentColor: Colors.teal,
         accentColorBrightness: Brightness.light,
-        brightness: Brightness.dark),
-    new ThemeData(
-        primarySwatch: Colors.blue,
-        accentColor: Colors.teal,
-        accentColorBrightness: Brightness.dark,
-        brightness: Brightness.light),
-    new ThemeData(
-        primarySwatch: Colors.deepPurple,
-        accentColor: Colors.amberAccent,
-        accentColorBrightness: Brightness.dark,
-        brightness: Brightness.dark),
-    new ThemeData(
-        primarySwatch: Colors.deepPurple,
-        accentColor: Colors.amberAccent,
-        accentColorBrightness: Brightness.light,
-        brightness: Brightness.light),
-    new ThemeData(
-        primarySwatch: Colors.deepOrange,
-        accentColor: Colors.pinkAccent,
-        accentColorBrightness: Brightness.dark,
-        brightness: Brightness.dark),
-    new ThemeData(
-        primarySwatch: Colors.deepOrange,
-        accentColor: Colors.pinkAccent,
-        accentColorBrightness: Brightness.light,
         brightness: Brightness.light),
   ];
 
   static Future saveTheme(
       ThemeData t, MaterialColor primary, MaterialAccentColor accent) async {
-    if (FileManager.fileExists("theme")) await FileManager.deleteFile("theme");
-    await FileManager.createFile("theme");
-    await FileManager.writeln(
-        "theme", Colors.primaries.indexOf(primary).toString());
-    await FileManager.writeln(
-        "theme", Colors.accents.indexOf(accent).toString(),
-        append: true);
-    await FileManager.writeln("theme", t.brightness.toString(), append: true);
-    await FileManager.writeln("theme", t.accentColorBrightness.toString(),
-        append: true);
+    await DatabaseManager.database.rawDelete("DELETE FROM Themes");
+    await DatabaseManager.database.rawInsert(
+        "INSERT INTO Themes(id, primary_color, accent_color, brightness, accent_color_brightness) VALUES(1, ?, ?, ?, ?)",
+        [
+          Colors.primaries.indexOf(primary),
+          Colors.accents.indexOf(accent),
+          t.brightness.toString(),
+          t.accentColorBrightness.toString()
+        ]);
   }
 
   static Future loadTheme() async {
-    if (!FileManager.fileExists("theme")) return;
-
-    var lines = await FileManager.readAsLines("theme");
+    var t = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes"));
+    if(t.length == 0) return;
+    var t2 = t.first;
     themes.clear();
     themes.add(new ThemeData(
-        primarySwatch: Colors.primaries[int.parse(lines[0])],
-        accentColor: Colors.accents[int.parse(lines[1])],
-        brightness: lines[2].toLowerCase().contains("dark")
+        primarySwatch: Colors.primaries[t2["primary_color"]],
+        accentColor: Colors.accents[t2["accent_color"]],
+        brightness: t2["brightness"].toLowerCase().contains("dark")
             ? Brightness.dark
             : Brightness.light,
-        accentColorBrightness: lines[3].toLowerCase().contains("dark")
-            ? Brightness.dark
-            : Brightness.light));
+        accentColorBrightness:
+            t2["accent_color_brightness"].toLowerCase().contains("dark")
+                ? Brightness.dark
+                : Brightness.light));
   }
 }
