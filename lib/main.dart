@@ -502,6 +502,7 @@ class _HomeState extends State<Home> {
             ? list.unsubscribeFromFirebaseMessaging()
             : list.subscribeForFirebaseMessaging();
         list.messagingEnabled = !list.messagingEnabled;
+        list.save();
         break;
     }
   }
