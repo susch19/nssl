@@ -120,6 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "passwordSet" : MessageLookupByLibrary.simpleMessage("Dein Passwort wurde erfolgreich geändert"),
     "tokenExpired" : MessageLookupByLibrary.simpleMessage("Token abgelaufen"),
     "tokenExpiredExplanation" : MessageLookupByLibrary.simpleMessage("Der Token ist abgelaufen. Deshalb wird ein erneuter Login benötigt. Es handelt sich hierbei erst um ein Fehler, falls diese Meldung mehrmals im Monat aufkommt."),
+    "noListLoaded" : MessageLookupByLibrary.simpleMessage("Keine Liste geladen"),
 
   };
 }

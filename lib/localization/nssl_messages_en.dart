@@ -119,7 +119,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "passwordSet" : MessageLookupByLibrary.simpleMessage("Your password has been set"),
     "tokenExpired" : MessageLookupByLibrary.simpleMessage("Token expired"),
     "tokenExpiredExplanation" : MessageLookupByLibrary.simpleMessage("Your token has expired. Login is required. If this happends multiple times per month, please contact us."),
-
-
+    "noListLoaded" : MessageLookupByLibrary.simpleMessage("No List Loaded"),
   };
 }

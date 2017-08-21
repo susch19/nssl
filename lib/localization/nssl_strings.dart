@@ -123,7 +123,7 @@ class NSSLStrings extends LocaleQueryData {
   String passwordSet() => Intl.message('Your password has been set', name: 'passwordSet');
   String tokenExpired() => Intl.message('Token expired', name: 'tokenExpired');
   String tokenExpiredExplanation() => Intl.message('Your token has expired. Login is required. If this happends multiple times per month, please contact us.', name: 'tokenExpiredExplanation');
-
+  String noListLoaded() => Intl.message('No List Loaded', name: 'noListLoaded');
 
 
 }
