@@ -29,7 +29,6 @@ class CustomThemePageState extends State<CustomThemePage> {
       accentColorBrightness: Brightness.dark,
       brightness: Brightness.light);
 
-
   NSSLStrings loc = NSSLStrings.instance;
 
   double primaryColorSlider = 0.0;
@@ -76,14 +75,29 @@ class CustomThemePageState extends State<CustomThemePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    var textColorTheme = new TextStyle(color: td.textTheme.title.color);
     return new Scaffold(
+      floatingActionButton: new FloatingActionButton(
+          child: new IconButton(
+              icon: new Icon(
+                Icons.save,
+                color: td.accentIconTheme.color,
+              ),
+              onPressed: null),
+          backgroundColor: td.brightness == Brightness.dark ? td.buttonColor : td.primaryColor,
+          onPressed: _handleSubmitted),
+      backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
-      appBar: new AppBar(title: new Text(loc.changeTheme()), actions: <Widget>[
-        new FlatButton(
-            child: new Text(loc.saveButton(),
-                style: theme.textTheme.body1.copyWith(color: Colors.white)),
-            onPressed: () => _handleSubmitted())
-      ]),
+      appBar: new AppBar(
+          title: new Text(loc.changeTheme(), style: textColorTheme),
+          backgroundColor: td.primaryColor,
+          iconTheme: td.iconTheme,
+          textTheme: td.textTheme,
+          actions: <Widget>[
+            new FlatButton(
+                child: new Text(loc.saveButton(), style: textColorTheme),
+                onPressed: () => _handleSubmitted())
+          ]),
       body: new Form(
           key: _formKey,
           onWillPop: _onWillPop,
@@ -91,44 +105,48 @@ class CustomThemePageState extends State<CustomThemePage> {
               padding: const EdgeInsets.all(16.0),
               children: <Widget>[
                 new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  new Text(loc.changePrimaryColor()),
+                  new Text(
+                    loc.changePrimaryColor(),
+                    style: textColorTheme,
+                  ),
                   new Slider(
-                      value: primaryColorSlider,
-                      max: Colors.primaries.length.ceilToDouble() - 1.0,
-                      divisions: Colors.primaries.length - 1,
-                      onChanged: onChangedPrimarySlider),
+                    value: primaryColorSlider,
+                    max: Colors.primaries.length.ceilToDouble() - 1.0,
+                    divisions: Colors.primaries.length - 1,
+                    onChanged: onChangedPrimarySlider,
+                    activeColor: td.accentColor,
+                  ),
                 ]),
                 new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  new Text(loc.changeAccentColor()),
+                  new Text(loc.changeAccentColor(), style: textColorTheme),
                   new Slider(
                       value: accentColorSlider,
                       max: Colors.accents.length.ceilToDouble() - 1.0,
                       divisions: Colors.accents.length - 1,
-                      onChanged: onChangedSecondarySlider),
+                      onChanged: onChangedSecondarySlider,
+                      activeColor: td.accentColor),
                 ]),
                 new Row(children: [
-                  new Text(loc.changeDarkTheme()),
+                  new Text(loc.changeDarkTheme(), style: textColorTheme),
                   new Checkbox(
                       value: primaryColorCheckbox,
-                      onChanged: primaryBrightnessChange),
+                      onChanged: primaryBrightnessChange,
+                      activeColor: td.accentColor),
                 ]),
                 new Row(children: [
-                  new Text(loc.changeAccentTextColor()),
+                  new Text(loc.changeAccentTextColor(), style: textColorTheme),
                   new Checkbox(
                       value: accentColorCheckbox,
-                      onChanged: secondaryBrightnessChange),
+                      onChanged: secondaryBrightnessChange,
+                      activeColor: td.accentColor),
                 ]),
-                new ConstrainedBox(
-                  child: new MaterialApp(
-                    debugShowCheckedModeBanner: false,
-                    home: new Scaffold(
-                      body: buildBody(),
-                      resizeToAvoidBottomPadding: false,
-                    ),
-                    theme: td,
-                  ),
-                  constraints: const BoxConstraints(maxHeight: 470.0),
-                )
+                new Row(children: [
+                  new Text('Demo', style: textColorTheme),
+                  new Checkbox(
+                      value: true,
+                      onChanged: (v) {},
+                      activeColor: td.accentColor),
+                ]),
               ])),
     );
   }
