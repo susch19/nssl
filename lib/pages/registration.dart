@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:testProject/localization/nssl_strings.dart';
+import 'package:testProject/main.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +33,7 @@ class RegistrationState extends State<Registration> {
         content: new Text(value), duration: new Duration(seconds: 3)));
   }
 
-  void _handleSubmitted() {
+  Future _handleSubmitted() async {
     bool error = false;
     _resetInput();
 
@@ -66,7 +69,8 @@ class RegistrationState extends State<Registration> {
           errorText: p2i);
       error = true;
     }
-    if (pwInput.textEditingController.text != pw2Input.textEditingController.text) {
+    if (pwInput.textEditingController.text !=
+        pw2Input.textEditingController.text) {
       pw2Input.decoration = new InputDecoration(
           labelText: pw2Input.decoration.labelText,
           helperText: pw2Input.decoration.helperText,
@@ -80,26 +84,32 @@ class RegistrationState extends State<Registration> {
     String email = emailInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
 
+    var res = await UserSync.create(name, email, password, context);
 
-    UserSync.create(name, email, password, context).then((res) {
-      if (!HelperMethods.reactToRespone(res,context,
-          scaffoldState: _scaffoldKey.currentState))
+    if (res.statusCode != 200)
+      return;
+    else {
+      var response = LoginResult.fromJson(res.body);
+      if (!response.success) {
+        showInSnackBar(response.error);
         return;
-      else {
-        var response = LoginResult.fromJson(res.body);
-        if (!response.success) {
-          showInSnackBar(response.error);
-          return;
-        }
-        showInSnackBar(loc.registrationSuccessfulMessage());
-        Navigator.pop(_scaffoldKey.currentContext);
-        User.token = response.token;
-        User.username = response.username;
-        User.eMail = response.eMail;
-
-        User.save();
       }
-    });
+      showInSnackBar(loc.registrationSuccessfulMessage());
+      var x = await UserSync.login(name, password, context);
+
+      if (x.statusCode != 200) {
+        Navigator.pop(context);
+        return;
+      }
+      var loginRes = LoginResult.fromJson(x.body);
+      User.token = loginRes.token;
+      User.username = response.username;
+      User.eMail = response.eMail;
+
+      await User.save();
+      Navigator.pop(context);
+      runApp(new NSSL());
+    }
   }
 
   String _validateName(String value) {
