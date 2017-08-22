@@ -48,15 +48,16 @@ class _ProductAddPageState extends State<ProductAddPage> {
           .firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var answer = await ShoppingListSync.changeProduct(list.id, item.id, 1, context);
+        var answer =
+            await ShoppingListSync.changeProduct(list.id, item.id, 1, context);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
         });
       } else {
-        var p = AddListItemResult.fromJson(
-            (await ShoppingListSync.addProduct(list.id, name, gtin ?? '-', 1, context))
-                .body);
+        var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
+                list.id, name, gtin ?? '-', 1, context))
+            .body);
         afterAdd = new ShoppingItem()
           ..name = p.name
           ..amount = 1
@@ -73,11 +74,12 @@ class _ProductAddPageState extends State<ProductAddPage> {
               label: loc.undo(),
               onPressed: () async {
                 var res = item == null
-                    ? await ShoppingListSync.deleteProduct(list.id, afterAdd.id, context)
+                    ? await ShoppingListSync.deleteProduct(
+                        list.id, afterAdd.id, context)
                     : await ShoppingListSync.changeProduct(
                         list.id, item.id, -1, context);
                 if (Result.fromJson(res.body).success) {
-                  if(item == null)
+                  if (item == null)
                     list.shoppingItems.remove(afterAdd);
                   else
                     item.amount--;
@@ -90,6 +92,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
   int lastLength = 0;
 
   bool noMoreProducts = false;
+  String oldValue = "";
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +108,13 @@ class _ProductAddPageState extends State<ProductAddPage> {
                     autofocus: true,
                     controller: tec,
                     onChanged: (s) => setState(() {
+                          if (s == oldValue) return;
                           prList.clear();
                           k = 1;
                           lastLength = 0;
                           noMoreProducts = false;
-                        })))),
+                          oldValue = s;
+                    })))),
         floatingActionButton: new FloatingActionButton(
           onPressed: () => {},
           child: new IconButton(
