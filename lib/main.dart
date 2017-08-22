@@ -304,8 +304,15 @@ class _HomeState extends State<Home> {
       });
 
   Future<Null> _getEAN() async {
-    await platform.invokeMethod('getEAN');
+    platform.setMethodCallHandler(cameraPermissionsSet);
+    await platform.invokeMethod('getCameraPermission');
+  }
+
+  Future<dynamic> cameraPermissionsSet(MethodCall methodCall) async{
+
     platform.setMethodCallHandler(setEAN);
+    await platform.invokeMethod('getEAN');
+
   }
 
   Future<dynamic> setEAN(MethodCall methodCall) async {

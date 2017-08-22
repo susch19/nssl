@@ -49,13 +49,20 @@ public class MainActivity extends FlutterActivity {
                     public void onMethodCall(MethodCall call, Result result) {
                         if (call.method.equals("getEAN")) {
                             startActivity(new Intent(cont, ScanActivity.class));
-
                             if (ean != "") {
                                 result.success(ean);
-                            } else {
+                            }
+                        }
+                        else if(call.method.equals("getCameraPermission")) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                grantCameraPermissionsThenStartScanning();
+                                result.success("");
+                            }
+                            else {
                                 result.error("ERROR", "Something went wrong.", null);
                             }
-                        } else {
+                        }
+                        else {
                             result.notImplemented();
                         }
                     }
@@ -72,6 +79,13 @@ public class MainActivity extends FlutterActivity {
                 this.requestPermissions(new String[]{ Manifest.permission.CAMERA },
                         CAMERA_PERMISSION_REQUEST);
             }
+            else {
+                new MethodChannel(flutterView, CHANNEL).invokeMethod("cameraPermissions", "");
+            }
+
+        }
+        else {
+            new MethodChannel(flutterView, CHANNEL).invokeMethod("cameraPermissions", "");
         }
     }
     @Override
@@ -84,8 +98,10 @@ public class MainActivity extends FlutterActivity {
             } else {
                 mDeniedCameraAccess = true;
             }
+            new MethodChannel(flutterView, CHANNEL).invokeMethod("cameraPermissions", "");
             return;
         }
+        new MethodChannel(flutterView, CHANNEL).invokeMethod("cameraPermissions", "");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
     @Override
@@ -94,9 +110,6 @@ public class MainActivity extends FlutterActivity {
 
         mPaused = false;
         // Handle permissions for Marshmallow and onwards...
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            grantCameraPermissionsThenStartScanning();
-        }
     }
     @Override
     protected void onPause() {
