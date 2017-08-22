@@ -84,13 +84,13 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   Widget buildBody() {
     bool isAdmin = false;
     if (conList.length > 0) {
-      isAdmin = conList.firstWhere((x) => x.name == User.username).isAdmin;
+      isAdmin = conList.firstWhere((x) => x.name.toLowerCase() == User.username.toLowerCase()).isAdmin;
       var listView = new ListView.builder(
           itemBuilder: (c, i) {
             return new ListTile(
                 title: new Text(conList[i].name +
                     (conList[i].isAdmin ? loc.contributorAdmin() : loc.contributorUser())),
-                trailing: isAdmin && conList[i].name != User.username
+                trailing: isAdmin && conList[i].name.toLowerCase() != User.username.toLowerCase()
                     ? new PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
                         onSelected: popupMenuClicked,
