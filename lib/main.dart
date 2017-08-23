@@ -397,15 +397,9 @@ class _HomeState extends State<Home> {
     var userheader = new UserAccountsDrawerHeader(
       accountName: new Text(User.username ?? loc.notLoggedInYet()),
       accountEmail: new Text(User.eMail ?? loc.notLoggedInYet()),
-      currentAccountPicture: new FloatingActionButton(
-        child: new CircleAvatar(
-            child: new Text(User.username.substring(0, 2).toUpperCase()),
-            backgroundColor: Themes.themes.first.accentColor),
-        backgroundColor: Themes.themes.first.accentColor,
-        onPressed: null,
-        highlightElevation: 0.0,
-      ),
-    );
+      currentAccountPicture: new CircleAvatar(
+            child: new Text(User.username.substring(0, 2)?.toUpperCase()),
+            backgroundColor: Themes.themes.first.accentColor),);
 
     var list = User.shoppingLists.isNotEmpty
         ? User.shoppingLists
