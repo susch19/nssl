@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/main.dart';
-import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/models/user.dart';
 import 'package:testProject/server_communication/helper_methods.dart';

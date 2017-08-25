@@ -26,7 +26,6 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   int listId;
   NSSLStrings loc = NSSLStrings.instance;
 
-
   _ContributorsPagePageState(int listId) {
     this.listId = listId;
     ShoppingListSync.getContributors(listId, context).then((o) {
@@ -68,29 +67,35 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   }
 
   Future _addContributor(String value) async {
-    ShoppingListSync.addContributor(listId, value, context).then((o) {
-      AddContributorResult z = AddContributorResult.fromJson(o.body);
-      if (!z.success)
-        showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
-            duration: new Duration(seconds: 10));
-      else
-        setState(() => conList.add(new ContributorResult()
-          ..name = z.name
-          ..userId = z.id
-          ..isAdmin = false));
-    });
+    var o = await ShoppingListSync.addContributor(listId, value, context);
+    AddContributorResult z = AddContributorResult.fromJson(o.body);
+    if (!z.success)
+      showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
+          duration: new Duration(seconds: 10));
+    else
+      setState(() => conList.add(new ContributorResult()
+        ..name = z.name
+        ..userId = z.id
+        ..isAdmin = false));
   }
 
   Widget buildBody() {
     bool isAdmin = false;
     if (conList.length > 0) {
-      isAdmin = conList.firstWhere((x) => x.name.toLowerCase() == User.username.toLowerCase()).isAdmin;
+      isAdmin = conList
+          .firstWhere(
+              (x) => x.name.toLowerCase() == User.username.toLowerCase())
+          .isAdmin;
       var listView = new ListView.builder(
           itemBuilder: (c, i) {
             return new ListTile(
                 title: new Text(conList[i].name +
-                    (conList[i].isAdmin ? loc.contributorAdmin() : loc.contributorUser())),
-                trailing: isAdmin && conList[i].name.toLowerCase() != User.username.toLowerCase()
+                    (conList[i].isAdmin
+                        ? loc.contributorAdmin()
+                        : loc.contributorUser())),
+                trailing: isAdmin &&
+                        conList[i].name.toLowerCase() !=
+                            User.username.toLowerCase()
                     ? new PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
                         onSelected: popupMenuClicked,
@@ -149,7 +154,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
     switch (command) {
       case "Remove":
         var userId = int.parse(splitted[0]);
-        var res = await ShoppingListSync.deleteContributor(listId, userId, context);
+        var res =
+            await ShoppingListSync.deleteContributor(listId, userId, context);
         var enres = Result.fromJson(res.body);
         if (!enres.success)
           showInSnackBar(enres.error);

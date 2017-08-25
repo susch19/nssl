@@ -9,7 +9,7 @@ import 'package:testProject/server_communication/shopping_list_sync.dart';
 class ShoppingList {
   int id;
   String name;
-  List<ShoppingItem> shoppingItems;
+  List<ShoppingItem> shoppingItems = new List<ShoppingItem>();
   bool messagingEnabled = true;
 
   Future save() async {

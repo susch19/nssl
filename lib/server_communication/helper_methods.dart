@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:testProject/localization/nssl_strings.dart';
 import 'dart:convert';
 import 'dart:async';
-import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/server_communication/jwt.dart';
 import 'user_sync.dart';

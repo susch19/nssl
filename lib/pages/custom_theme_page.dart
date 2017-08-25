@@ -74,7 +74,6 @@ class CustomThemePageState extends State<CustomThemePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     var textColorTheme = new TextStyle(color: td.textTheme.title.color);
     return new Scaffold(
       floatingActionButton: new FloatingActionButton(
