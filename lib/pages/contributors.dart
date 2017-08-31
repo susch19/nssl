@@ -24,7 +24,6 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   List<ContributorResult> conList = new List<ContributorResult>();
   int k = 1;
   int listId;
-  NSSLStrings loc = NSSLStrings.instance;
 
   _ContributorsPagePageState(int listId) {
     this.listId = listId;
@@ -35,7 +34,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
       }
       GetContributorsResult z = GetContributorsResult.fromJson(o.body);
       if (!z.success || z.contributors.length <= 0)
-        showInSnackBar(loc.genericErrorMessageSnackbar() + o.reasonPhrase,
+        showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + o.reasonPhrase,
             duration: new Duration(seconds: 10));
       else
         setState(() => conList.addAll(z.contributors));
@@ -51,7 +50,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
                 child: new TextField(
                     key: _iff,
                     decoration: new InputDecoration(
-                        hintText: loc.nameOfNewContributorHint()),
+                        hintText: NSSLStrings.of(context).nameOfNewContributorHint()),
                     onSubmitted: (x) => _addContributor(x),
                     autofocus: true,
                     controller: tec))),
@@ -70,7 +69,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
     var o = await ShoppingListSync.addContributor(listId, value, context);
     AddContributorResult z = AddContributorResult.fromJson(o.body);
     if (!z.success)
-      showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
+      showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error,
           duration: new Duration(seconds: 10));
     else
       setState(() => conList.add(new ContributorResult()
@@ -91,8 +90,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
             return new ListTile(
                 title: new Text(conList[i].name +
                     (conList[i].isAdmin
-                        ? loc.contributorAdmin()
-                        : loc.contributorUser())),
+                        ? NSSLStrings.of(context).contributorAdmin()
+                        : NSSLStrings.of(context).contributorUser())),
                 trailing: isAdmin &&
                         conList[i].name.toLowerCase() !=
                             User.username.toLowerCase()
@@ -109,15 +108,15 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
                                           ? const Icon(Icons.arrow_downward)
                                           : const Icon(Icons.arrow_upward)),
                                       title: (conList[i].isAdmin
-                                          ? new Text(loc.demoteMenu())
-                                          : new Text(loc.promoteMenu())))),
+                                          ? new Text(NSSLStrings.of(context).demoteMenu())
+                                          : new Text(NSSLStrings.of(context).promoteMenu())))),
                               const PopupMenuDivider(), // ignore: list_element_type_not_assignable
                               new PopupMenuItem<String>(
                                   value: conList[i].userId.toString() +
                                       "\u{1E}Remove", //x.id.toString() + "\u{1E}" + 'Remove',
                                   child: new ListTile(
                                       leading: const Icon(Icons.delete),
-                                      title: new Text(loc.remove())))
+                                      title: new Text(NSSLStrings.of(context).remove())))
                             ])
                     : const Text(""),
                 onTap: () => {});
@@ -179,7 +178,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
             }
             GetContributorsResult z = GetContributorsResult.fromJson(o.body);
             if (!z.success || z.contributors.length <= 0)
-              showInSnackBar(loc.genericErrorMessageSnackbar() + z.error,
+              showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error,
                   duration: new Duration(seconds: 10));
             else
               conList.clear();

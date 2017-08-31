@@ -43,10 +43,10 @@ class SimpleDialogSingleInput {
         ),
         actions: <Widget>[
           new FlatButton(
-              child: new Text(NSSLStrings.instance.cancelButton()),
+              child: new Text(NSSLStrings.of(context).cancelButton()),
               onPressed: () => Navigator.pop(context, "")),
           new FlatButton(
-              child: new Text(NSSLStrings.instance.acceptButton()),
+              child: new Text(NSSLStrings.of(context).acceptButton()),
               onPressed: () {
                 Navigator.pop(context, "");
                 onSubmitted(tec.text);
@@ -67,10 +67,10 @@ class SimpleDialogSingleInput {
 //              }),
 //          new Row(children: [
 //            new FlatButton(
-//                child: new Text(NSSLStrings.instance.cancelButton()),
+//                child: new Text(NSSLStrings.of(context).cancelButton()),
 //                onPressed: () => Navigator.pop(context, "")),
 //            new FlatButton(
-//                child: new Text(NSSLStrings.instance.acceptButton()),
+//                child: new Text(NSSLStrings.of(context).acceptButton()),
 //                onPressed: () {
 //                  Navigator.pop(context, "");
 //                  onSubmitted(tec.text);

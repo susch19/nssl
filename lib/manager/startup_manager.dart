@@ -13,6 +13,7 @@ class Startup {
     User.currentList =
         User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: ()=>User.shoppingLists.first);
     await Themes.loadTheme();
+    return true;
     // FileManager.createFolder("ShoppingListsCo");
     // FileManager.createFile("token.txt");
     // FileManager.createFile("User.txt");
@@ -48,6 +49,5 @@ class Startup {
     // User.currentListIndex = User.currentList.id;
     // await User.save();
 
-    return true;
   }
 }

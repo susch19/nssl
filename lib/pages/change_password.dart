@@ -21,7 +21,6 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   var newPwInput = new ForInput();
   var newPw2Input = new ForInput();
 
-  NSSLStrings loc = NSSLStrings.instance;
 
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
@@ -36,21 +35,21 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       oldPwInput.decoration = new InputDecoration(
           labelText: oldPwInput.decoration.labelText,
           helperText: oldPwInput.decoration.helperText,
-          errorText: loc.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPwInput.textEditingController)) {
       newPwInput.decoration = new InputDecoration(
           labelText: newPwInput.decoration.labelText,
           helperText: newPwInput.decoration.helperText,
-          errorText: loc.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPw2Input.textEditingController)) {
       newPw2Input.decoration = new InputDecoration(
           labelText: newPw2Input.decoration.labelText,
           helperText: newPw2Input.decoration.helperText,
-          errorText: loc.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     setState(() => {});
@@ -60,7 +59,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       newPw2Input.decoration = new InputDecoration(
           labelText: newPw2Input.decoration.labelText,
           helperText: newPw2Input.decoration.helperText,
-          errorText: loc.passwordsDontMatchError());
+          errorText: NSSLStrings.of(context).passwordsDontMatchError());
       setState(() => {});
       return;
     }
@@ -89,10 +88,10 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
     var dialog = new AlertDialog(
-        title: new Text(loc.successful()),
+        title: new Text(NSSLStrings.of(context).successful()),
         content: new SingleChildScrollView(
           child: new ListBody(
-            children: <Widget>[new Text(loc.passwordSet())],
+            children: <Widget>[new Text(NSSLStrings.of(context).passwordSet())],
           ),
         ),
         actions: <Widget>[
@@ -105,25 +104,25 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
 
   _resetInput() {
     oldPwInput.decoration = new InputDecoration(
-        helperText: loc.oldPasswordHint(), labelText: loc.oldPassword());
+        helperText: NSSLStrings.of(context).oldPasswordHint(), labelText: NSSLStrings.of(context).oldPassword());
     newPwInput.decoration = new InputDecoration(
-        helperText: loc.newPasswordHint(), labelText: loc.newPassword());
+        helperText: NSSLStrings.of(context).newPasswordHint(), labelText: NSSLStrings.of(context).newPassword());
     newPw2Input.decoration = new InputDecoration(
-        helperText: loc.new2PasswordHint(), labelText: loc.new2Password());
+        helperText: NSSLStrings.of(context).new2PasswordHint(), labelText: NSSLStrings.of(context).new2Password());
   }
 
   @override
   initState() {
     super.initState();
-    _resetInput();
   }
 
   @override
   Widget build(BuildContext context) {
+    _resetInput();
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
-      appBar: new AppBar(title: new Text(loc.changePasswordPD())),
+      appBar: new AppBar(title: new Text(NSSLStrings.of(context).changePasswordPD())),
       body: new Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
@@ -163,7 +162,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
                 child: new RaisedButton(
                   child: new SizedBox.expand(
                       child: new Center(
-                          child: new Text(loc.changePasswordButton()))),
+                          child: new Text(NSSLStrings.of(context).changePasswordButton()))),
                   onPressed: _handleSubmitted,
                 ),
                 padding: const EdgeInsets.only(top: 16.0)),

@@ -38,8 +38,6 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
   String brandName;
   String weight;
 
-  NSSLStrings loc = NSSLStrings.instance;
-
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
 
@@ -51,15 +49,15 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             context: context,
             child: new AlertDialog(
                 content:
-                    new Text(loc.discardNewProduct(), style: dialogTextStyle),
+                    new Text(NSSLStrings.of(context).discardNewProduct(), style: dialogTextStyle),
                 actions: <Widget>[
                   new FlatButton(
-                      child: new Text(loc.cancelButton()),
+                      child: new Text(NSSLStrings.of(context).cancelButton()),
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       }),
                   new FlatButton(
-                      child: new Text(loc.discardButton()),
+                      child: new Text(NSSLStrings.of(context).discardButton()),
                       onPressed: () {
                         Navigator.of(context).pop(true);
                       })
@@ -76,7 +74,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
       _autovalidate = true;
-      showInSnackBar(loc.fixErrorsBeforeSubmittingPrompt());
+      showInSnackBar(NSSLStrings.of(context).fixErrorsBeforeSubmittingPrompt());
       return false;
     } else {
       form.save();
@@ -129,9 +127,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     return new Scaffold(
       key: _scaffoldKey,
       appBar:
-          new AppBar(title: new Text(loc.newProductTitle()), actions: <Widget>[
+          new AppBar(title: new Text(NSSLStrings.of(context).newProductTitle()), actions: <Widget>[
         new FlatButton(
-            child: new Text(loc.saveButton(),
+            child: new Text(NSSLStrings.of(context).saveButton(),
                 style: theme.textTheme.body1.copyWith(color: Colors.white)),
             onPressed: () => _handleSubmitted())
       ]),
@@ -145,8 +143,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 new Container(
                     child: new TextFormField(
                         decoration: new InputDecoration(
-                          labelText: loc.newProductName(),
-                          hintText: loc.newProductNameHint(),
+                          labelText: NSSLStrings.of(context).newProductName(),
+                          hintText: NSSLStrings.of(context).newProductNameHint(),
                         ),
                         autofocus: true,
                         controller: tecProductName,
@@ -155,8 +153,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 new Container(
                     child: new TextFormField(
                         decoration: new InputDecoration(
-                            labelText: loc.newProductBrandName(),
-                            hintText: loc.newProductBrandNameHint()),
+                            labelText: NSSLStrings.of(context).newProductBrandName(),
+                            hintText: NSSLStrings.of(context).newProductBrandNameHint()),
                         autofocus: false,
                         controller: tecBrandName,
                         onSaved: (s) => brandName = s,
@@ -164,8 +162,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 new Container(
                     child: new TextFormField(
                         decoration: new InputDecoration(
-                            labelText: loc.newProductWeight(),
-                            hintText: loc.newProductWeightHint()),
+                            labelText: NSSLStrings.of(context).newProductWeight(),
+                            hintText: NSSLStrings.of(context).newProductWeightHint()),
                         autofocus: false,
                         onSaved: (s) => weight = s,
                         controller: tecPackagingSize)),
@@ -175,12 +173,12 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                         border: new Border(
                             bottom: new BorderSide(color: theme.dividerColor))),
                     alignment: FractionalOffset.bottomLeft,
-                    child: new Text(loc.codeText() + gtin)),
+                    child: new Text(NSSLStrings.of(context).codeText() + gtin)),
                 new Container(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     alignment: FractionalOffset.bottomLeft,
                     child: new Row(children: [
-                      new Text(loc.newProductAddToList()),
+                      new Text(NSSLStrings.of(context).newProductAddToList()),
                       new Checkbox(
                           value: putInList,
                           onChanged: (b) =>
@@ -188,7 +186,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                     ])),
                 new Container(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: new Text(loc.newProductStarExplanation(),
+                  child: new Text(NSSLStrings.of(context).newProductStarExplanation(),
                       style: Theme.of(context).textTheme.caption),
                 ),
               ])),
@@ -197,8 +195,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
   String _validateName(String value) {
     _saveNeeded = true;
-    if (value.isEmpty) return loc.fieldRequiredError();
-    if (value.length < 3) return loc.newProductNameToShort();
+    if (value.isEmpty) return NSSLStrings.of(context).fieldRequiredError();
+    if (value.length < 3) return NSSLStrings.of(context).newProductNameToShort();
     return null;
   }
 

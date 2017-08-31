@@ -8,8 +8,7 @@ import 'package:testProject/server_communication/jwt.dart';
 import 'user_sync.dart';
 
 class HelperMethods {
-  static const String url = "https://susch.undo.it";
-  static NSSLStrings loc = NSSLStrings.instance;
+  static const String url = "http://192.168.49.28:4344";
 
   static Future<http.Response> post(String path, BuildContext context,
       [Object body, skipTokenRefresh = false]) async {
@@ -72,8 +71,8 @@ class HelperMethods {
       throw new Exception();
     } else if (respone.statusCode == 401) {
       var ad = new AlertDialog(
-        title: new Text(loc.tokenExpired()),
-        content: new Text(loc.tokenExpiredExplanation()),
+        title: new Text(NSSLStrings.of(context).tokenExpired()),
+        content: new Text(NSSLStrings.of(context).tokenExpiredExplanation()),
         actions: [
           new MaterialButton(
             onPressed: () async {

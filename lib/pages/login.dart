@@ -40,14 +40,12 @@ class LoginPageState extends State<LoginPage> {
   var pwInput = new ForInput();
   var submit = new ForInput();
 
-  NSSLStrings loc = NSSLStrings.instance;
-
   void showInSnackBar(String value) {
     _scaffoldKey.currentState.showSnackBar(new SnackBar(
         content: new Text(value), duration: new Duration(seconds: 3)));
   }
 
-  void _handleSubmitted() {
+  Future _handleSubmitted() async{
     bool error = false;
     _resetInput();
 
@@ -73,22 +71,21 @@ class LoginPageState extends State<LoginPage> {
     String password = pwInput.textEditingController.text;
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
-      UserSync.login(name, password, context).then((res) {
+      var res = await UserSync.login(name, password, context);
         if (!HelperMethods.reactToRespone(res, context,
             scaffoldState: _scaffoldKey?.currentState))
           return;
         else
           _handleLoggedIn(LoginResult.fromJson(res.body));
-      });
     } else {
-      UserSync.loginEmail(name, password, context).then((res) {
+      var res = await UserSync.loginEmail(name, password, context);
         if (!HelperMethods.reactToRespone(res,context,
             scaffoldState: _scaffoldKey?.currentState))
           return;
         else
           _handleLoggedIn(LoginResult.fromJson(res.body));
-      });
-    }
+      }
+
   }
 
   Future _handleLoggedIn(LoginResult res) async {
@@ -96,7 +93,7 @@ class LoginPageState extends State<LoginPage> {
       showInSnackBar(res.error);
       return;
     }
-    showInSnackBar(loc.loginSuccessfulMessage());
+    showInSnackBar(NSSLStrings.of(context).loginSuccessfulMessage());
     bool firstBoot = User.username == null;
     User.token = res.token;
     User.username = res.username;
@@ -132,48 +129,51 @@ class LoginPageState extends State<LoginPage> {
   }
 
   String _validateName(String value) {
-    if (value.isEmpty) return loc.nameEmailRequiredError();
-    if (value.length < 4) return loc.usernameToShortError();
+    if (value.isEmpty) return NSSLStrings.of(context).nameEmailRequiredError();
+    if (value.length < 4) return NSSLStrings.of(context).usernameToShortError();
 
     return null;
   }
 
   String _validateEmail(String value) {
-    if (value.isEmpty) return loc.emailRequiredError();
+    if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value)) return loc.emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
   String _validatePassword(String value) {
     if (pwInput.textEditingController == null ||
         pwInput.textEditingController.text.isEmpty)
-      return loc.passwordEmptyError();
+      return NSSLStrings.of(context).passwordEmptyError();
     return null;
   }
 
   _resetInput() {
     nameInput.decoration = new InputDecoration(
-        helperText: loc.usernameOrEmailForLoginHint(),
-        labelText: loc.usernameOrEmailTitle());
+        helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(),
+        labelText: NSSLStrings.of(context).usernameOrEmailTitle());
 
     pwInput.decoration = new InputDecoration(
-        helperText: loc.choosenPasswordHint(), labelText: loc.password());
+        helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
   }
 
   @override
   initState() {
     super.initState();
-    _resetInput();
+   //
   }
+
 
   @override
   Widget build(BuildContext context) {
+    _resetInput();
+    var w = context.widget;
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
-      appBar: new AppBar(title: new Text(loc.login())),
+      appBar: new AppBar(title: new Text(NSSLStrings.of(context).login())),
       body: new Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
@@ -202,7 +202,7 @@ class LoginPageState extends State<LoginPage> {
                 child: new RaisedButton(
                   key: submit.key,
                   child: new SizedBox.expand(
-                      child: new Center(child: new Text(loc.loginButton()))),
+                      child: new Center(child: new Text(NSSLStrings.of(context).loginButton()))),
                   onPressed: _handleSubmitted,
                 ),
                 padding: const EdgeInsets.only(top: 16.0)
@@ -217,7 +217,7 @@ class LoginPageState extends State<LoginPage> {
                       ? Navigator.pushNamed(context, "/registration")
                       : Navigator.popAndPushNamed(context, "/registration");
                 },
-                child: new Text(loc.registerTextOnLogin()),
+                child: new Text(NSSLStrings.of(context).registerTextOnLogin()),
               )
             ],
             mainAxisAlignment: MainAxisAlignment.center,

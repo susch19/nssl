@@ -29,7 +29,6 @@ class CustomThemePageState extends State<CustomThemePage> {
       accentColorBrightness: Brightness.dark,
       brightness: Brightness.light);
 
-  NSSLStrings loc = NSSLStrings.instance;
 
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
@@ -47,15 +46,15 @@ class CustomThemePageState extends State<CustomThemePage> {
             context: context,
             child: new AlertDialog(
                 content:
-                    new Text(loc.discardNewProduct(), style: dialogTextStyle),
+                    new Text(NSSLStrings.of(context).discardNewProduct(), style: dialogTextStyle),
                 actions: <Widget>[
                   new FlatButton(
-                      child: new Text(loc.cancelButton()),
+                      child: new Text(NSSLStrings.of(context).cancelButton()),
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       }),
                   new FlatButton(
-                      child: new Text(loc.discardButton()),
+                      child: new Text(NSSLStrings.of(context).discardButton()),
                       onPressed: () {
                         Navigator.of(context).pop(true);
                       })
@@ -88,13 +87,13 @@ class CustomThemePageState extends State<CustomThemePage> {
       backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
       appBar: new AppBar(
-          title: new Text(loc.changeTheme(), style: textColorTheme),
+          title: new Text(NSSLStrings.of(context).changeTheme(), style: textColorTheme),
           backgroundColor: td.primaryColor,
           iconTheme: td.iconTheme,
           textTheme: td.textTheme,
           actions: <Widget>[
             new FlatButton(
-                child: new Text(loc.saveButton(), style: textColorTheme),
+                child: new Text(NSSLStrings.of(context).saveButton(), style: textColorTheme),
                 onPressed: () => _handleSubmitted())
           ]),
       body: new Form(
@@ -105,7 +104,7 @@ class CustomThemePageState extends State<CustomThemePage> {
               children: <Widget>[
                 new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   new Text(
-                    loc.changePrimaryColor(),
+                    NSSLStrings.of(context).changePrimaryColor(),
                     style: textColorTheme,
                   ),
                   new Slider(
@@ -117,7 +116,7 @@ class CustomThemePageState extends State<CustomThemePage> {
                   ),
                 ]),
                 new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  new Text(loc.changeAccentColor(), style: textColorTheme),
+                  new Text(NSSLStrings.of(context).changeAccentColor(), style: textColorTheme),
                   new Slider(
                       value: accentColorSlider,
                       max: Colors.accents.length.ceilToDouble() - 1.0,
@@ -126,14 +125,14 @@ class CustomThemePageState extends State<CustomThemePage> {
                       activeColor: td.accentColor),
                 ]),
                 new Row(children: [
-                  new Text(loc.changeDarkTheme(), style: textColorTheme),
+                  new Text(NSSLStrings.of(context).changeDarkTheme(), style: textColorTheme),
                   new Checkbox(
                       value: primaryColorCheckbox,
                       onChanged: primaryBrightnessChange,
                       activeColor: td.accentColor),
                 ]),
                 new Row(children: [
-                  new Text(loc.changeAccentTextColor(), style: textColorTheme),
+                  new Text(NSSLStrings.of(context).changeAccentTextColor(), style: textColorTheme),
                   new Checkbox(
                       value: accentColorCheckbox,
                       onChanged: secondaryBrightnessChange,

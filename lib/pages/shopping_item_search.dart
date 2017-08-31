@@ -37,8 +37,6 @@ class _ProductAddPageState extends State<ProductAddPage> {
   List<ProductResult> prList = new List<ProductResult>();
   int k = 1;
 
-  NSSLStrings loc = NSSLStrings.instance;
-
   Future _addProductToList(String name, String gtin) async {
     var list = User.currentList;
     if (list != null) {
@@ -67,11 +65,11 @@ class _ProductAddPageState extends State<ProductAddPage> {
 
       showInSnackBar(
           item == null
-              ? loc.addedProduct() + "$name"
-              : "$name" + loc.productWasAlreadyInList(),
+              ? NSSLStrings.of(context).addedProduct() + "$name"
+              : "$name" + NSSLStrings.of(context).productWasAlreadyInList(),
           duration: new Duration(seconds: item == null ? 2 : 4),
           action: new SnackBarAction(
-              label: loc.undo(),
+              label: NSSLStrings.of(context).undo(),
               onPressed: () async {
                 var res = item == null
                     ? await ShoppingListSync.deleteProduct(
@@ -103,7 +101,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
                 child: new TextField(
                     key: _iff,
                     decoration:
-                        new InputDecoration(hintText: loc.searchProductHint()),
+                        new InputDecoration(hintText: NSSLStrings.of(context).searchProductHint()),
                     onSubmitted: (x) => _searchProducts(x, 1),
                     autofocus: true,
                     controller: tec,
@@ -136,7 +134,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
     List<Map> z = JSON.decode(o.body);
     if (!noMoreProducts && z.length <= 0) {
       noMoreProducts = true;
-      showInSnackBar(loc.noMoreProductsMessage(),
+      showInSnackBar(NSSLStrings.of(context).noMoreProductsMessage(),
           duration: new Duration(seconds: 3));
     } else
       setState(() => prList.addAll(z.map(ProductAddPage.fromJson).toList()));
