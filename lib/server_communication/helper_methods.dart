@@ -8,7 +8,7 @@ import 'package:testProject/server_communication/jwt.dart';
 import 'user_sync.dart';
 
 class HelperMethods {
-  static const String url = "http://192.168.49.28:4344";
+  static const String url = "https://susch.undo.it";
 
   static Future<http.Response> post(String path, BuildContext context,
       [Object body, skipTokenRefresh = false]) async {

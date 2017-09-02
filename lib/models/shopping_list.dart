@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:testProject/models/shopping_item.dart';
 import 'package:testProject/manager/manager_export.dart';
+import 'package:testProject/models/user.dart';
 import 'dart:async';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/shopping_list_sync.dart';
@@ -80,6 +81,32 @@ class ShoppingList {
             ? false
             : true));
     save();
+  }
+
+  static Future reloadAllLists([BuildContext cont]) async{
+    var result =
+    GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
+    User.shoppingLists.clear();
+    var crossedOut = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
+    for (var res in result.shoppingLists) {
+      var list = new ShoppingList()
+        ..id = res.id
+        ..name = res.name
+        ..shoppingItems = new List<ShoppingItem>();
+
+      for (var item in res.products)
+        list.shoppingItems.add(new ShoppingItem()
+          ..name = item.name
+          ..id = item.id
+          ..amount = item.amount
+          ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
+              orElse: () => {"crossed": 0})["crossed"] == 0
+              ? false
+              : true));
+      User.shoppingLists.add(list);
+      list.save();
+    }
   }
 
   void subscribeForFirebaseMessaging() =>

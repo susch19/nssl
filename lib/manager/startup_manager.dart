@@ -1,18 +1,53 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/options/themes.dart';
+import 'package:testProject/server_communication/return_classes.dart';
+import 'package:testProject/server_communication/s_c.dart';
 
 class Startup {
   static Future<bool> initialize() async {
-
     await DatabaseManager.initialize();
+    await Themes.loadTheme();
 
     await User.load();
-    User.shoppingLists = await ShoppingList.load();
-    User.currentList =
-        User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: ()=>User.shoppingLists.first);
-    await Themes.loadTheme();
+
+    if (User.username == "" || User.eMail == "")
+      return;
+
+    var res = await ShoppingListSync.getLists(null);
+    if (res.statusCode == 200) {
+      var result = GetListsResult.fromJson(res.body);
+
+      User.shoppingLists.clear();
+      var crossedOut = (await DatabaseManager.database
+          .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
+      for (var res in result.shoppingLists) {
+        var list = new ShoppingList()
+          ..id = res.id
+          ..name = res.name
+          ..shoppingItems = new List<ShoppingItem>();
+
+        for (var item in res.products)
+          list.shoppingItems.add(new ShoppingItem()
+            ..name = item.name
+            ..id = item.id
+            ..amount = item.amount
+            ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
+                        orElse: () => {"crossed": 0})["crossed"] ==
+                    0
+                ? false
+                : true));
+        User.shoppingLists.add(list);
+        list.save();
+      }
+    } else
+      User.shoppingLists = await ShoppingList.load();
+    User.currentList = User.shoppingLists.firstWhere(
+        (x) => x.id == User.currentListIndex,
+        orElse: () => User.shoppingLists.first);
+
     return true;
     // FileManager.createFolder("ShoppingListsCo");
     // FileManager.createFile("token.txt");
@@ -48,6 +83,5 @@ class Startup {
     // }
     // User.currentListIndex = User.currentList.id;
     // await User.save();
-
   }
 }
