@@ -14,7 +14,7 @@ class Startup {
     await User.load();
 
     if (User.username == "" || User.eMail == "")
-      return;
+      return false;
 
     var res = await ShoppingListSync.getLists(null);
     if (res.statusCode == 200) {

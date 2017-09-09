@@ -54,13 +54,8 @@ public class MainActivity extends FlutterActivity {
                             }
                         }
                         else if(call.method.equals("getCameraPermission")) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                grantCameraPermissionsThenStartScanning();
-                                result.success("");
-                            }
-                            else {
-                                result.error("ERROR", "Something went wrong.", null);
-                            }
+                            grantCameraPermissionsThenStartScanning();
+                            result.success("");
                         }
                         else {
                             result.notImplemented();
@@ -69,9 +64,11 @@ public class MainActivity extends FlutterActivity {
                 });
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    //@TargetApi(Build.VERSION_CODES.M)
     private void grantCameraPermissionsThenStartScanning() {
-        if (this.checkSelfPermission(Manifest.permission.CAMERA)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            new MethodChannel(flutterView, CHANNEL).invokeMethod("cameraPermissions", "");
+        else if (this.checkSelfPermission(Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             if (mDeniedCameraAccess == false) {
                 // It's pretty clear for why the camera is required. We don't need to give a

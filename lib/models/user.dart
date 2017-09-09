@@ -12,7 +12,7 @@ class User {
   static ShoppingList currentList;
 
   static Future load() async {
-    var z = (await DatabaseManager.database.rawQuery("SELECT * FROM User")).first;
+    var z = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1")).first;
 
       User.username = z["username"];
       User.eMail = z["email"];
