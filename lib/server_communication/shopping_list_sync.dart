@@ -38,10 +38,15 @@ class ShoppingListSync {
             ..gtin = gtin
             ..productName = productName);
 
-  static Future<Response> changeProduct(
+  static Future<Response> changeProductAmount(
       int listId, int productId, int change,BuildContext context) =>
       HelperMethods.put("$listpath/$listId/products/$productId", context,
-          new ChangeProductArgs(change));
+          new ChangeProductArgs(change: change, newName: ""));
+
+  static Future<Response> changeProductName(
+      int listId, int productId, String newName,BuildContext context) =>
+      HelperMethods.put("$listpath/$listId/products/$productId", context,
+          new ChangeProductArgs(change: 0, newName: newName));
 
   static Future<Response> changeProducts(
       int listId, List<int> productIds, List<int> amount,BuildContext context) =>

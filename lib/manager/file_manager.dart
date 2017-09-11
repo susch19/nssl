@@ -84,7 +84,7 @@ class DatabaseManager {
       await db.execute(
           "CREATE TABLE ShoppingLists (id INTEGER PRIMARY KEY, name TEXT, messaging INTEGER)");
       await db.execute(
-          "CREATE TABLE User (username TEXT, email TEXT, token TEXT, current_list_index INTEGER)");
+          "CREATE TABLE User (own_id INTEGER, username TEXT, email TEXT, token TEXT, current_list_index INTEGER)");
       await db.execute(
           "CREATE TABLE Themes (id INTEGER PRIMARY KEY, primary_color INTEGER, accent_color INTEGER, brightness TEXT, accent_color_brightness TEXT)");
     });

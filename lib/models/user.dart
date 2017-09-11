@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/shopping_list.dart';
+import 'package:testProject/server_communication/jwt.dart';
 
 class User {
   static String username;
@@ -10,6 +11,7 @@ class User {
   static String token;
   static int currentListIndex;
   static ShoppingList currentList;
+  static int ownId;
 
   static Future load() async {
     var z = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1")).first;
@@ -18,13 +20,21 @@ class User {
       User.eMail = z["email"];
       User.token = z["token"];
       User.currentListIndex = z["current_list_index"];
-    
+      if(z["own_id"] == null)
+      {
+        await DatabaseManager.database.execute("DROP TABLE User");
+        await DatabaseManager.database.execute("CREATE TABLE User (own_id INTEGER, username TEXT, email TEXT, token TEXT, current_list_index INTEGER)");
+        User.ownId = await JWT.getIdFromToken(User.token);
+        await save();
+      }
+      else
+        User.ownId = z["own_id"];
   }
 
   static Future save() async {
     await DatabaseManager.database.rawDelete("DELETE FROM User");
     await DatabaseManager.database.rawInsert(
-        "INSERT INTO User(username, email, token, current_list_index) VALUES(?, ?, ?, ?)",
-        [User.username, User.eMail, User.token, User.currentListIndex]);
+        "INSERT INTO User(own_id, username, email, token, current_list_index) VALUES(?, ?, ?, ?, ?)",
+        [User.ownId, User.username, User.eMail, User.token, User.currentListIndex]);
   }
 }

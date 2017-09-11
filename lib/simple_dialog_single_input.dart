@@ -20,9 +20,12 @@ class SimpleDialogSingleInput {
       {String hintText,
       String labelText,
       String title,
+      String defaultText = "",
+      int maxLines = 1,
       ValueChanged<String> onSubmitted,
       BuildContext context}) {
     var tec = new TextEditingController();
+    tec.text = defaultText;
 
     return new _SystemPadding(child: new AlertDialog(
         title: new Text(title),
@@ -33,6 +36,7 @@ class SimpleDialogSingleInput {
                   decoration:
                   new InputDecoration(hintText: hintText, labelText: labelText),
                   controller: tec,
+                  maxLines: maxLines,
                   autofocus: true,
                   onSubmitted: (s) {
                     Navigator.pop(context);

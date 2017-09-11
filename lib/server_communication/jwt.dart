@@ -11,4 +11,10 @@ class JWT {
       return true;
     return false;
   }
+
+  static Future<int> getIdFromToken(String token) async{
+    JsonWebTokenDecoder dec = new JsonWebTokenDecoder();
+    var map = dec.convert(token);
+    return int.parse(map["id"]);
+  }
 }

@@ -26,9 +26,10 @@ class TransferOwnershipArgs {
 }
 
 class ChangeProductArgs {
-  ChangeProductArgs(this.change);
+  ChangeProductArgs({this.change, this.newName});
   int change;
-  toJson() => {"change": "$change"};
+  String newName;
+  toJson() => {"change": "$change", "newName" : "$newName"};
 }
 
 class ChangeProductsArgs {

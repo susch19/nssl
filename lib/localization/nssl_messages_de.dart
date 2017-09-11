@@ -121,6 +121,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "tokenExpired" : MessageLookupByLibrary.simpleMessage("Token abgelaufen"),
     "tokenExpiredExplanation" : MessageLookupByLibrary.simpleMessage("Der Token ist abgelaufen. Deshalb wird ein erneuter Login benötigt. Es handelt sich hierbei erst um ein Fehler, falls diese Meldung mehrmals im Monat aufkommt."),
     "noListLoaded" : MessageLookupByLibrary.simpleMessage("Keine Liste geladen"),
+    "renameListItem" : MessageLookupByLibrary.simpleMessage("Produkt umbennen"),
+    "renameListItemHint" : MessageLookupByLibrary.simpleMessage("Der neue Name des Produktes"),
+    "renameListItemLabel" : MessageLookupByLibrary.simpleMessage("Neuer Prdouktname"),
 
   };
 }

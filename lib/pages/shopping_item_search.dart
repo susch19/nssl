@@ -47,7 +47,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
       ShoppingItem afterAdd;
       if (item != null) {
         var answer =
-            await ShoppingListSync.changeProduct(list.id, item.id, 1, context);
+            await ShoppingListSync.changeProductAmount(list.id, item.id, 1, context);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
@@ -74,7 +74,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
                 var res = item == null
                     ? await ShoppingListSync.deleteProduct(
                         list.id, afterAdd.id, context)
-                    : await ShoppingListSync.changeProduct(
+                    : await ShoppingListSync.changeProductAmount(
                         list.id, item.id, -1, context);
                 if (Result.fromJson(res.body).success) {
                   if (item == null)

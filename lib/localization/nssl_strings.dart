@@ -131,6 +131,9 @@ class NSSLStrings {
   String tokenExpired() => Intl.message('Token expired', name: 'tokenExpired', locale:_localeName);
   String tokenExpiredExplanation() => Intl.message('Your token has expired. Login is required. If this happends multiple times per month, please contact us.', name: 'tokenExpiredExplanation', locale:_localeName);
   String noListLoaded() => Intl.message('No List Loaded', name: 'noListLoaded', locale:_localeName);
+  String renameListItem() => Intl.message('Rename Product', name: 'renameListItem', locale:_localeName);
+  String renameListItemHint() => Intl.message('The new name of the product', name: 'renameListItemHint', locale:_localeName);
+  String renameListItemLabel() => Intl.message('new product name', name: 'renameListItemLabel', locale:_localeName);
 
 
 }

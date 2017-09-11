@@ -155,6 +155,7 @@ class RegistrationState extends State<Registration> {
                       decoration: nameInput.decoration,
                       controller: nameInput.textEditingController,
                       autofocus: true,
+                      autocorrect: false,
                       onSubmitted: (s) {
                         FocusScope
                             .of(context)
@@ -165,6 +166,7 @@ class RegistrationState extends State<Registration> {
                       decoration: emailInput.decoration,
                       controller: emailInput.textEditingController,
                       focusNode: emailInput.focusNode,
+                      autocorrect: false,
                       keyboardType: TextInputType.emailAddress,
                       onSubmitted: (s) {
                         FocusScope.of(context).requestFocus(pwInput.focusNode);
@@ -178,6 +180,7 @@ class RegistrationState extends State<Registration> {
                                 decoration: pwInput.decoration,
                                 controller: pwInput.textEditingController,
                                 focusNode: pwInput.focusNode,
+                                autocorrect: false,
                                 obscureText: true,
                                 onSubmitted: (s) {
                                   FocusScope
@@ -191,6 +194,7 @@ class RegistrationState extends State<Registration> {
                                 decoration: pw2Input.decoration,
                                 controller: pw2Input.textEditingController,
                                 focusNode: pw2Input.focusNode,
+                                autocorrect: false,
                                 obscureText: true,
                                 onSubmitted: (s) {
                                   _handleSubmitted();

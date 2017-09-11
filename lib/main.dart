@@ -190,6 +190,8 @@ class HomePageState extends State<HomePage> {
           itemBuilder: buildChangeMenuItems,
         ),
         onTap: () => crossOutMainListItem(x),
+        //
+        onLongPress: () => renameListItem(x),
       );
 
       return new Dismissible(
@@ -283,7 +285,7 @@ class HomePageState extends State<HomePage> {
             onPressed: () {
               setState(() {
                 list.shoppingItems.insert(index, s);
-                ShoppingListSync.changeProduct(
+                ShoppingListSync.changeProductAmount(
                     list.id, s.id, s.amount, context);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
                 list.save();
@@ -361,8 +363,8 @@ class HomePageState extends State<HomePage> {
             .firstWhere((x) => x.name == k.name, orElse: () => null);
         ShoppingItem afterAdd;
         if (item != null) {
-          var answer =
-              await ShoppingListSync.changeProduct(list.id, item.id, 1, cont);
+          var answer = await ShoppingListSync.changeProductAmount(
+              list.id, item.id, 1, cont);
           var p = ChangeListItemResult.fromJson((answer).body);
           setState(() {
             item.amount = p.amount;
@@ -583,7 +585,7 @@ class HomePageState extends State<HomePage> {
 
   Future shoppingItemChange(ShoppingItem s, int change) async {
     var res = ChangeListItemResult.fromJson((await ShoppingListSync
-            .changeProduct(User.currentList.id, s.id, change, cont))
+            .changeProductAmount(User.currentList.id, s.id, change, cont))
         .body);
     setState(() {
       s.id = res.id;
@@ -666,4 +668,25 @@ class HomePageState extends State<HomePage> {
             }));
   }
 
+  renameListItem(ShoppingItem x) {
+    showDialog(
+        context: cont,
+        child: SimpleDialogSingleInput.create(
+            context: cont,
+            title: NSSLStrings.of(context).renameListItem(),
+            hintText: NSSLStrings.of(context).renameListHint(),
+            labelText: NSSLStrings.of(context).renameListItemLabel(),
+            defaultText: x.name,
+            maxLines: 2,
+            onSubmitted: (s) async {
+              var res = ChangeListItemResult.fromJson((await ShoppingListSync
+                      .changeProductName(User.currentList.id, x.id, s, cont))
+                  .body);
+              setState(() {
+                x.id = res.id;
+                x.amount = res.amount;
+                x.name = res.name;
+              });
+            }));
+  }
 }

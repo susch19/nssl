@@ -98,12 +98,16 @@ class LoginPageState extends State<LoginPage> {
     User.token = res.token;
     User.username = res.username;
     User.eMail = res.eMail;
+    User.ownId = res.id;
     await User.save();
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
-      if (User.shoppingLists?.length > 0)
+      if (User.shoppingLists?.length > 0){
         User.currentList = User.shoppingLists.first;
+        User.currentListIndex = 1;
+        await User.save();
+      }
       runApp(new NSSL());
     } else
       Navigator.pop(context);
@@ -169,7 +173,6 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
-    var w = context.widget;
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
@@ -183,6 +186,8 @@ class LoginPageState extends State<LoginPage> {
                   decoration: nameInput.decoration,
                   //onChanged: (input) => nameInput.errorText = _validateName(input),
                   controller: nameInput.textEditingController,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
                   autofocus: true,
                   onSubmitted: (val) {
                     FocusScope.of(context).requestFocus(pwInput.focusNode);
@@ -193,6 +198,7 @@ class LoginPageState extends State<LoginPage> {
                   decoration: pwInput.decoration,
                   focusNode: pwInput.focusNode,
                   obscureText: true,
+                  autocorrect: false,
                   controller: pwInput.textEditingController,
                   onSubmitted: (val) {
                     _handleSubmitted();
