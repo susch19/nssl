@@ -1,0 +1,16 @@
+image: martinlowinski/flutter-android-sdk
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - gradle
+          - gradlewrapper
+        script:
+          - echo "Building APK..."
+          - flutter doctor
+          - flutter build apk
+
+definitions:
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
