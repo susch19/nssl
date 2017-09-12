@@ -265,8 +265,6 @@ class HomePageState extends State<HomePage> {
 
   Future login() => Navigator.pushNamed(cont, "/login");
 
-  //Future handleDismissDrawer(DismissDirection dir, Widget w) =>
-  //    handleDismiss(dir, w, drawerList.children);
   void handleDismissMain(DismissDirection dir, ShoppingItem s) {
     var list = User.currentList;
     final String action = (dir == DismissDirection.endToStart)

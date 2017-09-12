@@ -20,7 +20,7 @@ class User {
       User.eMail = z["email"];
       User.token = z["token"];
       User.currentListIndex = z["current_list_index"];
-      if(z["own_id"] == null)
+      if(!z.containsKey("own_id"))
       {
         await DatabaseManager.database.execute("DROP TABLE User");
         await DatabaseManager.database.execute("CREATE TABLE User (own_id INTEGER, username TEXT, email TEXT, token TEXT, current_list_index INTEGER)");
