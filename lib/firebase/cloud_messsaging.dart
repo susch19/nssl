@@ -8,7 +8,9 @@ final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 class CloudMessaging {
   static Future onMessage(Map<String, dynamic> message, Function setState) async{
     int listId = int.parse(message["listId"]);
-
+    if(User.ownId == int.parse(message["userId"])){
+      return null;
+    }
     if (User.shoppingLists
             .firstWhere((x) => x.id == listId, orElse: () => null) ==
         null) {
