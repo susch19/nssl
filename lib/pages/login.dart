@@ -45,7 +45,7 @@ class LoginPageState extends State<LoginPage> {
         content: new Text(value), duration: new Duration(seconds: 3)));
   }
 
-  Future _handleSubmitted() async{
+  Future _handleSubmitted() async {
     bool error = false;
     _resetInput();
 
@@ -72,20 +72,19 @@ class LoginPageState extends State<LoginPage> {
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
       var res = await UserSync.login(name, password, context);
-        if (!HelperMethods.reactToRespone(res, context,
-            scaffoldState: _scaffoldKey?.currentState))
-          return;
-        else
-          _handleLoggedIn(LoginResult.fromJson(res.body));
+      if (!HelperMethods.reactToRespone(res, context,
+          scaffoldState: _scaffoldKey?.currentState))
+        return;
+      else
+        _handleLoggedIn(LoginResult.fromJson(res.body));
     } else {
       var res = await UserSync.loginEmail(name, password, context);
-        if (!HelperMethods.reactToRespone(res,context,
-            scaffoldState: _scaffoldKey?.currentState))
-          return;
-        else
-          _handleLoggedIn(LoginResult.fromJson(res.body));
-      }
-
+      if (!HelperMethods.reactToRespone(res, context,
+          scaffoldState: _scaffoldKey?.currentState))
+        return;
+      else
+        _handleLoggedIn(LoginResult.fromJson(res.body));
+    }
   }
 
   Future _handleLoggedIn(LoginResult res) async {
@@ -103,7 +102,7 @@ class LoginPageState extends State<LoginPage> {
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
-      if (User.shoppingLists?.length > 0){
+      if (User.shoppingLists?.length > 0) {
         User.currentList = User.shoppingLists.first;
         User.currentListIndex = 1;
         await User.save();
@@ -114,10 +113,10 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _getAllListsInit() async {
-    var result =
-        GetListsResult.fromJson((await ShoppingListSync.getLists(context)).body);
+    var result = GetListsResult
+        .fromJson((await ShoppingListSync.getLists(context)).body);
     setState(() => User.shoppingLists.clear());
-    for (var res in result.shoppingLists) {
+   for (var res in result.shoppingLists) {
       var list = new ShoppingList()
         ..id = res.id
         ..name = res.name
@@ -128,6 +127,7 @@ class LoginPageState extends State<LoginPage> {
           ..id = item.id
           ..amount = item.amount);
       setState(() => User.shoppingLists.add(list));
+      list.subscribeForFirebaseMessaging();
       list.save();
     }
   }
@@ -143,7 +143,8 @@ class LoginPageState extends State<LoginPage> {
     if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
+    if (!email.hasMatch(value))
+      return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
@@ -160,15 +161,15 @@ class LoginPageState extends State<LoginPage> {
         labelText: NSSLStrings.of(context).usernameOrEmailTitle());
 
     pwInput.decoration = new InputDecoration(
-        helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
+        helperText: NSSLStrings.of(context).choosenPasswordHint(),
+        labelText: NSSLStrings.of(context).password());
   }
 
   @override
   initState() {
     super.initState();
-   //
+    //
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,11 +209,12 @@ class LoginPageState extends State<LoginPage> {
                 child: new RaisedButton(
                   key: submit.key,
                   child: new SizedBox.expand(
-                      child: new Center(child: new Text(NSSLStrings.of(context).loginButton()))),
+                      child: new Center(
+                          child:
+                              new Text(NSSLStrings.of(context).loginButton()))),
                   onPressed: _handleSubmitted,
                 ),
-                padding: const EdgeInsets.only(top: 16.0)
-            ),
+                padding: const EdgeInsets.only(top: 16.0)),
           ),
           new Flexible(
               child: new Column(

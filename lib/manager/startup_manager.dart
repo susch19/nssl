@@ -40,6 +40,7 @@ class Startup {
                 ? false
                 : true));
         User.shoppingLists.add(list);
+        list.subscribeForFirebaseMessaging();
         list.save();
       }
     } else
