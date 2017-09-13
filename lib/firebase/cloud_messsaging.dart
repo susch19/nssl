@@ -6,9 +6,10 @@ import 'package:testProject/models/model_export.dart';
 final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
 class CloudMessaging {
-  static Future onMessage(Map<String, dynamic> message, Function setState) async{
+  static Future onMessage(
+      Map<String, dynamic> message, Function setState) async {
     int listId = int.parse(message["listId"]);
-    if(User.ownId == int.parse(message["userId"])){
+    if (User.ownId == int.parse(message["userId"])) {
       return null;
     }
     if (User.shoppingLists
@@ -27,8 +28,8 @@ class CloudMessaging {
             .toList());
       firebaseMessaging
           .subscribeToTopic(listId.toString() + "shoppingListTopic");
-    } else if (message.length == 1){
-    //List deleted
+    } else if (message.length == 1) {
+      //List deleted
       User.shoppingLists.removeWhere((x) => x.id == listId);
       firebaseMessaging
           .unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
@@ -65,6 +66,12 @@ class CloudMessaging {
           break;
         case "Refresh": //action
           await list.refresh();
+          break;
+        case "ItemRenamed": //product.Id, product.Name
+          list.shoppingItems
+              .firstWhere((x) => x.id == int.parse(message["productId"]))
+              .name = message["Name"];
+          list.save();
           break;
       }
     }

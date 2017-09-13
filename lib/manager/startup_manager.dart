@@ -43,8 +43,12 @@ class Startup {
         list.subscribeForFirebaseMessaging();
         list.save();
       }
-    } else
+    } else{
       User.shoppingLists = await ShoppingList.load();
+      for (var list in User.shoppingLists){
+        list.subscribeForFirebaseMessaging();
+      }
+    }
     User.currentList = User.shoppingLists.firstWhere(
         (x) => x.id == User.currentListIndex,
         orElse: () => User.shoppingLists.first);
