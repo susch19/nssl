@@ -13,8 +13,7 @@ class Startup {
 
     await User.load();
 
-    if (User.username == "" || User.eMail == "")
-      return false;
+    if (User.username == "" || User.eMail == "") return false;
 
     var res = await ShoppingListSync.getLists(null);
     if (res.statusCode == 200) {
@@ -43,9 +42,9 @@ class Startup {
         list.subscribeForFirebaseMessaging();
         list.save();
       }
-    } else{
+    } else {
       User.shoppingLists = await ShoppingList.load();
-      for (var list in User.shoppingLists){
+      for (var list in User.shoppingLists) {
         list.subscribeForFirebaseMessaging();
       }
     }

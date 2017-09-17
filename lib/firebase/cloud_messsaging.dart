@@ -69,7 +69,7 @@ class CloudMessaging {
           break;
         case "ItemRenamed": //product.Id, product.Name
           list.shoppingItems
-              .firstWhere((x) => x.id == int.parse(message["productId"]))
+              .firstWhere((x) => x.id == int.parse(message["Id"]))
               .name = message["Name"];
           list.save();
           break;

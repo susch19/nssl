@@ -69,7 +69,10 @@ class _NSSLState extends State<NSSLPage> {
       color: Colors.grey[500],
       localizationsDelegates: <_NSSLLocalizationsDelegate>[
         new _NSSLLocalizationsDelegate()
-      ],
+      ],supportedLocales: const <Locale>[
+      const Locale('de', 'DE'),
+      const Locale('en', 'US'),
+    ],
       theme: Themes.themes.first,
       home: User.username == null
           ? mainAppLoginRegister()
