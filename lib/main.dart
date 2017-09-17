@@ -60,6 +60,11 @@ class _NSSLState extends State<NSSLPage> {
     super.initState();
     firebaseMessaging.configure(
         onMessage: (x) => CloudMessaging.onMessage(x, setState));
+    for (var list in User.shoppingLists) {
+      if(list.messagingEnabled)
+        list.subscribeForFirebaseMessaging();
+    }
+
   }
 
   @override
@@ -70,8 +75,8 @@ class _NSSLState extends State<NSSLPage> {
       localizationsDelegates: <_NSSLLocalizationsDelegate>[
         new _NSSLLocalizationsDelegate()
       ],supportedLocales: const <Locale>[
-      const Locale('de', 'DE'),
       const Locale('en', 'US'),
+      const Locale('de', 'DE'),
     ],
       theme: Themes.themes.first,
       home: User.username == null
@@ -360,8 +365,10 @@ class HomePageState extends State<HomePage> {
       var z = JSON.decode((firstRequest).body);
       var k = ProductAddPage.fromJson(z);
       if (k.success) {
+        RegExp reg = new RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
+        String name = reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
         var item = list.shoppingItems
-            .firstWhere((x) => x.name == k.name, orElse: () => null);
+            .firstWhere((x) => x.name == name, orElse: () => null);
         ShoppingItem afterAdd;
         if (item != null) {
           var answer = await ShoppingListSync.changeProductAmount(
@@ -371,8 +378,9 @@ class HomePageState extends State<HomePage> {
             item.amount = p.amount;
           });
         } else {
+
           var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                  list.id, "${k.name} ${k.quantity}${k.unit}", '-', 1, cont))
+                  list.id, name, '-', 1, cont))
               .body);
           afterAdd = new ShoppingItem()
             ..name = "${p.name}"
@@ -628,15 +636,26 @@ class HomePageState extends State<HomePage> {
 
   Future _addWithoutSearch(String value) async {
     var list = User.currentList;
-    var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
-    if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
-    var product = AddListItemResult.fromJson(res.body);
-    if (!product.success) showInSnackBar(product.error);
-    setState(() => list.shoppingItems.add(new ShoppingItem()
-      ..id = product.productId
-      ..amount = 1
-      ..name = product.name
-      ..crossedOut = false));
+    var same = list.shoppingItems.where((x)=>x.name.toLowerCase()==value.toLowerCase());
+    if(same.length > 0){
+      var res = await ShoppingListSync.changeProductAmount(list.id, same.first.id, 1, cont);
+      if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
+      var product = ChangeListItemResult.fromJson(res.body);
+      if (!product.success) showInSnackBar(product.error);
+      setState(() => same.first.amount = product.amount);
+      same.first;
+    }
+    else{
+      var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
+      if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
+      var product = AddListItemResult.fromJson(res.body);
+      if (!product.success) showInSnackBar(product.error);
+      setState(() => list.shoppingItems.add(new ShoppingItem()
+        ..id = product.productId
+        ..amount = 1
+        ..name = product.name
+        ..crossedOut = false));
+    }
   }
 
   Future _deleteCrossedOutItems() async {

@@ -39,14 +39,10 @@ class Startup {
                 ? false
                 : true));
         User.shoppingLists.add(list);
-        list.subscribeForFirebaseMessaging();
         list.save();
       }
     } else {
       User.shoppingLists = await ShoppingList.load();
-      for (var list in User.shoppingLists) {
-        list.subscribeForFirebaseMessaging();
-      }
     }
     User.currentList = User.shoppingLists.firstWhere(
         (x) => x.id == User.currentListIndex,
