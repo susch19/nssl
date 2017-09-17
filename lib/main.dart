@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:testProject/localization/nssl_messages_all.dart';
 import 'package:testProject/options/themes.dart';
 import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
@@ -10,7 +9,6 @@ import 'package:testProject/simple_dialog_single_input.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 
@@ -26,22 +24,19 @@ class NSSL extends StatelessWidget {
 }
 
 class NSSLPage extends StatefulWidget {
-  static ThemeData theme = new ThemeData(
-      primarySwatch: Colors.blue,
-      accentColor: Colors.teal,
-      accentColorBrightness: Brightness.light,
-      brightness: Brightness.light);
-  static MaterialColor swatch = Colors.blue;
-
   NSSLPage({Key key}) : super(key: key);
 
+  static _NSSLState state;
   @override
-  _NSSLState createState() => new _NSSLState();
+  _NSSLState createState() {
+    state = new _NSSLState();
+    return state;
+  }
 }
 
 class _NSSLState extends State<NSSLPage> {
   _NSSLState() : super();
-  BuildContext cont;
+  static BuildContext cont;
 
   final GlobalKey<ScaffoldState> _mainScaffoldKey =
       new GlobalKey<ScaffoldState>();
@@ -64,7 +59,6 @@ class _NSSLState extends State<NSSLPage> {
       if(list.messagingEnabled)
         list.subscribeForFirebaseMessaging();
     }
-
   }
 
   @override
@@ -74,14 +68,13 @@ class _NSSLState extends State<NSSLPage> {
       color: Colors.grey[500],
       localizationsDelegates: <_NSSLLocalizationsDelegate>[
         new _NSSLLocalizationsDelegate()
-      ],supportedLocales: const <Locale>[
-      const Locale('en', 'US'),
-      const Locale('de', 'DE'),
-    ],
+      ],
+      supportedLocales: const <Locale>[
+        const Locale('en', 'US'),
+        const Locale('de', 'DE'),
+      ],
       theme: Themes.themes.first,
-      home: User.username == null
-          ? mainAppLoginRegister()
-          : mainAppHome(), //mainAppHome(),
+      home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
       routes: <String, WidgetBuilder>{
         '/login': (BuildContext context) => new LoginPage(),
         '/registration': (BuildContext context) => new Registration(),
@@ -198,7 +191,6 @@ class HomePageState extends State<HomePage> {
           itemBuilder: buildChangeMenuItems,
         ),
         onTap: () => crossOutMainListItem(x),
-        //
         onLongPress: () => renameListItem(x),
       );
 
@@ -300,22 +292,19 @@ class HomePageState extends State<HomePage> {
         duration: new Duration(seconds: 10));
   }
 
-  void selectedOption(String s) {
+  Future selectedOption(String s) async {
     switch (s) {
       case "Login/Register":
         login();
         break;
       case "Options":
-        Navigator
-            .push(
-                cont,
-                new MaterialPageRoute<DismissDialogAction>(
-                  builder: (BuildContext context) => new CustomThemePage(),
-                  fullscreenDialog: true,
-                ))
-            .then((x) => setState(() {
-                  NSSLPage.theme = NSSLPage.theme;
-                }));
+        await Navigator.push(
+            cont,
+            new MaterialPageRoute<DismissDialogAction>(
+              builder: (BuildContext context) => new CustomThemePage(),
+              fullscreenDialog: true,
+            ));
+        NSSLPage.state.setState(() {});
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -366,7 +355,8 @@ class HomePageState extends State<HomePage> {
       var k = ProductAddPage.fromJson(z);
       if (k.success) {
         RegExp reg = new RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
-        String name = reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
+        String name =
+            reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
         var item = list.shoppingItems
             .firstWhere((x) => x.name == name, orElse: () => null);
         ShoppingItem afterAdd;
@@ -378,10 +368,9 @@ class HomePageState extends State<HomePage> {
             item.amount = p.amount;
           });
         } else {
-
-          var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                  list.id, name, '-', 1, cont))
-              .body);
+          var p = AddListItemResult.fromJson(
+              (await ShoppingListSync.addProduct(list.id, name, '-', 1, cont))
+                  .body);
           afterAdd = new ShoppingItem()
             ..name = "${p.name}"
             ..amount = 1
@@ -636,17 +625,19 @@ class HomePageState extends State<HomePage> {
 
   Future _addWithoutSearch(String value) async {
     var list = User.currentList;
-    var same = list.shoppingItems.where((x)=>x.name.toLowerCase()==value.toLowerCase());
-    if(same.length > 0){
-      var res = await ShoppingListSync.changeProductAmount(list.id, same.first.id, 1, cont);
+    var same = list.shoppingItems
+        .where((x) => x.name.toLowerCase() == value.toLowerCase());
+    if (same.length > 0) {
+      var res = await ShoppingListSync.changeProductAmount(
+          list.id, same.first.id, 1, cont);
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = ChangeListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
       setState(() => same.first.amount = product.amount);
       same.first;
-    }
-    else{
-      var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
+    } else {
+      var res =
+          await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = AddListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);

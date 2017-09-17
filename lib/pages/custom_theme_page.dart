@@ -23,11 +23,7 @@ class CustomThemePageState extends State<CustomThemePage> {
   Brightness primaryBrightness = Brightness.light;
   Brightness accentBrightness = Brightness.dark;
 
-  ThemeData td = new ThemeData(
-      primarySwatch: Colors.blue,
-      accentColor: Colors.blueAccent,
-      accentColorBrightness: Brightness.dark,
-      brightness: Brightness.light);
+  ThemeData td = Themes.themes.first;
 
 
   double primaryColorSlider = 0.0;
@@ -82,7 +78,7 @@ class CustomThemePageState extends State<CustomThemePage> {
                 color: td.accentIconTheme.color,
               ),
               onPressed: null),
-          backgroundColor: td.brightness == Brightness.dark ? td.buttonColor : td.primaryColor,
+          backgroundColor: td.accentColor,
           onPressed: _handleSubmitted),
       backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
