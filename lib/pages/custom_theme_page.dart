@@ -42,7 +42,7 @@ class CustomThemePageState extends State<CustomThemePage> {
             context: context,
             child: new AlertDialog(
                 content:
-                    new Text(NSSLStrings.of(context).discardNewProduct(), style: dialogTextStyle),
+                    new Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
                 actions: <Widget>[
                   new FlatButton(
                       child: new Text(NSSLStrings.of(context).cancelButton()),

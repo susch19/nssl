@@ -134,6 +134,7 @@ class NSSLStrings {
   String renameListItem() => Intl.message('Rename Product', name: 'renameListItem', locale:_localeName);
   String renameListItemHint() => Intl.message('The new name of the product', name: 'renameListItemHint', locale:_localeName);
   String renameListItemLabel() => Intl.message('new product name', name: 'renameListItemLabel', locale:_localeName);
+  String discardNewTheme() => Intl.message('Discard new theme?', name: 'discardNewTheme', locale:_localeName);
 
 
 }

@@ -123,5 +123,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "renameListItem" : MessageLookupByLibrary.simpleMessage("Rename Product"),
     "renameListItemHint" : MessageLookupByLibrary.simpleMessage("The new name of the product"),
     "renameListItemLabel" : MessageLookupByLibrary.simpleMessage("new product name"),
+    "discardNewTheme" : MessageLookupByLibrary.simpleMessage('Discard new theme?'),
   };
 }
