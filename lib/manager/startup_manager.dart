@@ -15,40 +15,8 @@ class Startup {
 
     if (User.username == "" || User.eMail == "") return false;
 
-    var res = await ShoppingListSync.getLists(null);
-    if (res.statusCode == 200) {
-      var result = GetListsResult.fromJson(res.body);
-
-      User.shoppingLists.clear();
-      var crossedOut = (await DatabaseManager.database
-          .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
-      for (var res in result.shoppingLists) {
-        var list = new ShoppingList()
-          ..id = res.id
-          ..name = res.name
-          ..shoppingItems = new List<ShoppingItem>();
-
-        for (var item in res.products)
-          list.shoppingItems.add(new ShoppingItem()
-            ..name = item.name
-            ..id = item.id
-            ..amount = item.amount
-            ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
-                        orElse: () => {"crossed": 0})["crossed"] ==
-                    0
-                ? false
-                : true));
-        User.shoppingLists.add(list);
-        list.save();
-      }
-    } else {
-      User.shoppingLists = await ShoppingList.load();
-    }
-    User.currentList = User.shoppingLists.firstWhere(
-        (x) => x.id == User.currentListIndex,
-        orElse: () => User.shoppingLists.first);
-
     return true;
+
     // FileManager.createFolder("ShoppingListsCo");
     // FileManager.createFile("token.txt");
     // FileManager.createFile("User.txt");
@@ -83,5 +51,44 @@ class Startup {
     // }
     // User.currentListIndex = User.currentList.id;
     // await User.save();
+  }
+
+  static Future postInitialize() async {
+    User.shoppingLists = await ShoppingList.load();
+    User.currentList = User.shoppingLists.firstWhere(
+            (x) => x.id == User.currentListIndex,
+        orElse: () => User.shoppingLists.first);
+    var res = await ShoppingListSync.getLists(null);
+    if (res.statusCode == 200) {
+      var result = GetListsResult.fromJson(res.body);
+
+      User.shoppingLists.clear();
+      var crossedOut = (await DatabaseManager.database
+          .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
+      for (var res in result.shoppingLists) {
+        var list = new ShoppingList()
+          ..id = res.id
+          ..name = res.name
+          ..shoppingItems = new List<ShoppingItem>();
+
+        for (var item in res.products)
+          list.shoppingItems.add(new ShoppingItem()
+            ..name = item.name
+            ..id = item.id
+            ..amount = item.amount
+            ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
+                        orElse: () => {"crossed": 0})["crossed"] ==
+                    0
+                ? false
+                : true));
+        User.shoppingLists.add(list);
+        list.save();
+      }
+    }
+    User.currentList = User.shoppingLists.firstWhere(
+            (x) => x.id == User.currentListIndex,
+        orElse: () => User.shoppingLists.first);
+
+    return true;
   }
 }
