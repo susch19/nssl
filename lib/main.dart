@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   Startup.initialize().whenComplete(() => runApp(new NSSLPage()));
@@ -56,8 +57,7 @@ class _NSSLState extends State<NSSLPage> {
     firebaseMessaging.configure(
         onMessage: (x) => CloudMessaging.onMessage(x, setState));
     for (var list in User.shoppingLists) {
-      if(list.messagingEnabled)
-        list.subscribeForFirebaseMessaging();
+      if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
     }
   }
 
@@ -66,8 +66,10 @@ class _NSSLState extends State<NSSLPage> {
     return new MaterialApp(
       title: 'NSSL',
       color: Colors.grey[500],
-      localizationsDelegates: <_NSSLLocalizationsDelegate>[
-        new _NSSLLocalizationsDelegate()
+      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+        new _NSSLLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: const <Locale>[
         const Locale('en', 'US'),
@@ -100,6 +102,9 @@ class _NSSLState extends State<NSSLPage> {
 }
 
 class _NSSLLocalizationsDelegate extends LocalizationsDelegate<NSSLStrings> {
+  @override
+  bool isSupported(Locale locale) => true;
+
   @override
   Future<NSSLStrings> load(Locale locale) => NSSLStrings.load(locale);
 

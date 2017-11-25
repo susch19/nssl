@@ -78,7 +78,7 @@ class NSSLStrings {
   String unknownPasswordError() => Intl.message('There is something wrong with your password', name: 'unknownPasswordError', locale:_localeName);
   String unknownReenterPasswordError() => Intl.message('There is something wrong with your password validation', name: 'unknownReenterPasswordError', locale:_localeName);
   String registrationSuccessfulMessage() => Intl.message('Registration successfull.', name: 'registrationSuccessfullMessage', locale:_localeName);
-  String registrationTitle() => Intl.message('Registration.', name: 'registrationTitle', locale:_localeName);
+  String registrationTitle() => Intl.message('Registration', name: 'registrationTitle', locale:_localeName);
   String nameEmptyError() => Intl.message('Name is required.', name: 'nameEmptyError', locale:_localeName);
   String chooseAPasswordPrompt() => Intl.message('Please choose a password.', name: 'chooseAPasswordPrompt', locale:_localeName);
   String reenterPasswordPrompt() => Intl.message('Please reenter your password.', name: 'reenterPasswordPromt', locale:_localeName);
@@ -135,6 +135,8 @@ class NSSLStrings {
   String renameListItemHint() => Intl.message('The new name of the product', name: 'renameListItemHint', locale:_localeName);
   String renameListItemLabel() => Intl.message('new product name', name: 'renameListItemLabel', locale:_localeName);
   String discardNewTheme() => Intl.message('Discard new theme?', name: 'discardNewTheme', locale:_localeName);
+  String forgotPassword() => Intl.message('Forgot password?', name: 'forgotPassword', locale:_localeName);
+  //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 
 }

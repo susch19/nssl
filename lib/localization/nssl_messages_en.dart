@@ -67,7 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "unknownPasswordError" : MessageLookupByLibrary.simpleMessage("There is something wrong with your password"),
     "unknownReenterPasswordError" : MessageLookupByLibrary.simpleMessage("There is something wrong with your password validation"),
     "registrationSuccessfulMessage" : MessageLookupByLibrary.simpleMessage("Registration successfull."),
-    "registrationTitle" : MessageLookupByLibrary.simpleMessage("Registration."),
+    "registrationTitle" : MessageLookupByLibrary.simpleMessage("Registration"),
     "nameEmptyError" : MessageLookupByLibrary.simpleMessage('Name is required.'),
     "chooseAPasswordPrompt" : MessageLookupByLibrary.simpleMessage('Please choose a password.'),
     "reenterPasswordPrompt" : MessageLookupByLibrary.simpleMessage('Please reenter your password.'),
@@ -124,5 +124,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "renameListItemHint" : MessageLookupByLibrary.simpleMessage("The new name of the product"),
     "renameListItemLabel" : MessageLookupByLibrary.simpleMessage("new product name"),
     "discardNewTheme" : MessageLookupByLibrary.simpleMessage('Discard new theme?'),
+    "forgotPassword" : MessageLookupByLibrary.simpleMessage('Forgot password?'),
   };
 }

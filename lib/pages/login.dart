@@ -36,6 +36,8 @@ class ForInput {
 class LoginPageState extends State<LoginPage> {
   LoginPageState() : super();
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  bool _autovalidate = false;
   var nameInput = new ForInput();
   var pwInput = new ForInput();
   var submit = new ForInput();
@@ -46,10 +48,15 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _handleSubmitted() async {
-    bool error = false;
-    _resetInput();
-
-    var validate = _validateName(nameInput.textEditingController.text);
+    //bool error = false;
+    //_resetInput();
+    final FormState form = _formKey.currentState;
+    if (!form.validate()) {
+      _autovalidate = true;
+      return;
+    }
+    //form.save();
+    /*  var validate = _validateName(nameInput.textEditingController.text);
     if (validate != null) {
       nameInput.decoration = new InputDecoration(
           labelText: nameInput.decoration.labelText,
@@ -64,8 +71,8 @@ class LoginPageState extends State<LoginPage> {
           errorText: _validatePassword(pwInput.textEditingController.text));
       error = true;
     }
-    setState(() => {});
-    if (error == true) return;
+    setState(() => {});*/
+//    if (error == true) return;
 
     String name = nameInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
@@ -116,7 +123,7 @@ class LoginPageState extends State<LoginPage> {
     var result = GetListsResult
         .fromJson((await ShoppingListSync.getLists(context)).body);
     setState(() => User.shoppingLists.clear());
-   for (var res in result.shoppingLists) {
+    for (var res in result.shoppingLists) {
       var list = new ShoppingList()
         ..id = res.id
         ..name = res.name
@@ -174,65 +181,81 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
+//    return new ListView(children: <Widget>[new (child: new Scaffold(
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomPadding: true,
       appBar: new AppBar(title: new Text(NSSLStrings.of(context).login())),
-      body: new Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child:
-            new Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          new Flexible(
-              child: new TextField(
-                  decoration: nameInput.decoration,
-                  //onChanged: (input) => nameInput.errorText = _validateName(input),
-                  controller: nameInput.textEditingController,
-                  keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  autofocus: true,
-                  onSubmitted: (val) {
-                    FocusScope.of(context).requestFocus(pwInput.focusNode);
-                  })),
-          new Flexible(
-              child: new TextField(
-                  key: pwInput.key,
-                  decoration: pwInput.decoration,
-                  focusNode: pwInput.focusNode,
-                  obscureText: true,
-                  autocorrect: false,
-                  controller: pwInput.textEditingController,
-                  onSubmitted: (val) {
-                    _handleSubmitted();
-                  })),
-          new Flexible(
-            child: new Container(
-                child: new RaisedButton(
-                  key: submit.key,
-                  child: new SizedBox.expand(
+      body: new Form(
+        key: _formKey,
+        autovalidate: _autovalidate,
+        child: new ListView(
+//              physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            children: [
+              new ListTile(
+                  title: new TextFormField(
+                      key: nameInput.key,
+                      decoration: nameInput.decoration,
+                      //onChanged: (input) => nameInput.errorText = _validateName(input),
+                      controller: nameInput.textEditingController,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      autofocus: true,
+                      validator: _validateName,
+                      onSaved: (val) {
+                        FocusScope.of(context).requestFocus(pwInput.focusNode);
+                      })),
+              new ListTile(
+                  title: new TextFormField(
+                      key: pwInput.key,
+                      decoration: pwInput.decoration,
+                      focusNode: pwInput.focusNode,
+                      obscureText: true,
+                      autocorrect: false,
+                      controller: pwInput.textEditingController,
+                      validator: _validatePassword,
+                      onSaved: (val) {
+                        _handleSubmitted();
+                      })),
+              new ListTile(
+                title: new Container(
+                    child: new RaisedButton(
+                      key: submit.key,
                       child: new Center(
                           child:
-                              new Text(NSSLStrings.of(context).loginButton()))),
-                  onPressed: _handleSubmitted,
-                ),
-                padding: const EdgeInsets.only(top: 16.0)),
-          ),
-          new Flexible(
-              child: new Column(
-            children: [
+                              new Text(NSSLStrings.of(context).loginButton())),
+                      onPressed: _handleSubmitted,
+                    ),
+                    padding: const EdgeInsets.only(top: 16.0)),
+              ),
+              new ListTile(
+                title: new Container(
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: new FlatButton(
+                    onPressed: () {
+                      User.username == null
+                          ? Navigator.pushNamed(context, "/registration")
+                          : Navigator.popAndPushNamed(context, "/registration");
+                    },
+                    child:
+                        new Text(NSSLStrings.of(context).registerTextOnLogin()),
+                  ), /*
               new FlatButton(
                 onPressed: () {
-                  User.username == null
-                      ? Navigator.pushNamed(context, "/registration")
-                      : Navigator.popAndPushNamed(context, "/registration");
+                      Navigator.pushNamed(context, "/forgot_password");
                 },
-                child: new Text(NSSLStrings.of(context).registerTextOnLogin()),
-              )
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-            //padding: new EdgeInsets.only(
-            //    top: MediaQuery.of(context).size.height / 5),
-          ))
-        ]),
+                child: new Text(NSSLStrings.of(context).forgotPassword()),
+              )*/
+
+                  //padding: new EdgeInsets.only(
+                  //    top: MediaQuery.of(context).size.height / 5),
+                ),
+              ),
+            ]
+            //]),
+
+            ),
       ),
     );
   }

@@ -4,8 +4,11 @@ description: A new flutter project.
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   path_provider:
   intl:
+  intl_translation:
   jwt:
     git: git://github.com/susch19/dart-json_web_token.git
   crypto: "^2.0.1"
