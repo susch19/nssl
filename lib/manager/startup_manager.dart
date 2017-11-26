@@ -14,7 +14,10 @@ class Startup {
     await User.load();
 
     if (User.username == "" || User.eMail == "") return false;
-
+    User.shoppingLists = await ShoppingList.load();
+    User.currentList = User.shoppingLists.firstWhere(
+            (x) => x.id == User.currentListIndex,
+        orElse: () => User.shoppingLists.first);
     return true;
 
     // FileManager.createFolder("ShoppingListsCo");
@@ -53,11 +56,7 @@ class Startup {
     // await User.save();
   }
 
-  static Future postInitialize() async {
-    User.shoppingLists = await ShoppingList.load();
-    User.currentList = User.shoppingLists.firstWhere(
-            (x) => x.id == User.currentListIndex,
-        orElse: () => User.shoppingLists.first);
+  static Future initializeNewListsFromServer() async {
     var res = await ShoppingListSync.getLists(null);
     if (res.statusCode == 200) {
       var result = GetListsResult.fromJson(res.body);

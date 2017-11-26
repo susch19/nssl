@@ -14,8 +14,10 @@ import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  Startup.initialize().whenComplete(() =>
-      Startup.postInitialize().whenComplete(() => runApp(new NSSLPage())));
+  Startup.initialize().whenComplete(() {
+    runApp(new NSSLPage());
+    Startup.initializeNewListsFromServer();
+  });
 }
 
 class NSSL extends StatelessWidget {

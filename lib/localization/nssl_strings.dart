@@ -136,6 +136,7 @@ class NSSLStrings {
   String renameListItemLabel() => Intl.message('new product name', name: 'renameListItemLabel', locale:_localeName);
   String discardNewTheme() => Intl.message('Discard new theme?', name: 'discardNewTheme', locale:_localeName);
   String forgotPassword() => Intl.message('Forgot password?', name: 'forgotPassword', locale:_localeName);
+  String bePatient() => Intl.message('Please be patient, the server is processing your request already', name: 'bePatient', locale:_localeName);
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 

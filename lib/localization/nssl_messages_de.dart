@@ -126,5 +126,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "renameListItemLabel" : MessageLookupByLibrary.simpleMessage("Neuer Prdouktname"),
     "discardNewTheme" : MessageLookupByLibrary.simpleMessage("Änderungen verwerfen?"),
     "forgotPassword" : MessageLookupByLibrary.simpleMessage("Passwort vergessen?"),
+    "bePatient" : MessageLookupByLibrary.simpleMessage('Der Server bearbeitet diese Anfrage bereits'),
+
   };
 }
