@@ -58,6 +58,7 @@ class Startup {
 
   static Future initializeNewListsFromServer() async {
     var res = await ShoppingListSync.getLists(null);
+
     if (res.statusCode == 200) {
       var result = GetListsResult.fromJson(res.body);
 

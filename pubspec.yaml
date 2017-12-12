@@ -14,7 +14,7 @@ dependencies:
   crypto: "^2.0.1"
   cryptoutils:
   cipher:
-  firebase_messaging:
+  firebase_messaging:  "0.0.6"
   sqflite:
 
 # For information on the generic Dart part of this file, see the

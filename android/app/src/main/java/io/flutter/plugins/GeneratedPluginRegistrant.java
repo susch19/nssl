@@ -10,8 +10,20 @@ import com.tekartik.sqflite.SqflitePlugin;
  */
 public final class GeneratedPluginRegistrant {
   public static void registerWith(PluginRegistry registry) {
+    if (alreadyRegisteredWith(registry)) {
+      return;
+    }
     FirebaseMessagingPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.path_provider.PathProviderPlugin"));
     SqflitePlugin.registerWith(registry.registrarFor("com.tekartik.sqflite.SqflitePlugin"));
+  }
+
+  private static boolean alreadyRegisteredWith(PluginRegistry registry) {
+    final String key = GeneratedPluginRegistrant.class.getCanonicalName();
+    if (registry.hasPlugin(key)) {
+      return true;
+    }
+    registry.registrarFor(key);
+    return false;
   }
 }

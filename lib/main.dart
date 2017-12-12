@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:testProject/options/themes.dart';
 import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
@@ -12,11 +13,13 @@ import 'package:flutter/services.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'dart:developer';
 
 void main() {
-  Startup.initialize().whenComplete(() {
+// iWonderHowLongThisTakes();
+  Startup.initialize().then((s) {
+    if (s) Startup.initializeNewListsFromServer();
     runApp(new NSSLPage());
-    Startup.initializeNewListsFromServer();
   });
 }
 
@@ -123,44 +126,51 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        key: _mainScaffoldKey,
-        appBar: new AppBar(
-            title: new Text(
-              User?.currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
-            ),
-            actions: <Widget>[
-              new PopupMenuButton<String>(
-                  onSelected: selectedOption,
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<String>>[
-                        new PopupMenuItem<String>(
-                            value: 'Options',
-                            child: new Text(
-                                NSSLStrings.of(context).changeTheme())),
-                        new PopupMenuItem<String>(
-                            value: 'ChangePassword',
-                            child: new Text(
-                                NSSLStrings.of(context).changePasswordPD())),
-                        new PopupMenuItem<String>(
-                            value: 'deleteCrossedOut',
-                            child: new Text(
-                                NSSLStrings.of(context).deleteCrossedOutPB())),
-                      ])
-            ]),
-        body: buildBody(context),
-        drawer: _buildDrawer(context),
-        persistentFooterButtons: [
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).addPB()),
-              onPressed: _addWithoutSearchDialog),
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).scanPB()),
-              onPressed: _getEAN),
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).searchPB()),
-              onPressed: search),
-        ]);
+//    return new WillPopScope(
+//        onWillPop: _onWillPop,
+//        child:
+
+            return new Scaffold(
+                key: _mainScaffoldKey,
+                appBar: new AppBar(
+                    title: new Text(
+                      User?.currentList?.name ??
+                          NSSLStrings.of(context).noListLoaded(),
+                    ),
+                    actions: <Widget>[
+                      new PopupMenuButton<String>(
+                          onSelected: selectedOption,
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuItem<String>>[
+                                new PopupMenuItem<String>(
+                                    value: 'Options',
+                                    child: new Text(
+                                        NSSLStrings.of(context).changeTheme())),
+                                new PopupMenuItem<String>(
+                                    value: 'ChangePassword',
+                                    child: new Text(NSSLStrings
+                                        .of(context)
+                                        .changePasswordPD())),
+                                new PopupMenuItem<String>(
+                                    value: 'deleteCrossedOut',
+                                    child: new Text(NSSLStrings
+                                        .of(context)
+                                        .deleteCrossedOutPB())),
+                              ])
+                    ]),
+                body: buildBody(context),
+                drawer: _buildDrawer(context),
+                persistentFooterButtons: [
+              new FlatButton(
+                  child: new Text(NSSLStrings.of(context).addPB()),
+                  onPressed: _addWithoutSearchDialog),
+              new FlatButton(
+                  child: new Text(NSSLStrings.of(context).scanPB()),
+                  onPressed: _getEAN),
+              new FlatButton(
+                  child: new Text(NSSLStrings.of(context).searchPB()),
+                  onPressed: search),
+            ]);
   }
 
   Widget buildBody(BuildContext context) {
@@ -708,4 +718,11 @@ class HomePageState extends State<HomePage> {
               });
             }));
   }
+
+//  //Workarount Firebase Messaging
+//  Future<bool> _onWillPop() {
+//    Navigator.of(context).pop();
+//    exit(0);
+//    return new Future(() => true);
+//  }
 }
