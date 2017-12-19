@@ -14,9 +14,11 @@ class User {
   static int ownId;
 
   static Future load() async {
-    var z = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1")).first;
-
-      User.username = z["username"];
+    var list = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1"));
+    if(list.length == 0)
+      return;
+    var z = list.first;
+    User.username = z["username"];
       User.eMail = z["email"];
       User.token = z["token"];
       User.currentListIndex = z["current_list_index"];

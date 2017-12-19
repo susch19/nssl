@@ -13,7 +13,7 @@ class Startup {
 
     await User.load();
 
-    if (User.username == "" || User.eMail == "") return false;
+    if (User.username == null || User.username == "" || User.eMail == null || User.eMail == "") return false;
     User.shoppingLists = await ShoppingList.load();
     User.currentList = User.shoppingLists.firstWhere(
             (x) => x.id == User.currentListIndex,
