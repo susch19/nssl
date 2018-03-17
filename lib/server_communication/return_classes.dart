@@ -206,6 +206,26 @@ class GetListsResult {
   }
 }
 
+class GetBoughtListResult {
+  int id;
+  String name;
+  Iterable<ShoppingItem> products;
+
+  static GetBoughtListResult fromJson(String dataString) =>
+      _fromJson(JSON.decode(dataString));
+
+  static GetBoughtListResult _fromJson(Map data) {
+    var r = new GetBoughtListResult();
+    r.id = data["id"];
+    r.name = data["name"];
+    List<Map> unMaped = data["products"] ?? new List<Map>();
+    r.products =
+        unMaped.map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+    return r;
+  }
+}
+
+
 class InfoResult {
   int id;
   String username;

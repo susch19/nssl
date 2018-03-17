@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:testProject/manager/file_manager.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/options/themes.dart';
@@ -8,12 +7,13 @@ import 'package:testProject/server_communication/s_c.dart';
 
 class Startup {
   static Future<bool> initialize() async {
+
     await DatabaseManager.initialize();
-    await Themes.loadTheme();
 
     await User.load();
 
     if (User.username == null || User.username == "" || User.eMail == null || User.eMail == "") return false;
+    await Themes.loadTheme();
     User.shoppingLists = await ShoppingList.load();
     User.currentList = User.shoppingLists.firstWhere(
             (x) => x.id == User.currentListIndex,
@@ -59,19 +59,21 @@ class Startup {
   static Future initializeNewListsFromServer() async {
     var res = await ShoppingListSync.getLists(null);
 
+
     if (res.statusCode == 200) {
       var result = GetListsResult.fromJson(res.body);
 
       User.shoppingLists.clear();
+      await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
       var crossedOut = (await DatabaseManager.database
           .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
-      for (var res in result.shoppingLists) {
+      for (var resu in result.shoppingLists) {
         var list = new ShoppingList()
-          ..id = res.id
-          ..name = res.name
+          ..id = resu.id
+          ..name = resu.name
           ..shoppingItems = new List<ShoppingItem>();
 
-        for (var item in res.products)
+        for (var item in resu.products)
           list.shoppingItems.add(new ShoppingItem()
             ..name = item.name
             ..id = item.id

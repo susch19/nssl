@@ -1,4 +1,4 @@
-include ':app', ':ScanditBarcodeScanner'
+include ':app'
 
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 

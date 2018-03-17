@@ -39,4 +39,8 @@ class User {
         "INSERT INTO User(own_id, username, email, token, current_list_index) VALUES(?, ?, ?, ?, ?)",
         [User.ownId, User.username, User.eMail, User.token, User.currentListIndex]);
   }
+
+  static Future delete() async{
+    await DatabaseManager.database.rawDelete("DELETE FROM User where own_id = ?", [ownId]);
+  }
 }

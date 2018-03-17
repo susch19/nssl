@@ -20,8 +20,8 @@ class ShoppingList {
           [name, messagingEnabled ? 1 : 0, id]);
       if (count == 0)
         await DatabaseManager.database.rawInsert(
-            'INSERT INTO ShoppingLists(id, name, messaging) VALUES(?, ?, ?)',
-            [id, name, messagingEnabled ? 1 : 0]);
+            'INSERT INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
+            [id, name, messagingEnabled ? 1 : 0, User.ownId]);
 
       await DatabaseManager.database
           .rawDelete("DELETE FROM ShoppingItems WHERE res_list_id = ?", [id]);
@@ -34,10 +34,11 @@ class ShoppingList {
   }
 
   static Future<List<ShoppingList>> load() async {
+    var lists = await DatabaseManager.database.rawQuery(
+        "SELECT * FROM ShoppingLists WHERE user_id = ?", [User.ownId]);
+
     var items =
         await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingItems");
-    var lists =
-        await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingLists");
 
     return lists
         .map((x) => new ShoppingList()
@@ -83,12 +84,13 @@ class ShoppingList {
     save();
   }
 
-  static Future reloadAllLists([BuildContext cont]) async{
+  static Future reloadAllLists([BuildContext cont]) async {
     var result =
-    GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
+        GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
     User.shoppingLists.clear();
-    var crossedOut = (await DatabaseManager.database.rawQuery(
-        "SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
+    await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
+    var crossedOut = (await DatabaseManager.database
+        .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
     for (var res in result.shoppingLists) {
       var list = new ShoppingList()
         ..id = res.id
@@ -101,10 +103,13 @@ class ShoppingList {
           ..id = item.id
           ..amount = item.amount
           ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
-              orElse: () => {"crossed": 0})["crossed"] == 0
+                      orElse: () => {"crossed": 0})["crossed"] ==
+                  0
               ? false
               : true));
       User.shoppingLists.add(list);
+      
+      list.subscribeForFirebaseMessaging();
       list.save();
     }
   }

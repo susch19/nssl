@@ -1,24 +1,24 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:scandit/scandit.dart';
+import 'package:testProject/helper/simple_dialog.dart';
 import 'package:testProject/options/themes.dart';
 import 'package:testProject/pages/pages.dart';
 import 'package:testProject/manager/manager_export.dart';
 import 'package:testProject/models/model_export.dart';
 import 'package:testProject/server_communication/return_classes.dart';
 import 'package:testProject/server_communication/s_c.dart';
-import 'package:testProject/simple_dialog_single_input.dart';
+import 'package:testProject/helper/simple_dialog_single_input.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 import 'package:testProject/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'dart:developer';
 
 void main() {
 // iWonderHowLongThisTakes();
   Startup.initialize().then((s) {
-    if (s) Startup.initializeNewListsFromServer();
+    //if (s) Startup.initializeNewListsFromServer();
     runApp(new NSSLPage());
   });
 }
@@ -62,9 +62,8 @@ class _NSSLState extends State<NSSLPage> {
     super.initState();
     firebaseMessaging.configure(
         onMessage: (x) => CloudMessaging.onMessage(x, setState));
-    for (var list in User.shoppingLists) {
+    for (var list in User.shoppingLists)
       if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
-    }
   }
 
   @override
@@ -87,6 +86,7 @@ class _NSSLState extends State<NSSLPage> {
         '/login': (BuildContext context) => new LoginPage(),
         '/registration': (BuildContext context) => new Registration(),
         '/search': (BuildContext context) => new ProductAddPage(),
+        '/forgot_password': (BuildContext context) => new CustomThemePage(),
       },
       showPerformanceOverlay: performanceOverlay,
       showSemanticsDebugger: false,
@@ -123,131 +123,7 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => new HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-//    return new WillPopScope(
-//        onWillPop: _onWillPop,
-//        child:
-
-            return new Scaffold(
-                key: _mainScaffoldKey,
-                appBar: new AppBar(
-                    title: new Text(
-                      User?.currentList?.name ??
-                          NSSLStrings.of(context).noListLoaded(),
-                    ),
-                    actions: <Widget>[
-                      new PopupMenuButton<String>(
-                          onSelected: selectedOption,
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuItem<String>>[
-                                new PopupMenuItem<String>(
-                                    value: 'Options',
-                                    child: new Text(
-                                        NSSLStrings.of(context).changeTheme())),
-                                new PopupMenuItem<String>(
-                                    value: 'ChangePassword',
-                                    child: new Text(NSSLStrings
-                                        .of(context)
-                                        .changePasswordPD())),
-                                new PopupMenuItem<String>(
-                                    value: 'deleteCrossedOut',
-                                    child: new Text(NSSLStrings
-                                        .of(context)
-                                        .deleteCrossedOutPB())),
-                              ])
-                    ]),
-                body: buildBody(context),
-                drawer: _buildDrawer(context),
-                persistentFooterButtons: [
-              new FlatButton(
-                  child: new Text(NSSLStrings.of(context).addPB()),
-                  onPressed: _addWithoutSearchDialog),
-              new FlatButton(
-                  child: new Text(NSSLStrings.of(context).scanPB()),
-                  onPressed: _getEAN),
-              new FlatButton(
-                  child: new Text(NSSLStrings.of(context).searchPB()),
-                  onPressed: search),
-            ]);
-  }
-
-  Widget buildBody(BuildContext context) {
-    cont = context;
-
-    if (User.currentList == null ||
-        User.currentList.shoppingItems == null ||
-        User.currentList.shoppingItems.length == 0) return const Text("");
-
-    User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
-    User.currentList?.shoppingItems?.sort(
-        (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
-
-    var mainList = User.currentList.shoppingItems.map((x) {
-      var lt = new ListTile(
-        title: new Row(children: [
-          new Expanded(
-              child: new Text(
-            x.name,
-            maxLines: 2,
-            softWrap: true,
-            style: new TextStyle(
-                decoration: x.crossedOut
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none),
-          )),
-        ]),
-        leading: new PopupMenuButton<String>(
-          child: new Row(children: [
-            new Text(x.amount.toString() + "x"),
-            const Icon(Icons.expand_more, size: 16.0),
-            new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
-          ]),
-          initialValue: x.amount.toString(),
-          onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
-          itemBuilder: buildChangeMenuItems,
-        ),
-        onTap: () => crossOutMainListItem(x),
-        onLongPress: () => renameListItem(x),
-      );
-
-      return new Dismissible(
-        key: new ValueKey(x),
-        child: lt,
-        onDismissed: (DismissDirection d) => handleDismissMain(d, x),
-        direction: DismissDirection.startToEnd,
-        background: new Container(
-            decoration:
-                new BoxDecoration(color: Theme.of(context).primaryColor),
-            child: new ListTile(
-                leading: new Icon(Icons.delete,
-                    color: Theme.of(context).accentIconTheme.color,
-                    size: 36.0))),
-      );
-    }).toList(growable: true);
-
-    var lv = new CustomScrollView(
-      slivers: [
-        new SliverFixedExtentList(
-            delegate: new SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-              return new Container(
-                alignment: FractionalOffset.center,
-                child: mainList[index],
-              );
-            }, childCount: mainList.length),
-            itemExtent: 50.0)
-      ],
-      physics: const AlwaysScrollableScrollPhysics(),
-    );
-
-    return new RefreshIndicator(
-      child: lv,
-      onRefresh: _handleMainListRefresh,
-    );
-  }
-
+class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   BuildContext cont;
 
   final GlobalKey<ScaffoldState> _mainScaffoldKey =
@@ -261,6 +137,156 @@ class HomePageState extends State<HomePage> {
   String ean = "";
   bool performanceOverlay = false;
   bool materialGrid = false;
+
+  AnimationController _controller;
+  Animation<double> _drawerContentsOpacity;
+  Animation<Offset> _drawerDetailsPosition;
+  bool _showDrawerContents = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Startup.initializeNewListsFromServer();
+    Scandit.initialize("***REMOVED***");
+    setState(() {});
+    _controller = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _drawerContentsOpacity = new CurvedAnimation(
+      parent: new ReverseAnimation(_controller),
+      curve: Curves.fastOutSlowIn,
+    );
+    _drawerDetailsPosition = new Tween<Offset>(
+      begin: const Offset(0.0, -1.0),
+      end: Offset.zero,
+    )
+        .animate(new CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+//    return new WillPopScope(
+//        onWillPop: _onWillPop,
+//        child:
+
+    return new Scaffold(
+        key: _mainScaffoldKey,
+        appBar: new AppBar(
+            title: new Text(
+              User?.currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
+            ),
+            actions: <Widget>[
+              new PopupMenuButton<String>(
+                  onSelected: selectedOption,
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuItem<String>>[
+                        new PopupMenuItem<String>(
+                            value: 'Options',
+                            child: new Text(
+                                NSSLStrings.of(context).changeTheme())),
+                        new PopupMenuItem<String>(
+                            value: 'deleteCrossedOut',
+                            child: new Text(
+                                NSSLStrings.of(context).deleteCrossedOutPB())),
+                      ])
+            ]),
+        body: buildBody(context),
+        drawer: _buildDrawer(context),
+        persistentFooterButtons: [
+          new FlatButton(
+              child: new Text(NSSLStrings.of(context).addPB()),
+              onPressed: _addWithoutSearchDialog),
+          new FlatButton(
+              child: new Text(NSSLStrings.of(context).scanPB()),
+              onPressed: _getEAN),
+          new FlatButton(
+              child: new Text(NSSLStrings.of(context).searchPB()),
+              onPressed: search),
+        ]);
+  }
+
+  Widget buildBody(BuildContext context) {
+    cont = context;
+
+    if (User.currentList == null || User.currentList.shoppingItems == null)
+      return const Text("");
+    var lv;
+    if (User.currentList.shoppingItems.length > 0) {
+      User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
+      User.currentList?.shoppingItems?.sort(
+          (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
+      var mainList = User.currentList.shoppingItems.map((x) {
+        var lt = new ListTile(
+          title: new Row(children: [
+            new Expanded(
+                child: new Text(
+              x.name,
+              maxLines: 2,
+              softWrap: true,
+              style: new TextStyle(
+                  decoration: x.crossedOut
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none),
+            )),
+          ]),
+          leading: new PopupMenuButton<String>(
+            child: new Row(children: [
+              new Text(x.amount.toString() + "x"),
+              const Icon(Icons.expand_more, size: 16.0),
+              new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
+            ]),
+            initialValue: x.amount.toString(),
+            onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
+            itemBuilder: buildChangeMenuItems,
+          ),
+          onTap: () => crossOutMainListItem(x),
+          onLongPress: () => renameListItem(x),
+        );
+
+        return new Dismissible(
+          key: new ValueKey(x),
+          child: lt,
+          onDismissed: (DismissDirection d) => handleDismissMain(d, x),
+          direction: DismissDirection.startToEnd,
+          background: new Container(
+              decoration:
+                  new BoxDecoration(color: Theme.of(context).primaryColor),
+              child: new ListTile(
+                  leading: new Icon(Icons.delete,
+                      color: Theme.of(context).accentIconTheme.color,
+                      size: 36.0))),
+        );
+      }).toList(growable: true);
+
+      lv = new CustomScrollView(
+        slivers: [
+          new SliverFixedExtentList(
+              delegate: new SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                return new Container(
+                  alignment: FractionalOffset.center,
+                  child: mainList[index],
+                );
+              }, childCount: mainList.length),
+              itemExtent: 50.0)
+        ],
+        physics: const AlwaysScrollableScrollPhysics(),
+      );
+    } else
+      lv = new ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: <Widget>[new ListTile(title: const Text(""))],
+      );
+    return new RefreshIndicator(
+      child: lv,
+      onRefresh: _handleMainListRefresh,
+    );
+  }
+
   void showInSnackBar(String value,
       {Duration duration, SnackBarAction action}) {
     _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
@@ -282,6 +308,8 @@ class HomePageState extends State<HomePage> {
   Future search() => Navigator.pushNamed(cont, "/search");
 
   Future login() => Navigator.pushNamed(cont, "/login");
+
+  Future addProduct() => Navigator.pushNamed(cont, "/addProduct");
 
   void handleDismissMain(DismissDirection dir, ShoppingItem s) {
     var list = User.currentList;
@@ -353,58 +381,48 @@ class HomePageState extends State<HomePage> {
       });
 
   Future<Null> _getEAN() async {
-    platform.setMethodCallHandler(cameraPermissionsSet);
-    await platform.invokeMethod('getCameraPermission');
-  }
 
-  Future<dynamic> cameraPermissionsSet(MethodCall methodCall) async {
-    platform.setMethodCallHandler(setEAN);
-    await platform.invokeMethod('getEAN');
-  }
+    ean = await Scandit.scan();
 
-  Future<dynamic> setEAN(MethodCall methodCall) async {
-    String method = methodCall.method;
+    if (ean == "" || ean == "Permissions denied") return;
 
-    if (method == "setEAN") {
-      var list = User.currentList;
-      ean = methodCall.arguments;
-      var firstRequest = await ProductSync.getProduct(ean, cont);
-      var z = JSON.decode((firstRequest).body);
-      var k = ProductAddPage.fromJson(z);
-      if (k.success) {
-        RegExp reg = new RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
-        String name =
-            reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
-        var item = list.shoppingItems
-            .firstWhere((x) => x.name == name, orElse: () => null);
-        ShoppingItem afterAdd;
-        if (item != null) {
-          var answer = await ShoppingListSync.changeProductAmount(
-              list.id, item.id, 1, cont);
-          var p = ChangeListItemResult.fromJson((answer).body);
-          setState(() {
-            item.amount = p.amount;
-          });
-        } else {
-          var p = AddListItemResult.fromJson(
-              (await ShoppingListSync.addProduct(list.id, name, '-', 1, cont))
-                  .body);
-          afterAdd = new ShoppingItem()
-            ..name = "${p.name}"
-            ..amount = 1
-            ..id = p.productId;
-          setState(() => list.shoppingItems.add(afterAdd));
-        }
-        list.save();
-        return;
+    var list = User.currentList;
+    var firstRequest = await ProductSync.getProduct(ean, cont);
+    var z = JSON.decode((firstRequest).body);
+    var k = ProductAddPage.fromJson(z);
+
+    if (k.success) {
+      RegExp reg = new RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
+      String name =
+          reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
+      var item = list.shoppingItems
+          .firstWhere((x) => x.name == name, orElse: () => null);
+      ShoppingItem afterAdd;
+      if (item != null) {
+        var answer = await ShoppingListSync.changeProductAmount(
+            list.id, item.id, 1, cont);
+        var p = ChangeListItemResult.fromJson((answer).body);
+        setState(() {
+          item.amount = p.amount;
+        });
+      } else {
+        var p = AddListItemResult.fromJson(
+            (await ShoppingListSync.addProduct(list.id, name, '-', 1, cont))
+                .body);
+        afterAdd = new ShoppingItem()
+          ..name = "${p.name}"
+          ..amount = 1
+          ..id = p.productId;
+        setState(() => list.shoppingItems.add(afterAdd));
       }
-      Navigator.push(
-          cont,
-          new MaterialPageRoute<DismissDialogAction>(
-            builder: (BuildContext context) => new AddProductToDatabase(ean),
-            fullscreenDialog: true,
-          ));
+      list.save();
+      return;
     }
+    Navigator.push(
+        context,
+        new MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => new AddProductToDatabase(ean),
+            fullscreenDialog: true));
   }
 
   void addListDialog() {
@@ -443,8 +461,6 @@ class HomePageState extends State<HomePage> {
     newList.save();
   }
 
-  bool b = true;
-
   Widget _buildDrawer(BuildContext context) {
     var userheader = new UserAccountsDrawerHeader(
       accountName:
@@ -454,6 +470,10 @@ class HomePageState extends State<HomePage> {
       currentAccountPicture: new CircleAvatar(
           child: new Text(User.username.substring(0, 2)?.toUpperCase()),
           backgroundColor: Themes.themes.first.accentColor),
+      onDetailsPressed: () {
+        _showDrawerContents = !_showDrawerContents;
+        _showDrawerContents ? _controller.reverse() : _controller.forward();
+      },
     );
 
     var list = User.shoppingLists.isNotEmpty
@@ -461,7 +481,8 @@ class HomePageState extends State<HomePage> {
             .map((x) => new ListTile(
                   key: new ValueKey(x),
                   title: new Text(x.name),
-                  onTap: () => changeCurrentList(User.shoppingLists.indexOf(x)),
+                  onTap: () => changeCurrentList(User.shoppingLists.indexOf(
+                      User.shoppingLists.firstWhere((y) => y.id == x.id))),
                   trailing: new PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
                       onSelected: drawerListItemMenuClicked,
@@ -476,6 +497,15 @@ class HomePageState extends State<HomePage> {
                                     NSSLStrings.of(context).contributors()),
                               ),
                             ),
+//                            new PopupMenuItem<String>(
+//                              value:
+//                              x.id.toString() + "\u{1E}" + "BoughtList",
+//                              child: new ListTile(
+//                                leading: const Icon(Icons.history),
+//                                title: new Text("BoughtList"),
+//                                   // NSSLStrings.of(context).contributors()),
+//                              ),
+//                            ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
                                 child: new ListTile(
@@ -490,8 +520,7 @@ class HomePageState extends State<HomePage> {
                                         : Icons.check_box_outline_blank),
                                     title: new Text(
                                         NSSLStrings.of(context).autoSync()))),
-                            const PopupMenuDivider() //ignore: list_element_type_not_assignable
-                                ,
+                            const PopupMenuDivider(),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
                                 child: new ListTile(
@@ -507,14 +536,59 @@ class HomePageState extends State<HomePage> {
                     new Text(NSSLStrings.of(context).noListsInDrawerMessage())),
           ];
     //drawerList = new MyList<ListTile>(children: list);
-
+    var emptyListTiles = new List<ListTile>();
+    for (int i = 0; i < list.length - 2; i++)
+      emptyListTiles.add(new ListTile(
+        title: const Text(("")),
+      ));
     var d = new Scaffold(
         key: _drawerScaffoldKey,
         body: new RefreshIndicator(
-            child: new ListView(children: [
-              userheader,
-              new Column(children: list),
-            ], physics: const AlwaysScrollableScrollPhysics()),
+            child: new ListView(
+              children: <Widget>[
+                userheader,
+                new Stack(
+                  children: <Widget>[
+                    new FadeTransition(
+                      opacity: _drawerContentsOpacity,
+                      child: new Column(children: list),
+                    ),
+                    new SlideTransition(
+                      position: _drawerDetailsPosition,
+                      child: new FadeTransition(
+                        opacity: new ReverseAnimation(_drawerContentsOpacity),
+                        child: new Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            new ListTile(
+                              leading: const Icon(Icons.sync),
+                              title: new Text(
+                                NSSLStrings.of(context).changePasswordPD(),
+                              ),
+                              onTap: () => selectedOption("ChangePassword"),
+                            ),
+                            new ListTile(
+                              leading: const Icon(Icons.exit_to_app),
+                              title: new Text(NSSLStrings.of(context).logout()),
+                              onTap: () async {
+                                await User.delete();
+                                User.username = null;
+                                User.eMail = null;
+                                User.token = null;
+                                runApp(new NSSL());
+                              },
+                            ),
+                            new Column(children: emptyListTiles)
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              physics: new AlwaysScrollableScrollPhysics(),
+            ),
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
         persistentFooterButtons: [
@@ -538,21 +612,44 @@ class HomePageState extends State<HomePage> {
               fullscreenDialog: true,
             ));
         break;
+      case "BoughtList":
+        Navigator.push(
+            cont,
+            new MaterialPageRoute<DismissDialogAction>(
+              builder: (BuildContext context) => new ContributorsPage(id),
+              fullscreenDialog: true,
+            ));
+        break;
       case "Rename":
         renameListDialog(id);
         break;
       case "Remove":
-        var res =
-            Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
-        if (!res.success)
-          showInDrawerSnackBar(res.error);
-        else {
-          showInDrawerSnackBar(
-              User.shoppingLists.firstWhere((x) => x.id == id).name +
-                  " " +
-                  NSSLStrings.of(context).removed());
-          setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
-        }
+        var deleteList = User.shoppingLists.firstWhere((x) => x.id == id);
+        showDialog(
+            context: cont,
+            child: SimpleDialogAcceptDeny.create(
+                title: "Delete List " + deleteList.name,
+                text:
+                    "Do you really want to delete the list? This CAN'T be undone!",
+                onSubmitted: (s) async {
+                  var res = Result.fromJson(
+                      (await ShoppingListSync.deleteList(id, cont)).body);
+                  if (!res.success)
+                    showInDrawerSnackBar(res.error);
+                  else {
+                    showInDrawerSnackBar(deleteList.name +
+                        " " +
+                        NSSLStrings.of(context).removed());
+                    if (User.currentList.id == id) {
+                      changeCurrentList(User.shoppingLists
+                        .indexOf(
+                            User.shoppingLists.firstWhere((l) => l.id != id)));
+                    }
+                    setState(() =>
+                        User.shoppingLists.removeWhere((x) => x.id == id));
+                  }
+                },
+                context: cont));
         break;
       case "Auto-Sync":
         var list = User.shoppingLists.firstWhere((x) => x.id == id);
@@ -565,32 +662,12 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future _handleDrawerRefresh() async {
-    var result =
-        GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
-    User.shoppingLists.clear();
-    var crossedOut = (await DatabaseManager.database
-        .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
-    for (var res in result.shoppingLists) {
-      var list = new ShoppingList()
-        ..id = res.id
-        ..name = res.name
-        ..shoppingItems = new List<ShoppingItem>();
-
-      for (var item in res.products)
-        list.shoppingItems.add(new ShoppingItem()
-          ..name = item.name
-          ..id = item.id
-          ..amount = item.amount
-          ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
-                      orElse: () => {"crossed": 0})["crossed"] ==
-                  0
-              ? false
-              : true));
-      setState(() => User.shoppingLists.add(list));
-      list.save();
-    }
+  Future _handleDrawerRefresh() async
+  {
+    await ShoppingList.reloadAllLists(context);
+    setState(()=>{});
   }
+
 
   Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
 
@@ -690,8 +767,10 @@ class HomePageState extends State<HomePage> {
               var hashResult = HashResult.fromJson(res.body);
               int ownHash = 0;
               for (var item in sublist) ownHash += item.id + item.amount;
-              if (ownHash == hashResult.hash)
+              if (ownHash == hashResult.hash){
                 setState(() => list.shoppingItems.addAll(sublist));
+                list.save();
+              }
               else
                 _handleListRefresh(list.id);
             }));
@@ -718,11 +797,4 @@ class HomePageState extends State<HomePage> {
               });
             }));
   }
-
-//  //Workarount Firebase Messaging
-//  Future<bool> _onWillPop() {
-//    Navigator.of(context).pop();
-//    exit(0);
-//    return new Future(() => true);
-//  }
 }

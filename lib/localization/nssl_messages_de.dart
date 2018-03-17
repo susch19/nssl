@@ -3,7 +3,6 @@ import 'package:intl/message_lookup_by_library.dart';
 
 final messages = new MessageLookup();
 
-final _keepAnalysisHappy = Intl.defaultLocale;
 
 class MessageLookup extends MessageLookupByLibrary {
   get localeName => 'de';
@@ -42,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "promoteMenu" : MessageLookupByLibrary.simpleMessage("Befördern"),
     "contributorUser" : MessageLookupByLibrary.simpleMessage(" - User"),
     "contributorAdmin" : MessageLookupByLibrary.simpleMessage(" - Admin"),
-    "genericErrorMessageSnackbar" : MessageLookupByLibrary.simpleMessage("Etwas unerwartetes ist passiert!\n "), //\${z.error}
+    "genericErrorMessageSnackbar" : MessageLookupByLibrary.simpleMessage("Etwas Unerwartetes ist passiert!\n "), //\${z.error}
     "nameOfNewContributorHint" : MessageLookupByLibrary.simpleMessage("Name des neuen Teilnehmers"),
     "wasRemovedSuccessfullyMessage" : MessageLookupByLibrary.simpleMessage(" wurde erfolgreich gelöscht"),
     "loginSuccessfulMessage" : MessageLookupByLibrary.simpleMessage("Login erfolgreich"),
@@ -109,24 +108,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Helle Icons"),
     "autoSync" : MessageLookupByLibrary.simpleMessage("Auto-Sync"),
     "changePasswordButton" : MessageLookupByLibrary.simpleMessage("ÄNDERE PASSWORT"),
-    "currentPassword" : MessageLookupByLibrary.simpleMessage("aktuelles passwort"),
-    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("das aktuelle passwort, dass geändert werden soll"),
-    "newPassword" : MessageLookupByLibrary.simpleMessage("neues passwort"),
-    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("das neue gewählte passwort"),
-    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("neues passwort wiederholen"),
-    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("wiederholung des neu gewählten passworts"),
+    "currentPassword" : MessageLookupByLibrary.simpleMessage("Aktuelles Passwort"),
+    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("Das aktuelle Passwort, dass geändert werden soll"),
+    "newPassword" : MessageLookupByLibrary.simpleMessage("Neues Passwort"),
+    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("Das neu gewählte Passwort"),
+    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("Neues Passwort wiederholen"),
+    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("Wiederholung des neu gewählten Passworts"),
     "changePasswordPD" : MessageLookupByLibrary.simpleMessage("Ändere Passwort"),
     "successful" : MessageLookupByLibrary.simpleMessage("Erfolgreich"),
     "passwordSet" : MessageLookupByLibrary.simpleMessage("Dein Passwort wurde erfolgreich geändert"),
     "tokenExpired" : MessageLookupByLibrary.simpleMessage("Token abgelaufen"),
     "tokenExpiredExplanation" : MessageLookupByLibrary.simpleMessage("Der Token ist abgelaufen. Deshalb wird ein erneuter Login benötigt. Es handelt sich hierbei erst um ein Fehler, falls diese Meldung mehrmals im Monat aufkommt."),
     "noListLoaded" : MessageLookupByLibrary.simpleMessage("Keine Liste geladen"),
-    "renameListItem" : MessageLookupByLibrary.simpleMessage("Produkt umbennen"),
+    "renameListItem" : MessageLookupByLibrary.simpleMessage("Produkt umbenennen"),
     "renameListItemHint" : MessageLookupByLibrary.simpleMessage("Der neue Name des Produktes"),
     "renameListItemLabel" : MessageLookupByLibrary.simpleMessage("Neuer Prdouktname"),
     "discardNewTheme" : MessageLookupByLibrary.simpleMessage("Änderungen verwerfen?"),
     "forgotPassword" : MessageLookupByLibrary.simpleMessage("Passwort vergessen?"),
     "bePatient" : MessageLookupByLibrary.simpleMessage('Der Server bearbeitet diese Anfrage bereits'),
+    "logout" : MessageLookupByLibrary.simpleMessage('Ausloggen'),
+    "deleteListTitle" : MessageLookupByLibrary.simpleMessage('Lösche Liste '),
+    "deleteListText" : MessageLookupByLibrary.simpleMessage('Soll diese Liste wirklich gelöscht werden? Das kann NICHT rückgängig gemacht werden!'),
 
   };
 }

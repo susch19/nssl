@@ -72,7 +72,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
   }
 
   Future<bool> _handleSubmitted() async {
-    if(_isSendToServer) {
+    if (_isSendToServer) {
       showInSnackBar(NSSLStrings.of(context).bePatient());
       return false;
     }
@@ -89,7 +89,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       var match = numberReg.firstMatch(weight);
       double realWeight = 0.0;
       String unit;
-      if(weight.length > 0){
+      if (weight.length > 0) {
         realWeight = double.parse(weight.substring(match.start, match.end));
         match = unitReg.firstMatch(weight);
         unit = weight.substring(match.start, match.end);

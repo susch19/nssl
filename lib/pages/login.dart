@@ -120,23 +120,8 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _getAllListsInit() async {
-    var result = GetListsResult
-        .fromJson((await ShoppingListSync.getLists(context)).body);
-    setState(() => User.shoppingLists.clear());
-    for (var res in result.shoppingLists) {
-      var list = new ShoppingList()
-        ..id = res.id
-        ..name = res.name
-        ..shoppingItems = new List<ShoppingItem>();
-      for (var item in res.products)
-        list.shoppingItems.add(new ShoppingItem()
-          ..name = item.name
-          ..id = item.id
-          ..amount = item.amount);
-      setState(() => User.shoppingLists.add(list));
-      list.subscribeForFirebaseMessaging();
-      list.save();
-    }
+    await ShoppingList.reloadAllLists(context);
+    setState(() => {});
   }
 
   String _validateName(String value) {
@@ -240,18 +225,22 @@ class LoginPageState extends State<LoginPage> {
                     },
                     child:
                         new Text(NSSLStrings.of(context).registerTextOnLogin()),
-                  ), /*
-              new FlatButton(
-                onPressed: () {
-                      Navigator.pushNamed(context, "/forgot_password");
-                },
-                child: new Text(NSSLStrings.of(context).forgotPassword()),
-              )*/
-
-                  //padding: new EdgeInsets.only(
-                  //    top: MediaQuery.of(context).size.height / 5),
+                  ),
                 ),
               ),
+//              new ListTile(
+//                title: new Container(
+//                  child: new FlatButton(
+//                    onPressed: () {
+//                      Navigator.pushNamed(context, "/forgot_password");
+//                    },
+//                    child:
+//                        new Text(NSSLStrings.of(context).forgotPassword()),
+//                  ),
+//                ),
+//              ),
+              //padding: new EdgeInsets.only(
+              //    top: MediaQuery.of(context).size.height / 5),
             ]
             //]),
 

@@ -3,7 +3,6 @@ import 'package:intl/message_lookup_by_library.dart';
 
 final messages = new MessageLookup();
 
-final _keepAnalysisHappy = Intl.defaultLocale;
 
 class MessageLookup extends MessageLookupByLibrary {
   get localeName => 'en';
@@ -51,17 +50,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailIncorrectFormatError" : MessageLookupByLibrary.simpleMessage('The email seems to be in the incorrect format.'),
     "chooseAPassword" : MessageLookupByLibrary.simpleMessage('Please choose a password.'),
     "login" : MessageLookupByLibrary.simpleMessage("Login"),
-    "usernameOrEmailForLoginHint" : MessageLookupByLibrary.simpleMessage('username or email can be used to login'),
+    "usernameOrEmailForLoginHint" : MessageLookupByLibrary.simpleMessage('Username or email can be used to login'),
     "usernameOrEmailTitle" : MessageLookupByLibrary.simpleMessage('Username or Email'),
     "emailTitle" : MessageLookupByLibrary.simpleMessage('Email'),
-    "choosenPasswordHint" : MessageLookupByLibrary.simpleMessage('the password you have choosen'),
+    "choosenPasswordHint" : MessageLookupByLibrary.simpleMessage('The password you have choosen'),
     "password" : MessageLookupByLibrary.simpleMessage('Password'),
     "loginButton" : MessageLookupByLibrary.simpleMessage('LOGIN'),
     "registerTextOnLogin" : MessageLookupByLibrary.simpleMessage("Don't have an account? Create one now."),
-    "usernameEmptyError" : MessageLookupByLibrary.simpleMessage("username has to be filled in"),
-    "passwordEmptyError" : MessageLookupByLibrary.simpleMessage("password has to be filled in"),
-    "emailEmptyError" : MessageLookupByLibrary.simpleMessage("email has to be filled in"),
-    "reenterPasswordError" : MessageLookupByLibrary.simpleMessage("passwords doesn't match or are empty"),
+    "usernameEmptyError" : MessageLookupByLibrary.simpleMessage("Username has to be filled in"),
+    "passwordEmptyError" : MessageLookupByLibrary.simpleMessage("Password has to be filled in"),
+    "emailEmptyError" : MessageLookupByLibrary.simpleMessage("Email has to be filled in"),
+    "reenterPasswordError" : MessageLookupByLibrary.simpleMessage("Passwords doesn't match or are empty"),
     "unknownUsernameError" : MessageLookupByLibrary.simpleMessage("There is something wrong with your username"),
     "unknownEmailError" : MessageLookupByLibrary.simpleMessage("There is something wrong with your email"),
     "unknownPasswordError" : MessageLookupByLibrary.simpleMessage("There is something wrong with your password"),
@@ -72,10 +71,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "chooseAPasswordPrompt" : MessageLookupByLibrary.simpleMessage('Please choose a password.'),
     "reenterPasswordPrompt" : MessageLookupByLibrary.simpleMessage('Please reenter your password.'),
     "passwordsDontMatchError" : MessageLookupByLibrary.simpleMessage('Passwords don\'t match'),
-    "usernameRegisterHint" : MessageLookupByLibrary.simpleMessage('the name to login and to be found by others'),
+    "usernameRegisterHint" : MessageLookupByLibrary.simpleMessage('The name to login and to be found by others'),
     "username" : MessageLookupByLibrary.simpleMessage('Username'),
-    "emailRegisterHint" : MessageLookupByLibrary.simpleMessage('the email to login and to be found by others'),
-    "passwordRegisterHint" : MessageLookupByLibrary.simpleMessage('the password to secure your account'),
+    "emailRegisterHint" : MessageLookupByLibrary.simpleMessage('The email to login and to be found by others'),
+    "passwordRegisterHint" : MessageLookupByLibrary.simpleMessage('The password to secure your account'),
     "retypePasswordHint" : MessageLookupByLibrary.simpleMessage('Re-type your password for validation'),
     "retypePasswordTitle" : MessageLookupByLibrary.simpleMessage('Re-type Password'),
     "registerButton" : MessageLookupByLibrary.simpleMessage('REGISTER'),
@@ -108,12 +107,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeAccentTextColor" : MessageLookupByLibrary.simpleMessage("Bright Icons"),
     "autoSync" : MessageLookupByLibrary.simpleMessage("Auto-Sync"),
     "changePasswordButton" : MessageLookupByLibrary.simpleMessage("CHANGE PASSWORD"),
-    "currentPassword" : MessageLookupByLibrary.simpleMessage("current password"),
-    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("current password that should be changed"),
-    "newPassword" : MessageLookupByLibrary.simpleMessage("new password"),
-    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("the new password you have chosen"),
-    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("repeat new password"),
-    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("repeat the new password you have chosen"),
+    "currentPassword" : MessageLookupByLibrary.simpleMessage("Current password"),
+    "currentPasswordHint" : MessageLookupByLibrary.simpleMessage("Current password that should be changed"),
+    "newPassword" : MessageLookupByLibrary.simpleMessage("New password"),
+    "newPasswordHint" : MessageLookupByLibrary.simpleMessage("The new password you have chosen"),
+    "repeatNewPassword" : MessageLookupByLibrary.simpleMessage("Repeat new password"),
+    "repeatNewPasswordHint" : MessageLookupByLibrary.simpleMessage("Repeat the new password you have chosen"),
     "changePasswordPD" : MessageLookupByLibrary.simpleMessage("Change Password"),
     "successful" : MessageLookupByLibrary.simpleMessage("Successful"),
     "passwordSet" : MessageLookupByLibrary.simpleMessage("Your password has been set"),
@@ -126,5 +125,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "discardNewTheme" : MessageLookupByLibrary.simpleMessage('Discard new theme?'),
     "forgotPassword" : MessageLookupByLibrary.simpleMessage('Forgot password?'),
     "bePatient" : MessageLookupByLibrary.simpleMessage('Please be patient, the server is processing your request already'),
+    "logout" : MessageLookupByLibrary.simpleMessage('Logout'),
+  "deleteListTitle" : MessageLookupByLibrary.simpleMessage('Delete List '),
+  "deleteListText" : MessageLookupByLibrary.simpleMessage('Do you really want to delete the list? This CAN\'T be undone!'),
+
+
   };
 }

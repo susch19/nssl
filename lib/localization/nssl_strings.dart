@@ -12,7 +12,8 @@ class NSSLStrings {
 
   static Future<NSSLStrings> load(Locale locale) {
     return initializeMessages(locale.toString())
-        .then((Null _) {
+        .then((dynamic _) {
+      // ignore: strong_mode_uses_dynamic_as_bottom
       return new NSSLStrings(locale);
     });
   }
@@ -34,13 +35,13 @@ class NSSLStrings {
   String remove() => Intl.message('Remove', name: 'remove', locale:_localeName);
   String addProduct() => Intl.message('Add Product', name: 'addProduct', locale:_localeName);
   String addProductWithoutSearch() => Intl.message('Insert the name of the product, without searching in the database', name: 'addProductWithoutSearch', locale:_localeName);
-  String productName() => Intl.message('product name', name: 'productName', locale:_localeName);
+  String productName() => Intl.message('Product name', name: 'productName', locale:_localeName);
   String messageDeleteAllCrossedOut() => Intl.message('You have deleted all crossed out items', name: 'messageDeleteAllCrossedOut', locale:_localeName);
   String undo() => Intl.message('UNDO', name: 'undo', locale:_localeName);
-  String noListsInDrawerMessage() => Intl.message('here is the place for your lists', name: 'noListsInDrawerMessage', locale:_localeName);
+  String noListsInDrawerMessage() => Intl.message('Here is the place for your lists', name: 'noListsInDrawerMessage', locale:_localeName);
   String notLoggedInYet() => Intl.message('Not logged in yet', name: 'notLoggedInYet', locale:_localeName);
   String newNameOfListHint() => Intl.message('The new name of the new list', name: 'newNameOfListHint', locale:_localeName);
-  String listName() => Intl.message('listname', name: 'listName', locale:_localeName);
+  String listName() => Intl.message('Listname', name: 'listName', locale:_localeName);
   String renameListTitle() => Intl.message('Rename List', name: 'renameListTitle', locale:_localeName);
   String renameListHint() => Intl.message('The name of the new list', name: 'renameListHint', locale:_localeName);
   String addNewListTitle() => Intl.message('Add new List', name: 'addNewListTitle', locale:_localeName);
@@ -62,17 +63,17 @@ class NSSLStrings {
   String emailIncorrectFormatError() => Intl.message('The email seems to be in the incorrect format.', name: 'emailIncorrectFormatError', locale:_localeName);
   String chooseAPassword() => Intl.message('Please choose a password.', name: 'chooseAPassword', locale:_localeName);
   String login() => Intl.message('Login', name: 'login', locale:_localeName);
-  String usernameOrEmailForLoginHint() => Intl.message('username or email can be used to login', name: 'usernameOrEmailForLoginHint', locale:_localeName);
+  String usernameOrEmailForLoginHint() => Intl.message('Username or email can be used to login', name: 'usernameOrEmailForLoginHint', locale:_localeName);
   String usernameOrEmailTitle() => Intl.message('Username or Email', name: 'usernameOrEmailTitle', locale:_localeName);
   String emailTitle() => Intl.message('Email', name: 'emailTitle', locale:_localeName);
-  String choosenPasswordHint() => Intl.message('the password you have choosen', name: 'choosenPasswordHint', locale:_localeName);
+  String choosenPasswordHint() => Intl.message('The password you have choosen', name: 'choosenPasswordHint', locale:_localeName);
   String password() => Intl.message('Password', name: 'password', locale:_localeName);
   String loginButton() => Intl.message('LOGIN', name: 'loginButton', locale:_localeName);
   String registerTextOnLogin() => Intl.message('Don\'t have an account? Create one now.', name: 'registerTextOnLogin', locale:_localeName);
-  String usernameEmptyError() => Intl.message('username has to be filled in', name: 'usernameEmptyError', locale:_localeName);
-  String passwordEmptyError() => Intl.message('password has to be filled in', name: 'passwordEmptyError', locale:_localeName);
-  String emailEmptyError() => Intl.message('email has to be filled in', name: 'emailEmptyError', locale:_localeName);
-  String reenterPasswordError() => Intl.message('passwords doesn\'t match or are empty', name: 'reenterPasswordError', locale:_localeName);
+  String usernameEmptyError() => Intl.message('Username has to be filled in', name: 'usernameEmptyError', locale:_localeName);
+  String passwordEmptyError() => Intl.message('Password has to be filled in', name: 'passwordEmptyError', locale:_localeName);
+  String emailEmptyError() => Intl.message('Email has to be filled in', name: 'emailEmptyError', locale:_localeName);
+  String reenterPasswordError() => Intl.message('Passwords doesn\'t match or are empty', name: 'reenterPasswordError', locale:_localeName);
   String unknownUsernameError() => Intl.message('There is something wrong with your username', name: 'unknownUsernameError', locale:_localeName);
   String unknownEmailError() => Intl.message('There is something wrong with your email', name: 'unknownEmailError', locale:_localeName);
   String unknownPasswordError() => Intl.message('There is something wrong with your password', name: 'unknownPasswordError', locale:_localeName);
@@ -83,10 +84,10 @@ class NSSLStrings {
   String chooseAPasswordPrompt() => Intl.message('Please choose a password.', name: 'chooseAPasswordPrompt', locale:_localeName);
   String reenterPasswordPrompt() => Intl.message('Please reenter your password.', name: 'reenterPasswordPromt', locale:_localeName);
   String passwordsDontMatchError() => Intl.message('Passwords don\'t match', name: 'passwordsDontMatchError', locale:_localeName);
-  String usernameRegisterHint() => Intl.message('the name to login and to be found by others', name: 'usernameRegisterHint', locale:_localeName);
+  String usernameRegisterHint() => Intl.message('The name to login and to be found by others', name: 'usernameRegisterHint', locale:_localeName);
   String username() => Intl.message('Username', name: 'username', locale:_localeName);
-  String emailRegisterHint() => Intl.message('the email to login and to be found by others', name: 'emailRegisterHint', locale:_localeName);
-  String passwordRegisterHint() => Intl.message('the password to secure your account', name: 'passwordRegisterHint', locale:_localeName);
+  String emailRegisterHint() => Intl.message('The email to login and to be found by others', name: 'emailRegisterHint', locale:_localeName);
+  String passwordRegisterHint() => Intl.message('The password to secure your account', name: 'passwordRegisterHint', locale:_localeName);
   String retypePasswordHint() => Intl.message('Re-type your password for validation', name: 'retypePasswordHint', locale:_localeName);
   String retypePasswordTitle() => Intl.message('Re-type Password', name: 'retypePasswordTitle', locale:_localeName);
   String registerButton() => Intl.message('REGISTER', name: 'registerButton', locale:_localeName);
@@ -119,11 +120,11 @@ class NSSLStrings {
   String changeAccentTextColor() => Intl.message('Dark Icons', name: 'changeAccentTextColor', locale:_localeName);
   String autoSync() => Intl.message('Auto-Sync', name: 'autoSync', locale:_localeName);
   String changePasswordButton() => Intl.message('CHANGE PASSWORD', name: 'changePasswordButton', locale:_localeName);
-  String oldPassword() => Intl.message('current password', name: 'currentPassword', locale:_localeName);
-  String oldPasswordHint() => Intl.message('current password that should be changed', name: 'currentPasswordHint', locale:_localeName);
-  String newPassword() => Intl.message('new password', name: 'newPassword', locale:_localeName);
-  String newPasswordHint() => Intl.message('the new password you have chosen', name: 'newPasswordHint', locale:_localeName);
-  String new2Password() => Intl.message('repeat new password', name: 'repeatNewPassword', locale:_localeName);
+  String oldPassword() => Intl.message('Current password', name: 'currentPassword', locale:_localeName);
+  String oldPasswordHint() => Intl.message('Current password that should be changed', name: 'currentPasswordHint', locale:_localeName);
+  String newPassword() => Intl.message('New password', name: 'newPassword', locale:_localeName);
+  String newPasswordHint() => Intl.message('The new password you have chosen', name: 'newPasswordHint', locale:_localeName);
+  String new2Password() => Intl.message('Repeat new password', name: 'repeatNewPassword', locale:_localeName);
   String new2PasswordHint() => Intl.message('repeat the new password you have chosen', name: 'repeatNewPasswordHint', locale:_localeName);
   String changePasswordPD() => Intl.message('Change Password', name: 'changePasswordPD', locale:_localeName);
   String successful() => Intl.message('Successful', name: 'successful', locale:_localeName);
@@ -137,6 +138,9 @@ class NSSLStrings {
   String discardNewTheme() => Intl.message('Discard new theme?', name: 'discardNewTheme', locale:_localeName);
   String forgotPassword() => Intl.message('Forgot password?', name: 'forgotPassword', locale:_localeName);
   String bePatient() => Intl.message('Please be patient, the server is processing your request already', name: 'bePatient', locale:_localeName);
+  String logout() => Intl.message('Logout', name: 'logout', locale:_localeName);
+  String deleteListTitle() => Intl.message('Delete List', name: 'deleteListTitle', locale:_localeName);
+  String deleteListText() => Intl.message('Do you really want to delete the list? This CAN\'T be undone!', name: 'deleteListText', locale:_localeName);
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 
