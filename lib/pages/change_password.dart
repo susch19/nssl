@@ -98,7 +98,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               child: const Text("OK"),
               onPressed: () => Navigator.popUntil(context, (r) => r.isFirst)),
         ]);
-    showDialog(context: context, child: dialog);
+    showDialog(context: context, builder: (BuildContext context) => dialog);
   }
 
   _resetInput() {

@@ -48,7 +48,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
     return await showDialog<bool>(
             context: context,
-            child: new AlertDialog(
+            builder: (BuildContext context) => new AlertDialog(
                 content: new Text(NSSLStrings.of(context).discardNewProduct(),
                     style: dialogTextStyle),
                 actions: <Widget>[
@@ -117,10 +117,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             showInSnackBar(pres.error);
           else {
             setState(() {
-              list.shoppingItems.add(new ShoppingItem()
+              list.shoppingItems.add(new ShoppingItem(pres.name)
                 ..amount = 1
-                ..id = pres.productId
-                ..name = pres.name);
+                ..id = pres.productId);
             });
           }
         }
@@ -216,9 +215,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     return null;
   }
 
-  double recursiveParsing(String source) {
-    if (source.length == 0) return null;
-    return double.parse(
-        source.substring(0, source.length - 1), recursiveParsing);
-  }
+  // double recursiveParsing(String source) {
+  //   if (source.length == 0) return null;
+  //   return double.parse(
+  //       source.substring(0, source.length - 1), recursiveParsing);
+  // }
 }

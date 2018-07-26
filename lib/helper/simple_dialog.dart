@@ -1,29 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:testProject/localization/nssl_strings.dart';
 
-class _SystemPadding extends StatelessWidget {
-  final Widget child;
-
-  _SystemPadding({Key key, this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var mediaQuery = MediaQuery.of(context);
-    return new AnimatedContainer(
-        padding: mediaQuery.viewInsets,
-        duration: const Duration(milliseconds: 33),
-        child: child);
-  }
-}
-
 class SimpleDialogAcceptDeny {
-  static _SystemPadding create(
+  static AlertDialog create(
       {String title = "",
       String text = "",
       ValueChanged<String> onSubmitted,
       BuildContext context}) {
-    return new _SystemPadding(
-        child: new AlertDialog(
+    return new AlertDialog(
             title: title == "" ? null : new Text(title),
             content: new SingleChildScrollView(
               child: new ListBody(
@@ -40,6 +24,6 @@ class SimpleDialogAcceptDeny {
                 Navigator.pop(context, "");
                 onSubmitted("");
               })
-        ]));
+        ]);
   }
 }

@@ -45,13 +45,10 @@ class _NSSLState extends State<NSSLPage> {
   _NSSLState() : super();
   static BuildContext cont;
 
-  final GlobalKey<ScaffoldState> _mainScaffoldKey =
-      new GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _drawerScaffoldKey =
-      new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _drawerScaffoldKey = new GlobalKey<ScaffoldState>();
 
-  static const platform =
-      const MethodChannel('com.yourcompany.testProject/Scandit');
+  static const platform = const MethodChannel('com.yourcompany.testProject/Scandit');
 
   String ean = "";
   bool performanceOverlay = false;
@@ -60,10 +57,8 @@ class _NSSLState extends State<NSSLPage> {
   @override
   initState() {
     super.initState();
-    firebaseMessaging.configure(
-        onMessage: (x) => CloudMessaging.onMessage(x, setState));
-    for (var list in User.shoppingLists)
-      if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
+    firebaseMessaging.configure(onMessage: (x) => CloudMessaging.onMessage(x, setState));
+    for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
   @override
@@ -94,10 +89,7 @@ class _NSSLState extends State<NSSLPage> {
     );
   }
 
-  Scaffold mainAppHome() => new Scaffold(
-      key: _mainScaffoldKey,
-      resizeToAvoidBottomPadding: false,
-      body: new HomePage() //new CustomThemePage()//LoginPage(),
+  Scaffold mainAppHome() => new Scaffold(key: _mainScaffoldKey, resizeToAvoidBottomPadding: false, body: new HomePage() //new CustomThemePage()//LoginPage(),
       );
 
   Scaffold mainAppLoginRegister() => new Scaffold(
@@ -126,13 +118,10 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   BuildContext cont;
 
-  final GlobalKey<ScaffoldState> _mainScaffoldKey =
-      new GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _drawerScaffoldKey =
-      new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _drawerScaffoldKey = new GlobalKey<ScaffoldState>();
 
-  static const platform =
-      const MethodChannel('com.yourcompany.testProject/Scandit');
+  static const platform = const MethodChannel('com.yourcompany.testProject/Scandit');
 
   String ean = "";
   bool performanceOverlay = false;
@@ -160,8 +149,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _drawerDetailsPosition = new Tween<Offset>(
       begin: const Offset(0.0, -1.0),
       end: Offset.zero,
-    )
-        .animate(new CurvedAnimation(
+    ).animate(new CurvedAnimation(
       parent: _controller,
       curve: Curves.fastOutSlowIn,
     ));
@@ -182,43 +170,28 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             actions: <Widget>[
               new PopupMenuButton<String>(
                   onSelected: selectedOption,
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<String>>[
-                        new PopupMenuItem<String>(
-                            value: 'Options',
-                            child: new Text(
-                                NSSLStrings.of(context).changeTheme())),
-                        new PopupMenuItem<String>(
-                            value: 'deleteCrossedOut',
-                            child: new Text(
-                                NSSLStrings.of(context).deleteCrossedOutPB())),
+                  itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                        new PopupMenuItem<String>(value: 'Options', child: new Text(NSSLStrings.of(context).changeTheme())),
+                        new PopupMenuItem<String>(value: 'deleteCrossedOut', child: new Text(NSSLStrings.of(context).deleteCrossedOutPB())),
                       ])
             ]),
         body: buildBody(context),
         drawer: _buildDrawer(context),
         persistentFooterButtons: [
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).addPB()),
-              onPressed: _addWithoutSearchDialog),
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).scanPB()),
-              onPressed: _getEAN),
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).searchPB()),
-              onPressed: search),
+          new FlatButton(child: new Text(NSSLStrings.of(context).addPB()), onPressed: _addWithoutSearchDialog),
+          new FlatButton(child: new Text(NSSLStrings.of(context).scanPB()), onPressed: _getEAN),
+          new FlatButton(child: new Text(NSSLStrings.of(context).searchPB()), onPressed: search),
         ]);
   }
 
   Widget buildBody(BuildContext context) {
     cont = context;
 
-    if (User.currentList == null || User.currentList.shoppingItems == null)
-      return const Text("");
+    if (User.currentList == null || User.currentList.shoppingItems == null) return const Text("");
     var lv;
     if (User.currentList.shoppingItems.length > 0) {
       User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
-      User.currentList?.shoppingItems?.sort(
-          (a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
+      User.currentList?.shoppingItems?.sort((a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
       var mainList = User.currentList.shoppingItems.map((x) {
         var lt = new ListTile(
           title: new Row(children: [
@@ -227,18 +200,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               x.name,
               maxLines: 2,
               softWrap: true,
-              style: new TextStyle(
-                  decoration: x.crossedOut
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none),
+              style: new TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
             )),
           ]),
           leading: new PopupMenuButton<String>(
-            child: new Row(children: [
-              new Text(x.amount.toString() + "x"),
-              const Icon(Icons.expand_more, size: 16.0),
-              new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
-            ]),
+            child: SizedBox(width: 38.0,
+              child: new Row(children: [
+                new Text(x.amount.toString() + "x"),
+                const Icon(Icons.expand_more, size: 16.0),
+                new SizedBox(height: 38.0), //for larger clickable size (2 Lines)
+              ]),
+            ),
             initialValue: x.amount.toString(),
             onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
             itemBuilder: buildChangeMenuItems,
@@ -253,20 +225,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           onDismissed: (DismissDirection d) => handleDismissMain(d, x),
           direction: DismissDirection.startToEnd,
           background: new Container(
-              decoration:
-                  new BoxDecoration(color: Theme.of(context).primaryColor),
-              child: new ListTile(
-                  leading: new Icon(Icons.delete,
-                      color: Theme.of(context).accentIconTheme.color,
-                      size: 36.0))),
+              decoration: new BoxDecoration(color: Theme.of(context).primaryColor),
+              child: new ListTile(leading: new Icon(Icons.delete, color: Theme.of(context).accentIconTheme.color, size: 36.0))),
         );
       }).toList(growable: true);
 
       lv = new CustomScrollView(
         slivers: [
           new SliverFixedExtentList(
-              delegate: new SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
+              delegate: new SliverChildBuilderDelegate((BuildContext context, int index) {
                 return new Container(
                   alignment: FractionalOffset.center,
                   child: mainList[index],
@@ -287,20 +254,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  void showInSnackBar(String value,
-      {Duration duration, SnackBarAction action}) {
-    _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value),
-        duration: duration ?? new Duration(seconds: 3),
-        action: action));
+  void showInSnackBar(String value, {Duration duration, SnackBarAction action}) {
+    _mainScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value), duration: duration ?? new Duration(seconds: 3), action: action));
   }
 
-  void showInDrawerSnackBar(String value,
-      {Duration duration, SnackBarAction action}) {
-    _drawerScaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value),
-        duration: duration ?? new Duration(seconds: 3),
-        action: action));
+  void showInDrawerSnackBar(String value, {Duration duration, SnackBarAction action}) {
+    _drawerScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value), duration: duration ?? new Duration(seconds: 3), action: action));
   }
 
   Future register() => Navigator.pushNamed(cont, "/registration");
@@ -313,24 +272,19 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void handleDismissMain(DismissDirection dir, ShoppingItem s) {
     var list = User.currentList;
-    final String action = (dir == DismissDirection.endToStart)
-        ? NSSLStrings.of(context).archived()
-        : NSSLStrings.of(context).deleted();
+    final String action = (dir == DismissDirection.endToStart) ? NSSLStrings.of(context).archived() : NSSLStrings.of(context).deleted();
     var index = list.shoppingItems.indexOf(s);
     setState(() => list.shoppingItems.remove(s));
 //    _mainScaffoldKey.currentState.removeCurrentSnackBar();
     ShoppingListSync.deleteProduct(list.id, s.id, context);
     list.save();
-    showInSnackBar(
-        NSSLStrings.of(context).youHaveActionItemMessage() +
-            "${s.name} $action",
+    showInSnackBar(NSSLStrings.of(context).youHaveActionItemMessage() + "${s.name} $action",
         action: new SnackBarAction(
             label: NSSLStrings.of(context).undo(),
             onPressed: () {
               setState(() {
                 list.shoppingItems.insert(index, s);
-                ShoppingListSync.changeProductAmount(
-                    list.id, s.id, s.amount, context);
+                ShoppingListSync.changeProductAmount(list.id, s.id, s.amount, context);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
                 list.save();
               });
@@ -381,36 +335,29 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       });
 
   Future<Null> _getEAN() async {
-
     ean = await Scandit.scan();
 
     if (ean == "" || ean == "Permissions denied") return;
 
     var list = User.currentList;
     var firstRequest = await ProductSync.getProduct(ean, cont);
-    var z = JSON.decode((firstRequest).body);
+    var z = jsonDecode((firstRequest).body);
     var k = ProductAddPage.fromJson(z);
 
     if (k.success) {
       RegExp reg = new RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
-      String name =
-          reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
-      var item = list.shoppingItems
-          .firstWhere((x) => x.name == name, orElse: () => null);
+      String name = reg.hasMatch(k.name) ? k.name : "${k.name} ${k.quantity}${k.unit}";
+      var item = list.shoppingItems.firstWhere((x) => x.name == name, orElse: () => null);
       ShoppingItem afterAdd;
       if (item != null) {
-        var answer = await ShoppingListSync.changeProductAmount(
-            list.id, item.id, 1, cont);
+        var answer = await ShoppingListSync.changeProductAmount(list.id, item.id, 1, cont);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
         });
       } else {
-        var p = AddListItemResult.fromJson(
-            (await ShoppingListSync.addProduct(list.id, name, '-', 1, cont))
-                .body);
-        afterAdd = new ShoppingItem()
-          ..name = "${p.name}"
+        var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(list.id, name, '-', 1, cont)).body);
+        afterAdd = new ShoppingItem("${p.name}")
           ..amount = 1
           ..id = p.productId;
         setState(() => list.shoppingItems.add(afterAdd));
@@ -419,10 +366,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       return;
     }
     Navigator.push(
-        context,
-        new MaterialPageRoute<DismissDialogAction>(
-            builder: (BuildContext context) => new AddProductToDatabase(ean),
-            fullscreenDialog: true));
+        context, new MaterialPageRoute<DismissDialogAction>(builder: (BuildContext context) => new AddProductToDatabase(ean), fullscreenDialog: true));
   }
 
   void addListDialog() {
@@ -434,13 +378,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         context: cont);
 //rename ? (s) => renameList(listId, s)
 
-    showDialog(child: sd, context: cont);
+    showDialog(builder: (BuildContext context) => sd, context: cont);
   }
 
   Future renameListDialog(int listId) {
     return showDialog(
         context: cont,
-        child: SimpleDialogSingleInput.create(
+        builder: (BuildContext context) => SimpleDialogSingleInput.create(
             hintText: NSSLStrings.of(context).renameListHint(),
             labelText: NSSLStrings.of(context).listName(),
             onSubmitted: (s) => renameList(listId, s),
@@ -456,20 +400,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ..name = newListRes.name;
     setState(() => User.shoppingLists.add(newList));
     User.currentListIndex = User.shoppingLists.indexOf(newList);
-    firebaseMessaging
-        .subscribeToTopic(newList.id.toString() + "shoppingListTopic");
+    firebaseMessaging.subscribeToTopic(newList.id.toString() + "shoppingListTopic");
     newList.save();
   }
 
   Widget _buildDrawer(BuildContext context) {
     var userheader = new UserAccountsDrawerHeader(
-      accountName:
-          new Text(User.username ?? NSSLStrings.of(context).notLoggedInYet()),
-      accountEmail:
-          new Text(User.eMail ?? NSSLStrings.of(context).notLoggedInYet()),
-      currentAccountPicture: new CircleAvatar(
-          child: new Text(User.username.substring(0, 2)?.toUpperCase()),
-          backgroundColor: Themes.themes.first.accentColor),
+      accountName: new Text(User.username ?? NSSLStrings.of(context).notLoggedInYet()),
+      accountEmail: new Text(User.eMail ?? NSSLStrings.of(context).notLoggedInYet()),
+      currentAccountPicture: new CircleAvatar(child: new Text(User.username.substring(0, 2)?.toUpperCase()), backgroundColor: Themes.themes.first.accentColor),
       onDetailsPressed: () {
         _showDrawerContents = !_showDrawerContents;
         _showDrawerContents ? _controller.reverse() : _controller.forward();
@@ -481,20 +420,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             .map((x) => new ListTile(
                   key: new ValueKey(x),
                   title: new Text(x.name),
-                  onTap: () => changeCurrentList(User.shoppingLists.indexOf(
-                      User.shoppingLists.firstWhere((y) => y.id == x.id))),
+                  onTap: () => changeCurrentList(User.shoppingLists.indexOf(User.shoppingLists.firstWhere((y) => y.id == x.id))),
                   trailing: new PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
                       onSelected: drawerListItemMenuClicked,
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                             new PopupMenuItem<String>(
-                              value:
-                                  x.id.toString() + "\u{1E}" + "Contributors",
+                              value: x.id.toString() + "\u{1E}" + "Contributors",
                               child: new ListTile(
                                 leading: const Icon(Icons.person_add),
-                                title: new Text(
-                                    NSSLStrings.of(context).contributors()),
+                                title: new Text(NSSLStrings.of(context).contributors()),
                               ),
                             ),
 //                            new PopupMenuItem<String>(
@@ -508,32 +443,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 //                            ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
-                                child: new ListTile(
-                                    leading: const Icon(Icons.mode_edit),
-                                    title: new Text(
-                                        NSSLStrings.of(context).rename()))),
+                                child: new ListTile(leading: const Icon(Icons.mode_edit), title: new Text(NSSLStrings.of(context).rename()))),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Auto-Sync',
                                 child: new ListTile(
-                                    leading: new Icon(x.messagingEnabled
-                                        ? Icons.check_box
-                                        : Icons.check_box_outline_blank),
-                                    title: new Text(
-                                        NSSLStrings.of(context).autoSync()))),
+                                    leading: new Icon(x.messagingEnabled ? Icons.check_box : Icons.check_box_outline_blank),
+                                    title: new Text(NSSLStrings.of(context).autoSync()))),
                             const PopupMenuDivider(),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
-                                child: new ListTile(
-                                    leading: const Icon(Icons.delete),
-                                    title: new Text(
-                                        NSSLStrings.of(context).remove())))
+                                child: new ListTile(leading: const Icon(Icons.delete), title: new Text(NSSLStrings.of(context).remove())))
                           ]),
                 ))
             .toList()
         : [
-            new ListTile(
-                title:
-                    new Text(NSSLStrings.of(context).noListsInDrawerMessage())),
+            new ListTile(title: new Text(NSSLStrings.of(context).noListsInDrawerMessage())),
           ];
     //drawerList = new MyList<ListTile>(children: list);
     var emptyListTiles = new List<ListTile>();
@@ -591,11 +515,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
-        persistentFooterButtons: [
-          new FlatButton(
-              child: new Text(NSSLStrings.of(context).addListPB()),
-              onPressed: addListDialog)
-        ]);
+        persistentFooterButtons: [new FlatButton(child: new Text(NSSLStrings.of(context).addListPB()), onPressed: addListDialog)]);
 
     return new Drawer(child: d);
   }
@@ -627,59 +547,46 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         var deleteList = User.shoppingLists.firstWhere((x) => x.id == id);
         showDialog(
             context: cont,
-            child: SimpleDialogAcceptDeny.create(
+            builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
                 title: "Delete List " + deleteList.name,
-                text:
-                    "Do you really want to delete the list? This CAN'T be undone!",
+                text: "Do you really want to delete the list? This CAN'T be undone!",
                 onSubmitted: (s) async {
-                  var res = Result.fromJson(
-                      (await ShoppingListSync.deleteList(id, cont)).body);
+                  var res = Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
                   if (!res.success)
                     showInDrawerSnackBar(res.error);
                   else {
-                    showInDrawerSnackBar(deleteList.name +
-                        " " +
-                        NSSLStrings.of(context).removed());
+                    showInDrawerSnackBar(deleteList.name + " " + NSSLStrings.of(context).removed());
                     if (User.currentList.id == id) {
-                      changeCurrentList(User.shoppingLists
-                        .indexOf(
-                            User.shoppingLists.firstWhere((l) => l.id != id)));
+                      changeCurrentList(User.shoppingLists.indexOf(User.shoppingLists.firstWhere((l) => l.id != id)));
                     }
-                    setState(() =>
-                        User.shoppingLists.removeWhere((x) => x.id == id));
+                    setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
                   }
                 },
                 context: cont));
         break;
       case "Auto-Sync":
         var list = User.shoppingLists.firstWhere((x) => x.id == id);
-        list.messagingEnabled
-            ? list.unsubscribeFromFirebaseMessaging()
-            : list.subscribeForFirebaseMessaging();
+        list.messagingEnabled ? list.unsubscribeFromFirebaseMessaging() : list.subscribeForFirebaseMessaging();
         list.messagingEnabled = !list.messagingEnabled;
         list.save();
         break;
     }
   }
 
-  Future _handleDrawerRefresh() async
-  {
+  Future<Null> _handleDrawerRefresh() async {
     await ShoppingList.reloadAllLists(context);
-    setState(()=>{});
+    setState(() => {});
   }
 
+  Future<Null> _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
 
-  Future _handleMainListRefresh() => _handleListRefresh(User.currentList.id);
-
-  Future _handleListRefresh(int listId) async {
+  Future<Null> _handleListRefresh(int listId) async {
     await User.shoppingLists.firstWhere((s) => s.id == listId).refresh(cont);
     setState(() {});
   }
 
-  Future shoppingItemChange(ShoppingItem s, int change) async {
-    var res = ChangeListItemResult.fromJson((await ShoppingListSync
-            .changeProductAmount(User.currentList.id, s.id, change, cont))
-        .body);
+  Future<Null> shoppingItemChange(ShoppingItem s, int change) async {
+    var res = ChangeListItemResult.fromJson((await ShoppingListSync.changeProductAmount(User.currentList.id, s.id, change, cont)).body);
     setState(() {
       s.id = res.id;
       s.amount = res.amount;
@@ -687,15 +594,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
+  var amountPopList = new List<PopupMenuEntry<String>>();
   List<PopupMenuEntry<String>> buildChangeMenuItems(BuildContext context) {
-    var list = new List<PopupMenuEntry<String>>();
-    for (int i = 1; i <= 30; i++)
-      list.add(new PopupMenuItem<String>(
-          value: i.toString(), child: new Text(i.toString())));
-    return list;
+    if (amountPopList.length == 0)
+      for (int i = 1; i <= 99; i++) amountPopList.add(new PopupMenuItem<String>(value: i.toString(), child: new Text(i.toString())));
+    return amountPopList;
   }
 
-  Future crossOutMainListItem(ShoppingItem x) async {
+  Future<Null> crossOutMainListItem(ShoppingItem x) async {
     setState(() => x.crossedOut = !x.crossedOut);
     await User.currentList.save();
   }
@@ -703,7 +609,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _addWithoutSearchDialog() {
     showDialog(
         context: cont,
-        child: SimpleDialogSingleInput.create(
+        builder: (BuildContext context) => SimpleDialogSingleInput.create(
             context: cont,
             title: NSSLStrings.of(context).addProduct(),
             hintText: NSSLStrings.of(context).addProductWithoutSearch(),
@@ -711,44 +617,39 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onSubmitted: _addWithoutSearch));
   }
 
-  Future renameList(int id, String text) async {
+  Future<Null> renameList(int id, String text) async {
     var put = await ShoppingListSync.changeLName(id, text, cont);
     showInDrawerSnackBar("${put.statusCode}" + put.reasonPhrase);
     var res = Result.fromJson((put.body));
     if (!res.success) showInDrawerSnackBar(res.error);
   }
 
-  Future _addWithoutSearch(String value) async {
+  Future<Null> _addWithoutSearch(String value) async {
     var list = User.currentList;
-    var same = list.shoppingItems
-        .where((x) => x.name.toLowerCase() == value.toLowerCase());
+    var same = list.shoppingItems.where((x) => x.name.toLowerCase() == value.toLowerCase());
     if (same.length > 0) {
-      var res = await ShoppingListSync.changeProductAmount(
-          list.id, same.first.id, 1, cont);
+      var res = await ShoppingListSync.changeProductAmount(list.id, same.first.id, 1, cont);
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = ChangeListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
       setState(() => same.first.amount = product.amount);
       same.first;
     } else {
-      var res =
-          await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
+      var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = AddListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
-      setState(() => list.shoppingItems.add(new ShoppingItem()
+      setState(() => list.shoppingItems.add(new ShoppingItem(product.name)
         ..id = product.productId
         ..amount = 1
-        ..name = product.name
         ..crossedOut = false));
     }
   }
 
-  Future _deleteCrossedOutItems() async {
+  Future<Null> _deleteCrossedOutItems() async {
     var list = User.currentList;
     var sublist = list.shoppingItems.where((s) => s.crossedOut).toList();
-    var res = await ShoppingListSync.deleteProducts(
-        list.id, sublist.map((s) => s.id).toList(), cont);
+    var res = await ShoppingListSync.deleteProducts(list.id, sublist.map((s) => s.id).toList(), cont);
     if (!Result.fromJson(res.body).success) return;
     setState(() {
       for (var item in sublist) list.shoppingItems.remove(item);
@@ -759,19 +660,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         action: new SnackBarAction(
             label: NSSLStrings.of(context).undo(),
             onPressed: () async {
-              var res = await ShoppingListSync.changeProducts(
-                  list.id,
-                  sublist.map((s) => s.id).toList(),
-                  sublist.map((s) => s.amount).toList(),
-                  cont);
+              var res = await ShoppingListSync.changeProducts(list.id, sublist.map((s) => s.id).toList(), sublist.map((s) => s.amount).toList(), cont);
               var hashResult = HashResult.fromJson(res.body);
               int ownHash = 0;
               for (var item in sublist) ownHash += item.id + item.amount;
-              if (ownHash == hashResult.hash){
+              if (ownHash == hashResult.hash) {
                 setState(() => list.shoppingItems.addAll(sublist));
                 list.save();
-              }
-              else
+              } else
                 _handleListRefresh(list.id);
             }));
   }
@@ -779,7 +675,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   renameListItem(ShoppingItem x) {
     showDialog(
         context: cont,
-        child: SimpleDialogSingleInput.create(
+        builder: (BuildContext context) => SimpleDialogSingleInput.create(
             context: cont,
             title: NSSLStrings.of(context).renameListItem(),
             hintText: NSSLStrings.of(context).renameListHint(),
@@ -787,9 +683,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             defaultText: x.name,
             maxLines: 2,
             onSubmitted: (s) async {
-              var res = ChangeListItemResult.fromJson((await ShoppingListSync
-                      .changeProductName(User.currentList.id, x.id, s, cont))
-                  .body);
+              var res = ChangeListItemResult.fromJson((await ShoppingListSync.changeProductName(User.currentList.id, x.id, s, cont)).body);
               setState(() {
                 x.id = res.id;
                 x.amount = res.amount;

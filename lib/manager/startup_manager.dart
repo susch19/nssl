@@ -15,6 +15,8 @@ class Startup {
     if (User.username == null || User.username == "" || User.eMail == null || User.eMail == "") return false;
     await Themes.loadTheme();
     User.shoppingLists = await ShoppingList.load();
+    if(User.shoppingLists.length == 0)
+      return true;
     User.currentList = User.shoppingLists.firstWhere(
             (x) => x.id == User.currentListIndex,
         orElse: () => User.shoppingLists.first);
@@ -65,17 +67,17 @@ class Startup {
 
       User.shoppingLists.clear();
       await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
+
       var crossedOut = (await DatabaseManager.database
           .rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
-      for (var resu in result.shoppingLists) {
+      result.shoppingLists.forEach((resu) {
         var list = new ShoppingList()
           ..id = resu.id
           ..name = resu.name
           ..shoppingItems = new List<ShoppingItem>();
 
         for (var item in resu.products)
-          list.shoppingItems.add(new ShoppingItem()
-            ..name = item.name
+          list.shoppingItems.add(new ShoppingItem(item.name)
             ..id = item.id
             ..amount = item.amount
             ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id,
@@ -85,7 +87,7 @@ class Startup {
                 : true));
         User.shoppingLists.add(list);
         list.save();
-      }
+      });
     }
     User.currentList = User.shoppingLists.firstWhere(
             (x) => x.id == User.currentListIndex,

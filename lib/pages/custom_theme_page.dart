@@ -40,7 +40,7 @@ class CustomThemePageState extends State<CustomThemePage> {
 
     return await showDialog<bool>(
             context: context,
-            child: new AlertDialog(
+            builder: (BuildContext context) => new AlertDialog(
                 content:
                     new Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
                 actions: <Widget>[

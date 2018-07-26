@@ -15,16 +15,15 @@ class CloudMessaging {
     if (User.shoppingLists
             .firstWhere((x) => x.id == listId, orElse: () => null) ==
         null) {
-      var mapp = JSON.decode(message["items"]);
+      var mapp = jsonDecode(message["items"]);
       //User was added to new list
       User.shoppingLists.add(new ShoppingList()
         ..id = listId
         ..name = message["Name"]
         ..shoppingItems = mapp
-            .map((x) => new ShoppingItem()
+            .map((x) => new ShoppingItem(x["Name"])
               ..id = x["Id"]
-              ..amount = x["Amount"]
-              ..name = x["Name"])
+              ..amount = x["Amount"])
             .toList());
       firebaseMessaging
           .subscribeToTopic(listId.toString() + "shoppingListTopic");
@@ -53,10 +52,9 @@ class CloudMessaging {
                   (x) => x.id == int.parse(message["Id"]),
                   orElse: () => null) !=
               null) break;
-          list.shoppingItems.add(new ShoppingItem()
+          list.shoppingItems.add(new ShoppingItem(message["Name"])
             ..id = int.parse(message["Id"])
             ..amount = int.parse(message["Amount"])
-            ..name = message["Name"]
             ..crossedOut = false);
           list.save();
           break;

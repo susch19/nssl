@@ -1,22 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:testProject/localization/nssl_strings.dart';
-class _SystemPadding extends StatelessWidget {
-  final Widget child;
 
-  _SystemPadding({Key key, this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var mediaQuery = MediaQuery.of(context);
-    return new AnimatedContainer(
-        padding: mediaQuery.viewInsets,
-        duration: const Duration(milliseconds: 0),
-        child: child);
-  }
-}
 class SimpleDialogSingleInput {
 
-  static _SystemPadding create(
+  static AlertDialog create(
       {String hintText,
       String labelText,
       String title,
@@ -27,7 +14,7 @@ class SimpleDialogSingleInput {
     var tec = new TextEditingController();
     tec.text = defaultText;
 
-    return new _SystemPadding(child: new AlertDialog(
+    return new AlertDialog(
         title: new Text(title),
         content: new SingleChildScrollView(
           child: new ListBody(
@@ -55,7 +42,7 @@ class SimpleDialogSingleInput {
                 Navigator.pop(context, "");
                 onSubmitted(tec.text);
               })
-        ]));
+        ]);
 
 //    var sdo = new SimpleDialogOption(
 //      child: new Column(

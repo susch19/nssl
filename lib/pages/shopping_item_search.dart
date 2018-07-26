@@ -56,8 +56,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
                 list.id, name, gtin ?? '-', 1, context))
             .body);
-        afterAdd = new ShoppingItem()
-          ..name = p.name
+        afterAdd = new ShoppingItem(p.name)
           ..amount = 1
           ..id = p.productId;
         setState(() => list.shoppingItems.add(afterAdd));
@@ -131,13 +130,13 @@ class _ProductAddPageState extends State<ProductAddPage> {
   Future _searchProducts(String value, int page) async {
     Response o = await ProductSync.getProducts(value, page, context);
 
-    List<Map> z = JSON.decode(o.body);
-    if (!noMoreProducts && z.length <= 0) {
+      List z = jsonDecode(o.body);// .decode(o.body);
+      if (!noMoreProducts && z.length <= 0) {
       noMoreProducts = true;
       showInSnackBar(NSSLStrings.of(context).noMoreProductsMessage(),
           duration: new Duration(seconds: 3));
     } else
-      setState(() => prList.addAll(z.map(ProductAddPage.fromJson).toList()));
+      setState(() => prList.addAll(z.map((f)=>new ProductResult()..unit=f["unit"]..name=f["name"]..quantity=f["quantity"]).toList()));
   }
 
   Widget buildBody() {

@@ -12,7 +12,7 @@ class CreateResult extends BaseResult {
   String username;
   String eMail;
   static CreateResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static CreateResult _fromJson(Map data) {
     var r = new CreateResult();
@@ -21,6 +21,7 @@ class CreateResult extends BaseResult {
     r.id = data["id"];
     r.username = data["username"];
     r.eMail = data["eMail"];
+    
     return r;
   }
 }
@@ -31,7 +32,7 @@ class LoginResult extends BaseResult {
   String eMail;
   String token;
   static LoginResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
   static LoginResult _fromJson(Map data) {
     var r = new LoginResult();
     r.success = data["success"];
@@ -48,7 +49,7 @@ class AddContributorResult extends BaseResult {
   String name;
   int id;
   static AddContributorResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static AddContributorResult _fromJson(Map data) {
     var r = new AddContributorResult();
@@ -70,7 +71,7 @@ class GetContributorsResult extends BaseResult {
   List<ContributorResult> contributors;
 
   static GetContributorsResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static GetContributorsResult _fromJson(Map data) {
     var r = new GetContributorsResult();
@@ -93,7 +94,7 @@ class ProductResult extends BaseResult{
   double quantity;
   String unit;
   static ProductResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static ProductResult _fromJson(Map data) {
     var r = new ProductResult();
@@ -112,7 +113,7 @@ class AddListItemResult extends BaseResult{
   String name;
   String gtin;
   static AddListItemResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static AddListItemResult _fromJson(Map data) {
     var r = new AddListItemResult();
@@ -131,7 +132,7 @@ class ChangeListItemResult extends BaseResult{
   int amount;
   int listId;
   static ChangeListItemResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static ChangeListItemResult _fromJson(Map data) {
     var r = new ChangeListItemResult();
@@ -149,7 +150,7 @@ class AddListResult extends BaseResult{
   int id;
   String name;
   static AddListResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static AddListResult _fromJson(Map data) {
     var r = new AddListResult();
@@ -170,7 +171,7 @@ class GetListResult {
   String contributors;
 
   static GetListResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static GetListResult _fromJson(Map data) {
     var r = new GetListResult();
@@ -178,9 +179,9 @@ class GetListResult {
     r.name = data["name"];
     r.userId = data["userId"];
     r.owner = data["owner"];
-    List<Map> unMaped = data["products"] ?? new List<Map>();
+    var unMaped = data["products"] ?? new List<Map>();
     r.products =
-        unMaped.map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+        unMaped.map<ShoppingItem>((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
     r.contributors = data["contributors"];
     return r;
   }
@@ -190,15 +191,15 @@ class GetListsResult {
   Iterable<ShoppingList> shoppingLists;
 
   static GetListsResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static GetListsResult _fromJson(Map data) {
     var r = new GetListsResult();
-    List<Map> unmappedShoppingLists = data["lists"];
+
+    List<dynamic> unmappedShoppingLists = data["lists"];
     r.shoppingLists = unmappedShoppingLists.map((s) => new ShoppingList()
       ..products = s["products"]
-          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]))
-          .toList()
+          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"])).toList().cast<ShoppingItem>()
       ..id = s["id"]
       ..name = s["name"]);
 
@@ -212,7 +213,7 @@ class GetBoughtListResult {
   Iterable<ShoppingItem> products;
 
   static GetBoughtListResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static GetBoughtListResult _fromJson(Map data) {
     var r = new GetBoughtListResult();
@@ -232,7 +233,7 @@ class InfoResult {
   String eMail;
   List<int> listIds;
   static InfoResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static InfoResult _fromJson(Map data) {
     var r = new InfoResult();
@@ -248,7 +249,7 @@ class HashResult extends Result {
   int hash;
 
   static HashResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
   static HashResult _fromJson(Map data) {
     var r = new HashResult();
     r.success = data["success"];
@@ -260,7 +261,7 @@ class HashResult extends Result {
 
 class Result extends BaseResult{
   static Result fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static Result _fromJson(Map data) {
     var r = new Result();
@@ -273,7 +274,7 @@ class Result extends BaseResult{
 class SessionRefreshResult {
   String token;
   static SessionRefreshResult fromJson(String dataString) =>
-      _fromJson(JSON.decode(dataString));
+      _fromJson(jsonDecode(dataString));
 
   static SessionRefreshResult _fromJson(Map data) {
     var r = new SessionRefreshResult();

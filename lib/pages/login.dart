@@ -43,8 +43,7 @@ class LoginPageState extends State<LoginPage> {
   var submit = new ForInput();
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value), duration: new Duration(seconds: 3)));
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value), duration: new Duration(seconds: 3)));
   }
 
   Future _handleSubmitted() async {
@@ -79,15 +78,13 @@ class LoginPageState extends State<LoginPage> {
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
       var res = await UserSync.login(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context,
-          scaffoldState: _scaffoldKey?.currentState))
+      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey?.currentState))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
     } else {
       var res = await UserSync.loginEmail(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context,
-          scaffoldState: _scaffoldKey?.currentState))
+      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey?.currentState))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
@@ -109,7 +106,7 @@ class LoginPageState extends State<LoginPage> {
     firebaseMessaging.subscribeToTopic(res.username + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
-      if (User.shoppingLists?.length > 0) {
+      if (User.shoppingLists != null && User.shoppingLists.length > 0) {
         User.currentList = User.shoppingLists.first;
         User.currentListIndex = 1;
         await User.save();
@@ -135,26 +132,20 @@ class LoginPageState extends State<LoginPage> {
     if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = new RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value))
-      return NSSLStrings.of(context).emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
   String _validatePassword(String value) {
-    if (pwInput.textEditingController == null ||
-        pwInput.textEditingController.text.isEmpty)
-      return NSSLStrings.of(context).passwordEmptyError();
+    if (pwInput.textEditingController == null || pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).passwordEmptyError();
     return null;
   }
 
   _resetInput() {
-    nameInput.decoration = new InputDecoration(
-        helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(),
-        labelText: NSSLStrings.of(context).usernameOrEmailTitle());
+    nameInput.decoration =
+        new InputDecoration(helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(), labelText: NSSLStrings.of(context).usernameOrEmailTitle());
 
-    pwInput.decoration = new InputDecoration(
-        helperText: NSSLStrings.of(context).choosenPasswordHint(),
-        labelText: NSSLStrings.of(context).password());
+    pwInput.decoration = new InputDecoration(helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
   }
 
   @override
@@ -207,9 +198,7 @@ class LoginPageState extends State<LoginPage> {
                 title: new Container(
                     child: new RaisedButton(
                       key: submit.key,
-                      child: new Center(
-                          child:
-                              new Text(NSSLStrings.of(context).loginButton())),
+                      child: new Center(child: new Text(NSSLStrings.of(context).loginButton())),
                       onPressed: _handleSubmitted,
                     ),
                     padding: const EdgeInsets.only(top: 16.0)),
@@ -219,12 +208,9 @@ class LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.only(top: 40.0),
                   child: new FlatButton(
                     onPressed: () {
-                      User.username == null
-                          ? Navigator.pushNamed(context, "/registration")
-                          : Navigator.popAndPushNamed(context, "/registration");
+                      User.username == null ? Navigator.pushNamed(context, "/registration") : Navigator.popAndPushNamed(context, "/registration");
                     },
-                    child:
-                        new Text(NSSLStrings.of(context).registerTextOnLogin()),
+                    child: new Text(NSSLStrings.of(context).registerTextOnLogin()),
                   ),
                 ),
               ),

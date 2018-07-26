@@ -76,11 +76,13 @@ import 'package:testProject/models/model_export.dart';
 class DatabaseManager {
   static Database database;
 
+  static int _version = 2;
+
   static Future initialize() async {
 
     database = await openDatabase(
         (await getApplicationDocumentsDirectory()).path + "/db.db",
-        version: 2, onCreate: (Database db, int version) async {
+        version: _version, onCreate: (Database db, int version) async {
       await db.execute(
           "CREATE TABLE ShoppingItems (id INTEGER PRIMARY KEY, name TEXT, amount INTEGER, crossed INTEGER, res_list_id INTEGER)");
       await db.execute(
@@ -91,6 +93,12 @@ class DatabaseManager {
           "CREATE TABLE Themes (id INTEGER PRIMARY KEY, primary_color INTEGER, accent_color INTEGER, brightness TEXT, accent_color_brightness TEXT, user_id INTEGER)");
     }, onUpgrade: _upgradeDatabase);
   }
+
+  // static Future<Database> openNewConnection() async{
+  //   database.close();
+  //   database = await openDatabase((await getApplicationDocumentsDirectory()).path + "/db.db", version: _version);
+  //   return database;
+  // }
 
   static Future _upgradeDatabase(
       Database db, int oldVersion, int newVersion) async {
