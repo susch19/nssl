@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:testProject/firebase/cloud_messsaging.dart';
-import 'package:testProject/models/shopping_item.dart';
-import 'package:testProject/manager/manager_export.dart';
-import 'package:testProject/models/user.dart';
+import 'package:nssl/firebase/cloud_messsaging.dart';
+import 'package:nssl/models/shopping_item.dart';
+import 'package:nssl/manager/manager_export.dart';
+import 'package:nssl/models/user.dart';
 import 'dart:async';
-import 'package:testProject/server_communication/return_classes.dart';
-import 'package:testProject/server_communication/shopping_list_sync.dart';
+import 'package:nssl/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/shopping_list_sync.dart';
 
 class ShoppingList {
   int id;
@@ -68,7 +68,10 @@ class ShoppingList {
       shoppingItems.add(new ShoppingItem(item.name)
         ..id = item.id
         ..amount = item.amount
-        ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true));
+        ..changed = item.changed
+        ..created = item.created
+        ..crossedOut = (crossedOut.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true))
+        ;
     save();
   }
 

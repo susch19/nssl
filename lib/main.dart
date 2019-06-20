@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'package:scandit/scandit.dart';
-import 'package:testProject/helper/simple_dialog.dart';
-import 'package:testProject/options/themes.dart';
-import 'package:testProject/pages/pages.dart';
-import 'package:testProject/manager/manager_export.dart';
-import 'package:testProject/models/model_export.dart';
-import 'package:testProject/server_communication/return_classes.dart';
-import 'package:testProject/server_communication/s_c.dart';
-import 'package:testProject/helper/simple_dialog_single_input.dart';
+import 'package:nssl/helper/simple_dialog.dart';
+import 'package:nssl/manager/export_manager.dart';
+import 'package:nssl/options/themes.dart';
+import 'package:nssl/pages/pages.dart';
+import 'package:nssl/manager/manager_export.dart';
+import 'package:nssl/models/model_export.dart';
+import 'package:nssl/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/s_c.dart';
+import 'package:nssl/helper/simple_dialog_single_input.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/firebase/cloud_messsaging.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
@@ -327,7 +328,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void changeCurrentList(int index) => setState(() {
-        User.currentListIndex = index;
+        // User.currentListIndex = index;
         setState(() => User.currentList = User.shoppingLists[index]);
         User.currentListIndex = User.shoppingLists[index].id;
         User.save();
@@ -354,6 +355,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
+          item.changed = p.changed;
         });
       } else {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(list.id, name, '-', 1, cont)).body);
@@ -399,7 +401,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ..id = newListRes.id
       ..name = newListRes.name;
     setState(() => User.shoppingLists.add(newList));
-    User.currentListIndex = User.shoppingLists.indexOf(newList);
+    changeCurrentList(User.shoppingLists.indexOf(newList));
+    // User.currentListIndex = User.shoppingLists.indexOf(newList);
     firebaseMessaging.subscribeToTopic(newList.id.toString() + "shoppingListTopic");
     newList.save();
   }
@@ -432,15 +435,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 title: new Text(NSSLStrings.of(context).contributors()),
                               ),
                             ),
-//                            new PopupMenuItem<String>(
-//                              value:
-//                              x.id.toString() + "\u{1E}" + "BoughtList",
-//                              child: new ListTile(
-//                                leading: const Icon(Icons.history),
-//                                title: new Text("BoughtList"),
-//                                   // NSSLStrings.of(context).contributors()),
-//                              ),
-//                            ),
+                           new PopupMenuItem<String>(
+                             value:
+                             x.id.toString() + "\u{1E}" + "BoughtList",
+                             child: new ListTile(
+                               leading: const Icon(Icons.history),
+                               title: new Text(NSSLStrings.of(context).boughtProducts()),
+                                  // NSSLStrings.of(context).contributors()),
+                             ),
+                           ),
+                            new PopupMenuItem<String>(
+                              value: x.id.toString() + "\u{1E}" + 'ExportAsPdf', 
+                              child: new ListTile(leading: const Icon(Icons.picture_as_pdf),title: new Text(NSSLStrings.of(context).exportAsPdf())),),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
                                 child: new ListTile(leading: const Icon(Icons.mode_edit), title: new Text(NSSLStrings.of(context).rename()))),
@@ -536,7 +542,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         Navigator.push(
             cont,
             new MaterialPageRoute<DismissDialogAction>(
-              builder: (BuildContext context) => new ContributorsPage(id),
+              builder: (BuildContext context) => new BoughtItemsPage(id),
               fullscreenDialog: true,
             ));
         break;
@@ -548,8 +554,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         showDialog(
             context: cont,
             builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
-                title: "Delete List " + deleteList.name,
-                text: "Do you really want to delete the list? This CAN'T be undone!",
+                title: NSSLStrings.of(context).deleteListTitle() + deleteList.name,
+                text: NSSLStrings.of(context).deleteListText(),
                 onSubmitted: (s) async {
                   var res = Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
                   if (!res.success)
@@ -569,6 +575,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         list.messagingEnabled ? list.unsubscribeFromFirebaseMessaging() : list.subscribeForFirebaseMessaging();
         list.messagingEnabled = !list.messagingEnabled;
         list.save();
+        break;
+        case "ExportAsPdf":
+          ExportManager.exportAsPDF(User.shoppingLists.firstWhere((x)=>x.id==id), context);
         break;
     }
   }
@@ -591,6 +600,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       s.id = res.id;
       s.amount = res.amount;
       s.name = res.name;
+      s.changed = res.changed;
     });
   }
 
@@ -632,7 +642,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = ChangeListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
-      setState(() => same.first.amount = product.amount);
+      setState(() { same.first.amount = product.amount; same.first.changed =product.changed;});
       same.first;
     } else {
       var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
@@ -688,6 +698,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 x.id = res.id;
                 x.amount = res.amount;
                 x.name = res.name;
+                x.changed = res.changed;
               });
             }));
   }

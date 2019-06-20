@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
-import 'package:testProject/localization/nssl_messages_all.dart';
+import 'package:nssl/localization/nssl_messages_all.dart';
 
 class NSSLStrings {
   NSSLStrings(Locale locale) : _localeName = locale.toString();
@@ -141,6 +141,9 @@ class NSSLStrings {
   String logout() => Intl.message('Logout', name: 'logout', locale:_localeName);
   String deleteListTitle() => Intl.message('Delete List', name: 'deleteListTitle', locale:_localeName);
   String deleteListText() => Intl.message('Do you really want to delete the list? This CAN\'T be undone!', name: 'deleteListText', locale:_localeName);
+  String exportAsPdf() => Intl.message('Export as PDF', name: 'exportAsPdf', locale:_localeName);
+  String boughtProducts() => Intl.message('Bought Products', name: 'boughtProducts', locale:_localeName);
+  String nothingBoughtYet() => Intl.message('Nothing bought yet', name: 'nothingBoughtYet', locale:_localeName);
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 

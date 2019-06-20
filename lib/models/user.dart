@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:testProject/manager/file_manager.dart';
-import 'package:testProject/models/shopping_list.dart';
-import 'package:testProject/server_communication/jwt.dart';
+import 'package:nssl/manager/file_manager.dart';
+import 'package:nssl/models/shopping_list.dart';
+import 'package:nssl/server_communication/jwt.dart';
 
 class User {
   static String username;

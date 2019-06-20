@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:intl/src/intl_helpers.dart';
 import 'package:intl/message_lookup_by_library.dart';
-import 'package:testProject/localization/nssl_messages_de.dart' as m_de;
-import 'package:testProject/localization/nssl_messages_en.dart' as m_en;
+import 'package:nssl/localization/nssl_messages_de.dart' as m_de;
+import 'package:nssl/localization/nssl_messages_en.dart' as m_en;
 
 Map<String, Function> _deferredLibraries = {
   'en': () => new Future.value(null),

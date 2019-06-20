@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/models/user.dart';
-import 'package:testProject/pages/login.dart';
-import 'package:testProject/server_communication/return_classes.dart';
-import 'package:testProject/server_communication/s_c.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/models/user.dart';
+import 'package:nssl/pages/login.dart';
+import 'package:nssl/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/s_c.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   ChangePasswordPage({Key key, this.scaffoldKey}) : super(key: key);

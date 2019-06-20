@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:testProject/models/model_export.dart';
+import 'package:nssl/models/model_export.dart';
 
 final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 

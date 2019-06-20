@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/main.dart';
-import 'package:testProject/server_communication/return_classes.dart';
-import 'package:testProject/server_communication/s_c.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/main.dart';
+import 'package:nssl/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/s_c.dart';
 import 'package:flutter/material.dart';
-import 'package:testProject/models/model_export.dart';
+import 'package:nssl/models/model_export.dart';
 import 'login.dart';
 
 class Registration extends StatefulWidget {

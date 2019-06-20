@@ -1,5 +1,5 @@
-name: testProject
-description: A new flutter project.
+name: nssl
+description: An app for handling shopping lists
 
 dependencies:
   flutter:
@@ -12,15 +12,17 @@ dependencies:
  # jwt:
  #   git: git://github.com/susch19/dart-json_web_token.git
   #jaguar_jwt: "^1.1.5"
-  dart_jwt: "^0.6.0"
   crypto: "^2.0.1"
-  cryptoutils:
-  cipher:
   firebase_messaging:
   http: "^0.11.3+16"
   sqflite:
+  permission_handler: ^1.0.1
   scandit:
     path: ../Plugins/scandit
+  pdf: ^1.0.1
+  flutter_colorpicker: 
+
+
     #git: https://github.com/tekartik/sqflite.git
 
 # For information on the generic Dart part of this file, see the

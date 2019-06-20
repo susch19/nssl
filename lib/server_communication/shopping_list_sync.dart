@@ -8,8 +8,8 @@ import 'package:http/http.dart';
 final String listpath = "shoppinglists";
 
 class ShoppingListSync {
-  static Future<Response> getList(int listId,BuildContext context) =>
-      HelperMethods.get("$listpath/$listId", context);
+  static Future<Response> getList(int listId,BuildContext context, {bool bought = false}) =>
+      HelperMethods.get("$listpath/$listId/$bought", context);
 
   static Future<Response> getLists(BuildContext context) =>
       HelperMethods.get("$listpath/batchaction/", context);

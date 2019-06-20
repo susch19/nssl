@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:testProject/models/user.dart';
+import 'package:nssl/models/user.dart';
 
 class JWT {
   static Future<bool> newToken() async {

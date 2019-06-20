@@ -128,6 +128,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "logout" : MessageLookupByLibrary.simpleMessage('Ausloggen'),
     "deleteListTitle" : MessageLookupByLibrary.simpleMessage('Lösche Liste '),
     "deleteListText" : MessageLookupByLibrary.simpleMessage('Soll diese Liste wirklich gelöscht werden? Das kann NICHT rückgängig gemacht werden!'),
-
+    "exportAsPdf" : MessageLookupByLibrary.simpleMessage('Als PDF exportieren'),
+    "boughtProducts" : MessageLookupByLibrary.simpleMessage('Eingekauft'),
+    "nothingBoughtYet" : MessageLookupByLibrary.simpleMessage('Noch nichts eingekauft'),
   };
 }

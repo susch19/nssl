@@ -125,9 +125,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "forgotPassword" : MessageLookupByLibrary.simpleMessage('Forgot password?'),
     "bePatient" : MessageLookupByLibrary.simpleMessage('Please be patient, the server is processing your request already'),
     "logout" : MessageLookupByLibrary.simpleMessage('Logout'),
-  "deleteListTitle" : MessageLookupByLibrary.simpleMessage('Delete List '),
-  "deleteListText" : MessageLookupByLibrary.simpleMessage('Do you really want to delete the list? This CAN\'T be undone!'),
-
-
+    "deleteListTitle" : MessageLookupByLibrary.simpleMessage('Delete List '),
+    "deleteListText" : MessageLookupByLibrary.simpleMessage('Do you really want to delete the list? This CAN\'T be undone!'),
+    "exportAsPdf" : MessageLookupByLibrary.simpleMessage('Export as PDF'),
+    "boughtProducts" : MessageLookupByLibrary.simpleMessage('Bought Products'),
+    "nothingBoughtYet" : MessageLookupByLibrary.simpleMessage('Nothing bought yet'),
   };
 }

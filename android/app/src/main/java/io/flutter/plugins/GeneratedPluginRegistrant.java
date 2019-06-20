@@ -3,6 +3,7 @@ package io.flutter.plugins;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
+import com.baseflow.permissionhandler.PermissionHandlerPlugin;
 import com.example.scandit.ScanditPlugin;
 import com.tekartik.sqflite.SqflitePlugin;
 
@@ -16,6 +17,7 @@ public final class GeneratedPluginRegistrant {
     }
     FirebaseMessagingPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
+    PermissionHandlerPlugin.registerWith(registry.registrarFor("com.baseflow.permissionhandler.PermissionHandlerPlugin"));
     ScanditPlugin.registerWith(registry.registrarFor("com.example.scandit.ScanditPlugin"));
     SqflitePlugin.registerWith(registry.registrarFor("com.tekartik.sqflite.SqflitePlugin"));
   }

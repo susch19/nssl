@@ -1,191 +1,155 @@
 import 'package:flutter/material.dart';
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/models/model_export.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/models/model_export.dart';
 import 'package:flutter/widgets.dart';
-import 'package:testProject/server_communication//s_c.dart';
-import 'dart:async';
-import 'package:testProject/server_communication/return_classes.dart';
+import 'package:nssl/server_communication//s_c.dart';
+import 'package:nssl/server_communication/return_classes.dart';
 
 class BoughtItemsPage extends StatefulWidget {
   BoughtItemsPage(this.listId, {Key key, this.title}) : super(key: key);
   final String title;
   final int listId;
   @override
-  _BoughtItemsPagePageState createState() =>
-      new _BoughtItemsPagePageState(listId);
+  _BoughtItemsPagePageState createState() => new _BoughtItemsPagePageState(listId);
 }
 
-class _BoughtItemsPagePageState extends State<BoughtItemsPage> {
-  final GlobalKey<ScaffoldState> _mainScaffoldKey =
-      new GlobalKey<ScaffoldState>();
+class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = new GlobalKey<ScaffoldState>();
   GlobalKey _iff = new GlobalKey();
   GlobalKey _ib = new GlobalKey();
-  TextEditingController tec = new TextEditingController();
-  List<ContributorResult> conList = new List<ContributorResult>();
+  var tec = new TextEditingController();
+  var shoppingItems = new List<ShoppingItem>();
+  var shoppingItemsGrouped = new Map<DateTime, List<ShoppingItem>>();
   int k = 1;
   int listId;
+  TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(vsync: this, length: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   _BoughtItemsPagePageState(int listId) {
     this.listId = listId;
-    ShoppingListSync.getContributors(listId, context).then((o) {
+    ShoppingListSync.getList(listId, context, bought: true).then((o) {
       if (o.statusCode == 500) {
         showInSnackBar("Internal Server Error");
         return;
       }
-      GetContributorsResult z = GetContributorsResult.fromJson(o.body);
-      if (!z.success || z.contributors.length <= 0)
-        showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + o.reasonPhrase,
+      var z = GetBoughtListResult.fromJson(o.body);
+      if (z.products.length <= 0)
+        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(),
             duration: new Duration(seconds: 10));
-      else
-        setState(() => conList.addAll(z.contributors));
+      else {
+        shoppingItems.addAll(z.products.map((f) => new ShoppingItem(f.name)
+          ..id = f.id
+          ..amount = f.amount
+          ..changed = f.changed
+          ..created = f.created
+          ..crossedOut = false));
+        DateTime date;
+        shoppingItems.sort((x,y)=>y.changed.compareTo(x.changed));
+        for (var item in shoppingItems) {
+          date = dateTimeToDate(item.changed);
+          if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed)))
+            shoppingItemsGrouped[date] = new List<ShoppingItem>();
+          shoppingItemsGrouped[date].add(item);
+        }
+      }
+
+      setState(() {
+        _controller = TabController(vsync: this, length: shoppingItemsGrouped.keys.length);
+      });
     });
+  }
+
+  DateTime dateTimeToDate(DateTime dateTime) {
+    return DateTime.utc(dateTime.year, dateTime.month, dateTime.day);
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        key: _mainScaffoldKey,
-        appBar: new AppBar(
-            title: new Form(
-                child: new TextField(
-                    key: _iff,
-                    decoration: new InputDecoration(
-                        hintText: NSSLStrings.of(context).nameOfNewContributorHint()),
-                    onSubmitted: (x) => _addContributor(x),
-                    autofocus: true,
-                    controller: tec))),
-        floatingActionButton: new FloatingActionButton(
-            onPressed: () => {},
-            child: new IconButton(
-                key: _ib,
-                icon: new Icon(Icons.add),
-                onPressed: () {
-                  _addContributor(tec.text);
-                })),
-        body: buildBody());
+    return Scaffold(
+      key: _mainScaffoldKey,
+      appBar: AppBar(
+        title: Text(NSSLStrings.of(context).boughtProducts()),
+        actions: <Widget>[],
+        bottom: TabBar(
+          controller: _controller,
+          isScrollable: true,
+          indicator: getIndicator(),
+          tabs: createTabs(),
+        ),
+      ),
+      body: TabBarView(
+        controller: _controller,
+        children: createChildren(),
+      ),
+    );
   }
 
-  Future _addContributor(String value) async {
-    var o = await ShoppingListSync.addContributor(listId, value, context);
-    AddContributorResult z = AddContributorResult.fromJson(o.body);
-    if (!z.success)
-      showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error,
-          duration: new Duration(seconds: 10));
-    else
-      setState(() => conList.add(new ContributorResult()
-        ..name = z.name
-        ..userId = z.id
-        ..isAdmin = false));
+  Decoration getIndicator() {
+    return ShapeDecoration(
+      shape: const StadiumBorder(
+            side: BorderSide(
+              color: Colors.white24,
+              width: 2.0,
+            ),
+          ) +
+          const StadiumBorder(
+            side: BorderSide(
+              color: Colors.transparent,
+              width: 4.0,
+            ),
+          ),
+    );
   }
 
-  Widget buildBody() {
-    bool isAdmin = false;
-    if (conList.length > 0) {
-      isAdmin = conList
-          .firstWhere(
-              (x) => x.name.toLowerCase() == User.username.toLowerCase())
-          .isAdmin;
-      var listView = new ListView.builder(
-          itemBuilder: (c, i) {
-            return new ListTile(
-                title: new Text(conList[i].name +
-                    (conList[i].isAdmin
-                        ? NSSLStrings.of(context).contributorAdmin()
-                        : NSSLStrings.of(context).contributorUser())),
-                trailing: isAdmin &&
-                        conList[i].name.toLowerCase() !=
-                            User.username.toLowerCase()
-                    ? new PopupMenuButton<String>(
-                        padding: EdgeInsets.zero,
-                        onSelected: popupMenuClicked,
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
-                              new PopupMenuItem<String>(
-                                  value: conList[i].userId.toString() +
-                                      "\u{1E}ChangeRight", //x.id.toString() + "\u{1E}" + 'Rename',
-                                  child: new ListTile(
-                                      leading: (conList[i].isAdmin
-                                          ? const Icon(Icons.arrow_downward)
-                                          : const Icon(Icons.arrow_upward)),
-                                      title: (conList[i].isAdmin
-                                          ? new Text(NSSLStrings.of(context).demoteMenu())
-                                          : new Text(NSSLStrings.of(context).promoteMenu())))),
-                              const PopupMenuDivider(), // ignore: list_element_type_not_assignable
-                              new PopupMenuItem<String>(
-                                  value: conList[i].userId.toString() +
-                                      "\u{1E}Remove", //x.id.toString() + "\u{1E}" + 'Remove',
-                                  child: new ListTile(
-                                      leading: const Icon(Icons.delete),
-                                      title: new Text(NSSLStrings.of(context).remove())))
-                            ])
-                    : const Text(""),
-                onTap: () => {});
-          },
-          itemCount: conList.length);
-      return listView;
-    } else
-      return new Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          new Container(
-            child: new SizedBox(
-                width: 40.0,
-                height: 40.0,
-                child: new CircularProgressIndicator()),
-            padding: const EdgeInsets.only(top: 16.0),
-          )
-        ],
-      );
-  }
-
-  void showInSnackBar(String value,
-      {Duration duration, SnackBarAction action}) {
+  void showInSnackBar(String value, {Duration duration, SnackBarAction action}) {
     _mainScaffoldKey.currentState.removeCurrentSnackBar();
-    _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value),
-        duration: duration ?? new Duration(seconds: 3),
-        action: action));
+    _mainScaffoldKey.currentState.showSnackBar(
+        new SnackBar(content: new Text(value), duration: duration ?? new Duration(seconds: 3), action: action));
   }
 
-  Future popupMenuClicked(String value) async {
-    var splitted = value.split("\u{1E}");
-    var command = splitted[1];
-    switch (command) {
-      case "Remove":
-        var userId = int.parse(splitted[0]);
-        var res =
-            await ShoppingListSync.deleteContributor(listId, userId, context);
-        var enres = Result.fromJson(res.body);
-        if (!enres.success)
-          showInSnackBar(enres.error);
-        else {
-          showInSnackBar(conList.firstWhere((x) => x.userId == userId).name +
-              " was removed successfully");
-          setState(() => conList.removeWhere((x) => x.userId == userId));
-        }
-        break;
-      case "ChangeRight":
-        var userId = int.parse(splitted[0]);
-        var res = await ShoppingListSync.changeRight(listId, userId, context);
-        var enres = Result.fromJson(res.body);
-        if (!enres.success)
-          showInSnackBar(enres.error);
-        else {
-          ShoppingListSync.getContributors(listId, context).then((o) {
-            if (o.statusCode == 500) {
-              showInSnackBar("Internal Server Error");
-              return;
-            }
-            GetContributorsResult z = GetContributorsResult.fromJson(o.body);
-            if (!z.success || z.contributors.length <= 0)
-              showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error,
-                  duration: new Duration(seconds: 10));
-            else
-              conList.clear();
-            setState(() => conList.addAll(z.contributors));
-          });
-        }
-        break;
+  List<Tab> createTabs() {
+    var tabs = new List<Tab>();
+    for (var item in shoppingItemsGrouped.keys) {
+      tabs.add(Tab(text: "${item.year}-${item.month}-${item.day}" ));
     }
+    return tabs;
+  }
+
+  List<Widget> createChildren() {
+    var children = new List<Widget>();
+    for (var item in shoppingItemsGrouped.keys) {
+      children.add(SafeArea(
+        top: false,
+        bottom: false,
+        child: Container(
+          key: ObjectKey(item),
+          padding: const EdgeInsets.all(12.0),
+          child: Card(
+            child: Center(
+              child: ListView(
+                children: shoppingItemsGrouped[item]
+                    .map((i) => ListTile(
+                          title: Text(i.name),
+                          leading: Text(i.amount.toString() +"x"),
+                        ))
+                    .toList(growable: false),
+              ),
+            ),
+          ),
+        ),
+      ));
+    }
+    return children;
   }
 }

@@ -1,9 +1,11 @@
 import 'dart:convert';
 
-class ShoppingItem extends JsonDecoder{
+class ShoppingItem {//extends JsonDecoder{
   int amount;
   String name;
   int id;
+  DateTime created;
+  DateTime changed;
   bool crossedOut = false;
 
   ShoppingItem(this.name);

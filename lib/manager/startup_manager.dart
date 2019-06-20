@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:testProject/manager/file_manager.dart';
-import 'package:testProject/models/model_export.dart';
-import 'package:testProject/options/themes.dart';
-import 'package:testProject/server_communication/return_classes.dart';
-import 'package:testProject/server_communication/s_c.dart';
+import 'package:nssl/manager/file_manager.dart';
+import 'package:nssl/models/model_export.dart';
+import 'package:nssl/options/themes.dart';
+import 'package:nssl/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/s_c.dart';
 
 class Startup {
   static Future<bool> initialize() async {

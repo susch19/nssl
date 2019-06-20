@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testProject/localization/nssl_strings.dart';
+import 'package:nssl/localization/nssl_strings.dart';
 
 class SimpleDialogSingleInput {
 

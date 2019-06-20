@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/models/model_export.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/models/model_export.dart';
 import 'package:flutter/widgets.dart';
-import 'package:testProject/server_communication//s_c.dart';
+import 'package:nssl/server_communication//s_c.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:testProject/server_communication/return_classes.dart';
+import 'package:nssl/server_communication/return_classes.dart';
 
 class ProductAddPage extends StatefulWidget {
   ProductAddPage({Key key, this.title}) : super(key: key);
@@ -51,6 +51,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
+          item.changed = p.changed;
         });
       } else {
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(

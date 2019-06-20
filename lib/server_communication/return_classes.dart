@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:testProject/models_json.dart';
+import 'package:nssl/models_json.dart';
 
 class BaseResult {
   bool success;
@@ -77,7 +77,7 @@ class GetContributorsResult extends BaseResult {
     var r = new GetContributorsResult();
     r.success = data["success"];
     r.error = data["error"];
-    List<Map> unMaped = data["contributors"] ?? new List<Map>();
+    List<dynamic> unMaped = data["contributors"] ?? new List<dynamic>();
     r.contributors = unMaped
         .map((x) => new ContributorResult()
           ..name = x["name"]
@@ -131,6 +131,7 @@ class ChangeListItemResult extends BaseResult{
   int id;
   int amount;
   int listId;
+  DateTime changed;
   static ChangeListItemResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -142,6 +143,7 @@ class ChangeListItemResult extends BaseResult{
     r.amount = data["amount"];
     r.listId = data["listId"];
     r.name = data["name"];
+    r.changed = DateTime.tryParse(data["changed"]);
     return r;
   }
 }
@@ -167,6 +169,8 @@ class GetListResult {
   String name;
   int userId;
   String owner;
+  DateTime changed;
+  DateTime created;
   Iterable<ShoppingItem> products;
   String contributors;
 
@@ -181,8 +185,11 @@ class GetListResult {
     r.owner = data["owner"];
     var unMaped = data["products"] ?? new List<Map>();
     r.products =
-        unMaped.map<ShoppingItem>((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+        unMaped.map<ShoppingItem>((x) =>
+          new ShoppingItem(x["id"], x["amount"], x["name"], DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"])));
+         
     r.contributors = data["contributors"];
+
     return r;
   }
 }
@@ -199,7 +206,7 @@ class GetListsResult {
     List<dynamic> unmappedShoppingLists = data["lists"];
     r.shoppingLists = unmappedShoppingLists.map((s) => new ShoppingList()
       ..products = s["products"]
-          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"])).toList().cast<ShoppingItem>()
+          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]))).toList().cast<ShoppingItem>()
       ..id = s["id"]
       ..name = s["name"]);
 
@@ -207,7 +214,7 @@ class GetListsResult {
   }
 }
 
-class GetBoughtListResult {
+class GetBoughtListResult{
   int id;
   String name;
   Iterable<ShoppingItem> products;
@@ -219,9 +226,9 @@ class GetBoughtListResult {
     var r = new GetBoughtListResult();
     r.id = data["id"];
     r.name = data["name"];
-    List<Map> unMaped = data["products"] ?? new List<Map>();
+    List<dynamic> unMaped = data["products"] ?? new List<Map>();
     r.products =
-        unMaped.map((x) => new ShoppingItem(x["id"], x["amount"], x["name"]));
+        unMaped.map((x) => new ShoppingItem(x["id"], x["boughtAmount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"])));
     return r;
   }
 }

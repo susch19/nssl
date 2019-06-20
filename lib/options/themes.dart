@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:testProject/manager/file_manager.dart';
-import 'package:testProject/models/user.dart';
+import 'package:nssl/manager/file_manager.dart';
+import 'package:nssl/models/user.dart';
 
 class Themes {
   static List<ThemeData> themes = [

@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:testProject/localization/nssl_strings.dart';
-import 'package:testProject/options/themes.dart';
+import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/options/themes.dart';
+
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_colorpicker/material_picker.dart';
+import 'package:flutter_colorpicker/block_picker.dart';
+import 'package:flutter_colorpicker/utils.dart';
 
 class CustomThemePage extends StatefulWidget {
   CustomThemePage();
@@ -11,6 +16,11 @@ class CustomThemePage extends StatefulWidget {
 }
 
 class CustomThemePageState extends State<CustomThemePage> {
+Color pickerColor = Color(0xff443a49);
+Color currentColor = Color(0xff443a49);
+void changeColor(Color color) {
+  setState(() => pickerColor = color);
+}
   CustomThemePageState();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
@@ -25,7 +35,6 @@ class CustomThemePageState extends State<CustomThemePage> {
 
   ThemeData td = Themes.themes.first;
 
-
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
   bool primaryColorCheckbox = false;
@@ -35,26 +44,24 @@ class CustomThemePageState extends State<CustomThemePage> {
     if (!_saveNeeded) return true;
 
     final ThemeData theme = Theme.of(context);
-    final TextStyle dialogTextStyle =
-        theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle = theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
 
     return await showDialog<bool>(
             context: context,
             builder: (BuildContext context) => new AlertDialog(
-                content:
-                    new Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
-                actions: <Widget>[
-                  new FlatButton(
-                      child: new Text(NSSLStrings.of(context).cancelButton()),
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      }),
-                  new FlatButton(
-                      child: new Text(NSSLStrings.of(context).discardButton()),
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                      })
-                ])) ??
+                    content: new Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
+                    actions: <Widget>[
+                      new FlatButton(
+                          child: new Text(NSSLStrings.of(context).cancelButton()),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          }),
+                      new FlatButton(
+                          child: new Text(NSSLStrings.of(context).discardButton()),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          })
+                    ])) ??
         false;
   }
 
@@ -95,53 +102,50 @@ class CustomThemePageState extends State<CustomThemePage> {
       body: new Form(
           key: _formKey,
           onWillPop: _onWillPop,
-          child: new ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: <Widget>[
-                new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  new Text(
-                    NSSLStrings.of(context).changePrimaryColor(),
-                    style: textColorTheme,
-                  ),
-                  new Slider(
-                    value: primaryColorSlider,
-                    max: Colors.primaries.length.ceilToDouble() - 1.0,
-                    divisions: Colors.primaries.length - 1,
-                    onChanged: onChangedPrimarySlider,
-                    activeColor: td.accentColor,
-                  ),
-                ]),
-                new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  new Text(NSSLStrings.of(context).changeAccentColor(), style: textColorTheme),
-                  new Slider(
-                      value: accentColorSlider,
-                      max: Colors.accents.length.ceilToDouble() - 1.0,
-                      divisions: Colors.accents.length - 1,
-                      onChanged: onChangedSecondarySlider,
-                      activeColor: td.accentColor),
-                ]),
-                new Row(children: [
-                  new Text(NSSLStrings.of(context).changeDarkTheme(), style: textColorTheme),
-                  new Checkbox(
-                      value: primaryColorCheckbox,
-                      onChanged: primaryBrightnessChange,
-                      activeColor: td.accentColor),
-                ]),
-                new Row(children: [
-                  new Text(NSSLStrings.of(context).changeAccentTextColor(), style: textColorTheme),
-                  new Checkbox(
-                      value: accentColorCheckbox,
-                      onChanged: secondaryBrightnessChange,
-                      activeColor: td.accentColor),
-                ]),
-                new Row(children: [
-                  new Text('Demo', style: textColorTheme),
-                  new Checkbox(
-                      value: true,
-                      onChanged: (v) {},
-                      activeColor: td.accentColor),
-                ]),
-              ])),
+          child: new ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
+            new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              new Text(
+                NSSLStrings.of(context).changePrimaryColor(),
+                style: textColorTheme,
+              ),
+              new Slider(
+                value: primaryColorSlider,
+                max: (Colors.primaries).length.ceilToDouble() - 1.0,
+                divisions: Colors.primaries.length - 1,
+                onChanged: onChangedPrimarySlider,
+                activeColor: td.accentColor,
+              ),
+            ]),
+            new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              new Text(NSSLStrings.of(context).changeAccentColor(), style: textColorTheme),
+              new Slider(
+                  value: accentColorSlider,
+                  max: Colors.accents.length.ceilToDouble() - 1.0,
+                  divisions: Colors.accents.length - 1,
+                  onChanged: onChangedSecondarySlider,
+                  activeColor: td.accentColor),
+            ]),
+            new Row(children: [
+              new Text(NSSLStrings.of(context).changeDarkTheme(), style: textColorTheme),
+              new Checkbox(
+                  value: primaryColorCheckbox, onChanged: primaryBrightnessChange, activeColor: td.accentColor),
+            ]),
+            new Row(children: [
+              new Text(NSSLStrings.of(context).changeAccentTextColor(), style: textColorTheme),
+              new Checkbox(
+                  value: accentColorCheckbox, onChanged: secondaryBrightnessChange, activeColor: td.accentColor),
+            ]),
+            new Row(children: [
+              new Text('Demo', style: textColorTheme),
+              new Checkbox(value: true, onChanged: (v) {}, activeColor: td.accentColor),
+            ]),
+            // ColorPicker(
+            //   pickerColor: pickerColor,
+            //   onColorChanged: changeColor,
+            //   enableLabel: true,
+            //   pickerAreaHeightPercent: 0.8,
+            // ),
+          ])),
     );
   }
 
@@ -207,10 +211,9 @@ class CustomThemePageState extends State<CustomThemePage> {
             new TextField(
               controller: tec,
             ),
+            
           ],
         ),
-        persistentFooterButtons: [
-          new FlatButton(child: const Text("Theme"), onPressed: () {})
-        ]);
+        persistentFooterButtons: [new FlatButton(child: const Text("Theme"), onPressed: () {})]);
   }
 }

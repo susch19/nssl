@@ -26,15 +26,17 @@ class Product {
 }
 
 class ShoppingItem {
-  ShoppingItem(this.id, this.amount, this.name) : super();
+  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created) : super();
   int id;
   int amount;
   String name;
+  DateTime changed;
+  DateTime created;
 
-  toJson() => {"id": id, "amount": amount, "name": name};
+  toJson() => {"id": id, "amount": amount, "name": name, "changed" :changed, "created" :created};
 
   static ShoppingItem fromJson(Map data) =>
-      new ShoppingItem(data["id"], data["amount"], data["name"]);
+      new ShoppingItem(data["id"], data["amount"], data["name"], data["changed"], data["created"]);
 }
 
 class ShoppingList {
