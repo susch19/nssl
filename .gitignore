@@ -9,3 +9,4 @@ packages
 pubspec.lock
 *.apk
 *.keystore
+.vscode/
