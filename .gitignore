@@ -10,3 +10,8 @@ pubspec.lock
 *.apk
 *.keystore
 .vscode/
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/package_config.json
+ios/Runner/GeneratedPluginRegistrant.h
+ios/Runner/GeneratedPluginRegistrant.m
