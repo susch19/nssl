@@ -15,3 +15,4 @@ pubspec.lock
 .dart_tool/package_config.json
 ios/Runner/GeneratedPluginRegistrant.h
 ios/Runner/GeneratedPluginRegistrant.m
+android/app/google-services.json
