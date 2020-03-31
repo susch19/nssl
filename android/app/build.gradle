@@ -17,7 +17,6 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '27.0.3'
 
     lintOptions {
         checkReleaseBuilds false // Add this
@@ -25,8 +24,10 @@ android {
     }
 
     defaultConfig {
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         applicationId 'de.susch19.nssl'
+        minSdkVersion 19
+        targetSdkVersion 28
     }
 
     buildTypes {
@@ -44,8 +45,8 @@ flutter {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
 configurations.all {

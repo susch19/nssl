@@ -102,4 +102,6 @@ class ShoppingList {
   void subscribeForFirebaseMessaging() => firebaseMessaging.subscribeToTopic(id.toString() + "shoppingListTopic");
 
   void unsubscribeFromFirebaseMessaging() => firebaseMessaging.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
+
+
 }

@@ -27,7 +27,6 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _controller = TabController(vsync: this, length: 0);
   }
 
   @override
@@ -45,8 +44,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
       }
       var z = GetBoughtListResult.fromJson(o.body);
       if (z.products.length <= 0)
-        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(),
-            duration: new Duration(seconds: 10));
+        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(), duration: new Duration(seconds: 10));
       else {
         shoppingItems.addAll(z.products.map((f) => new ShoppingItem(f.name)
           ..id = f.id
@@ -55,7 +53,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
           ..created = f.created
           ..crossedOut = false));
         DateTime date;
-        shoppingItems.sort((x,y)=>y.changed.compareTo(x.changed));
+        shoppingItems.sort((x, y) => y.changed.compareTo(x.changed));
         for (var item in shoppingItems) {
           date = dateTimeToDate(item.changed);
           if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed)))
@@ -76,6 +74,25 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null)
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(NSSLStrings.of(context).boughtProducts()),
+          actions: <Widget>[],
+        ), 
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Container(
+            child: new SizedBox(
+                width: 40.0,
+                height: 40.0,
+                child: new CircularProgressIndicator()),
+            padding: const EdgeInsets.only(top: 16.0),
+          )
+        ],
+      ));
+
     return Scaffold(
       key: _mainScaffoldKey,
       appBar: AppBar(
@@ -121,7 +138,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
   List<Tab> createTabs() {
     var tabs = new List<Tab>();
     for (var item in shoppingItemsGrouped.keys) {
-      tabs.add(Tab(text: "${item.year}-${item.month}-${item.day}" ));
+      tabs.add(Tab(text: "${item.year}-${item.month}-${item.day}"));
     }
     return tabs;
   }
@@ -141,7 +158,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
                 children: shoppingItemsGrouped[item]
                     .map((i) => ListTile(
                           title: Text(i.name),
-                          leading: Text(i.amount.toString() +"x"),
+                          leading: Text(i.amount.toString() + "x"),
                         ))
                     .toList(growable: false),
               ),

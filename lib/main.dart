@@ -191,6 +191,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (User.currentList == null || User.currentList.shoppingItems == null) return const Text("");
     var lv;
     if (User.currentList.shoppingItems.length > 0) {
+      //User.currentList?.shoppingItems?.sort((a, b) => a.sortOrder?.compareTo(b.sortOrder));
       User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
       User.currentList?.shoppingItems?.sort((a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
       var mainList = User.currentList.shoppingItems.map((x) {

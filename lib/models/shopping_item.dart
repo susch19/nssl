@@ -7,6 +7,7 @@ class ShoppingItem {//extends JsonDecoder{
   DateTime created;
   DateTime changed;
   bool crossedOut = false;
+  // int sortOrder;
 
   ShoppingItem(this.name);
 

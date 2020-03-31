@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
-import com.scandit.barcodepicker.ScanditLicense;
 
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugins.GeneratedPluginRegistrant;
