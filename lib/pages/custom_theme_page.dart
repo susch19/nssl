@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/options/themes.dart';
 
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_colorpicker/material_picker.dart';
-import 'package:flutter_colorpicker/block_picker.dart';
-import 'package:flutter_colorpicker/utils.dart';
-
 class CustomThemePage extends StatefulWidget {
   CustomThemePage();
 

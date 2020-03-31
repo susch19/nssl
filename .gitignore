@@ -16,3 +16,13 @@ pubspec.lock
 ios/Runner/GeneratedPluginRegistrant.h
 ios/Runner/GeneratedPluginRegistrant.m
 android/app/google-services.json
+.flutter-plugins
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/.filecache
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/app.dill
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/debug_android_application.stamp
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/flutter_assets.d
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/kernel_snapshot.d
+.dart_tool/flutter_build/2585b07303636caf2fb77fae512ffe23/kernel_snapshot.stamp
+ios/Flutter/flutter_export_environment.sh
+ios/Runner/GeneratedPluginRegistrant.h
+ios/Runner/GeneratedPluginRegistrant.m
