@@ -26,6 +26,7 @@ android {
     defaultConfig {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         applicationId 'de.susch19.nssl'
+        resValue "string", "app_name", "NSSL"
         minSdkVersion 19
         targetSdkVersion 28
     }
@@ -34,6 +35,11 @@ android {
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            resValue "string", "app_name", "NSSL Debug"
         }
     }
  

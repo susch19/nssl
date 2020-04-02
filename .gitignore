@@ -26,3 +26,4 @@ android/app/google-services.json
 ios/Flutter/flutter_export_environment.sh
 ios/Runner/GeneratedPluginRegistrant.h
 ios/Runner/GeneratedPluginRegistrant.m
+.dart_tool/
