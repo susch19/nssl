@@ -8,3 +8,4 @@ export 'shopping_item_search.dart';
 export 'custom_theme_page.dart';
 export 'change_password.dart';
 export 'bought_items.dart';
+export 'main_page.dart';
