@@ -128,6 +128,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
             onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
             itemBuilder: buildChangeMenuItems,
           ),
+          trailing: isReorderingItems? Icon(Icons.reorder):null,
           onTap: isReorderingItems ? null : (() => crossOutMainListItem(x)),
           onLongPress: isReorderingItems ? null : (() => renameListItem(x)),
         );
