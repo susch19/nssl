@@ -70,7 +70,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
             title: new Text(
               User?.currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
             ),
-            actions: <Widget>[
+            actions: isReorderingItems ? <Widget>[]: <Widget>[
               new PopupMenuButton<String>(
                   onSelected: selectedOption,
                   itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -83,12 +83,15 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       ])
             ]),
         body: buildBody(context),
+        floatingActionButton: isReorderingItems ? acceptReordingFAB() : null,
         drawer: _buildDrawer(context),
-        persistentFooterButtons: [
-          new FlatButton(child: new Text(NSSLStrings.of(context).addPB()), onPressed: _addWithoutSearchDialog),
-          new FlatButton(child: new Text(NSSLStrings.of(context).scanPB()), onPressed: _getEAN),
-          new FlatButton(child: new Text(NSSLStrings.of(context).searchPB()), onPressed: search),
-        ]);
+        persistentFooterButtons: isReorderingItems
+            ? <Widget>[]
+            : [
+                new FlatButton(child: new Text(NSSLStrings.of(context).addPB()), onPressed: _addWithoutSearchDialog),
+                new FlatButton(child: new Text(NSSLStrings.of(context).scanPB()), onPressed: _getEAN),
+                new FlatButton(child: new Text(NSSLStrings.of(context).searchPB()), onPressed: search),
+              ]);
   }
 
   Widget buildBody(BuildContext context) {
@@ -691,5 +694,10 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 x.changed = res.changed;
               });
             }));
+  }
+
+  Widget acceptReordingFAB() {
+
+    return FloatingActionButton(child: Icon(Icons.check,), onPressed: ()=>setState((){isReorderingItems=false;}),);
   }
 }
