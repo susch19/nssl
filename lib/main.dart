@@ -289,7 +289,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         var crossedOutItems = User.currentList.shoppingItems.where((x) => x.crossedOut).toList();
         for (var remove in crossedOutItems) User.currentList.shoppingItems.remove(remove);
 
-        crossedOutItems.sort((a, b) => a.name.compareTo(b.name));
+        crossedOutItems.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
         User.currentList.shoppingItems.addAll(crossedOutItems);
         User.currentList.save();
 
@@ -305,14 +305,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (insideUpdateOrderIndicies) return;
       insideUpdateOrderIndicies = true;
 
-      setState(() {
-        var i = 0;
-        for (var item in User.currentList.shoppingItems) {
-          item.sortOrder = i;
-          i++;
-        }
-        User.currentList.save();
-      });
+      var i = 0;
+      for (var item in User.currentList.shoppingItems) {
+        item.sortOrder = i;
+        i++;
+      }
+      User.currentList.save();
     } finally {
       insideUpdateOrderIndicies = false;
     }
