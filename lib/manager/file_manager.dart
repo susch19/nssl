@@ -38,7 +38,7 @@ class DatabaseManager {
       if (theme.length > 0 && userExists) await db.rawUpdate('UPDATE Themes SET user_id = ?', [User.ownId]);
     }
 
-    if (oldVersion == 1 || oldVersion == 2) {
+    if (oldVersion < 3) {
       await db.execute("ALTER TABLE ShoppingItems ADD sortorder INTEGER");
       await db.execute("UPDATE ShoppingItems SET sortorder = id");
     }
