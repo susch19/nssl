@@ -127,11 +127,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String ean = "";
   bool performanceOverlay = false;
   bool materialGrid = false;
+  bool isReorderingItems = false;
 
   AnimationController _controller;
   Animation<double> _drawerContentsOpacity;
   Animation<Offset> _drawerDetailsPosition;
   bool _showDrawerContents = true;
+  bool insideSortAndOrderCrossedOut = false;
+  bool insideUpdateOrderIndicies = false;
 
   @override
   void initState() {
@@ -174,6 +177,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
                         new PopupMenuItem<String>(value: 'Options', child: new Text(NSSLStrings.of(context).changeTheme())),
                         new PopupMenuItem<String>(value: 'deleteCrossedOut', child: new Text(NSSLStrings.of(context).deleteCrossedOutPB())),
+                        new PopupMenuItem<String>(value: 'reorderItems', child: new Text(NSSLStrings.of(context).reorderItems())),
                       ])
             ]),
         body: buildBody(context),
@@ -189,13 +193,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     cont = context;
 
     if (User.currentList == null || User.currentList.shoppingItems == null) return const Text("");
+
     var lv;
     if (User.currentList.shoppingItems.length > 0) {
-      //User.currentList?.shoppingItems?.sort((a, b) => a.sortOrder?.compareTo(b.sortOrder));
-      User.currentList?.shoppingItems?.sort((a, b) => a.id.compareTo(b.id));
-      User.currentList?.shoppingItems?.sort((a, b) => a.crossedOut.toString().compareTo(b.crossedOut.toString()));
       var mainList = User.currentList.shoppingItems.map((x) {
         var lt = new ListTile(
+          key: ValueKey(x.id),
           title: new Row(children: [
             new Expanded(
                 child: new Text(
@@ -206,7 +209,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             )),
           ]),
           leading: new PopupMenuButton<String>(
-            child: SizedBox(width: 38.0,
+            child: SizedBox(
+              width: 38.0,
               child: new Row(children: [
                 new Text(x.amount.toString() + "x"),
                 const Icon(Icons.expand_more, size: 16.0),
@@ -217,34 +221,42 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
             itemBuilder: buildChangeMenuItems,
           ),
-          onTap: () => crossOutMainListItem(x),
-          onLongPress: () => renameListItem(x),
+          onTap: isReorderingItems ? null : (() => crossOutMainListItem(x)),
+          onLongPress: isReorderingItems ? null : (() => renameListItem(x)),
         );
 
-        return new Dismissible(
-          key: new ValueKey(x),
-          child: lt,
-          onDismissed: (DismissDirection d) => handleDismissMain(d, x),
-          direction: DismissDirection.startToEnd,
-          background: new Container(
-              decoration: new BoxDecoration(color: Theme.of(context).primaryColor),
-              child: new ListTile(leading: new Icon(Icons.delete, color: Theme.of(context).accentIconTheme.color, size: 36.0))),
-        );
+        if (isReorderingItems) {
+          return lt;
+        } else {
+          return new Dismissible(
+            key: new ValueKey(x),
+            child: lt,
+            onDismissed: (DismissDirection d) => handleDismissMain(d, x),
+            direction: DismissDirection.startToEnd,
+            background: new Container(
+                decoration: new BoxDecoration(color: Theme.of(context).primaryColor),
+                child: new ListTile(leading: new Icon(Icons.delete, color: Theme.of(context).accentIconTheme.color, size: 36.0))),
+          );
+        }
       }).toList(growable: true);
 
-      lv = new CustomScrollView(
-        slivers: [
-          new SliverFixedExtentList(
-              delegate: new SliverChildBuilderDelegate((BuildContext context, int index) {
-                return new Container(
-                  alignment: FractionalOffset.center,
-                  child: mainList[index],
-                );
-              }, childCount: mainList.length),
-              itemExtent: 50.0)
-        ],
-        physics: const AlwaysScrollableScrollPhysics(),
-      );
+      if (isReorderingItems) {
+        lv = new ReorderableListView(onReorder: _onReorderItems, scrollDirection: Axis.vertical, children: mainList);
+      } else {
+        lv = new CustomScrollView(
+          slivers: [
+            new SliverFixedExtentList(
+                delegate: new SliverChildBuilderDelegate((BuildContext context, int index) {
+                  return new Container(
+                    alignment: FractionalOffset.center,
+                    child: mainList[index],
+                  );
+                }, childCount: mainList.length),
+                itemExtent: 50.0)
+          ],
+          physics: const AlwaysScrollableScrollPhysics(),
+        );
+      }
     } else
       lv = new ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -254,6 +266,54 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: lv,
       onRefresh: _handleMainListRefresh,
     );
+  }
+
+  void _onReorderItems(int oldIndex, int newIndex) {
+    setState(
+      () {
+        if (newIndex > oldIndex) newIndex -= 1;
+
+        final item = User.currentList.shoppingItems.removeAt(oldIndex);
+        User.currentList.shoppingItems.insert(newIndex, item);
+        updateOrderIndicies();
+      },
+    );
+  }
+
+  void sortAndOrderCrossedOut() {
+    try {
+      if (insideSortAndOrderCrossedOut) return;
+      insideSortAndOrderCrossedOut = true;
+
+      setState(() {
+        var crossedOutItems = User.currentList.shoppingItems.where((x) => x.crossedOut).toList();
+        for (var remove in crossedOutItems) User.currentList.shoppingItems.remove(remove);
+
+        crossedOutItems.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+        User.currentList.shoppingItems.addAll(crossedOutItems);
+        User.currentList.save();
+
+        updateOrderIndicies();
+      });
+    } finally {
+      insideSortAndOrderCrossedOut = false;
+    }
+  }
+
+  void updateOrderIndicies() {
+    try {
+      if (insideUpdateOrderIndicies) return;
+      insideUpdateOrderIndicies = true;
+
+      var i = 0;
+      for (var item in User.currentList.shoppingItems) {
+        item.sortOrder = i;
+        i++;
+      }
+      User.currentList.save();
+    } finally {
+      insideUpdateOrderIndicies = false;
+    }
   }
 
   void showInSnackBar(String value, {Duration duration, SnackBarAction action}) {
@@ -280,6 +340,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 //    _mainScaffoldKey.currentState.removeCurrentSnackBar();
     ShoppingListSync.deleteProduct(list.id, s.id, context);
     list.save();
+    updateOrderIndicies();
     showInSnackBar(NSSLStrings.of(context).youHaveActionItemMessage() + "${s.name} $action",
         action: new SnackBarAction(
             label: NSSLStrings.of(context).undo(),
@@ -288,6 +349,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 list.shoppingItems.insert(index, s);
                 ShoppingListSync.changeProductAmount(list.id, s.id, s.amount, context);
                 _mainScaffoldKey.currentState.removeCurrentSnackBar();
+                updateOrderIndicies();
                 list.save();
               });
             }),
@@ -324,6 +386,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               builder: (BuildContext context) => new ChangePasswordPage(),
               fullscreenDialog: true,
             ));
+        break;
+      case "reorderItems":
+        setState(() => isReorderingItems = !isReorderingItems);
         break;
     }
   }
@@ -363,7 +428,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         afterAdd = new ShoppingItem("${p.name}")
           ..amount = 1
           ..id = p.productId;
-        setState(() => list.shoppingItems.add(afterAdd));
+        setState(() {
+          list.shoppingItems.add(afterAdd);
+          updateOrderIndicies();
+        });
       }
       list.save();
       return;
@@ -436,18 +504,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 title: new Text(NSSLStrings.of(context).contributors()),
                               ),
                             ),
-                           new PopupMenuItem<String>(
-                             value:
-                             x.id.toString() + "\u{1E}" + "BoughtList",
-                             child: new ListTile(
-                               leading: const Icon(Icons.history),
-                               title: new Text(NSSLStrings.of(context).boughtProducts()),
-                                  // NSSLStrings.of(context).contributors()),
-                             ),
-                           ),
                             new PopupMenuItem<String>(
-                              value: x.id.toString() + "\u{1E}" + 'ExportAsPdf', 
-                              child: new ListTile(leading: const Icon(Icons.picture_as_pdf),title: new Text(NSSLStrings.of(context).exportAsPdf())),),
+                              value: x.id.toString() + "\u{1E}" + "BoughtList",
+                              child: new ListTile(
+                                leading: const Icon(Icons.history),
+                                title: new Text(NSSLStrings.of(context).boughtProducts()),
+                                // NSSLStrings.of(context).contributors()),
+                              ),
+                            ),
+                            new PopupMenuItem<String>(
+                              value: x.id.toString() + "\u{1E}" + 'ExportAsPdf',
+                              child: new ListTile(leading: const Icon(Icons.picture_as_pdf), title: new Text(NSSLStrings.of(context).exportAsPdf())),
+                            ),
                             new PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
                                 child: new ListTile(leading: const Icon(Icons.mode_edit), title: new Text(NSSLStrings.of(context).rename()))),
@@ -577,8 +645,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         list.messagingEnabled = !list.messagingEnabled;
         list.save();
         break;
-        case "ExportAsPdf":
-          ExportManager.exportAsPDF(User.shoppingLists.firstWhere((x)=>x.id==id), context);
+      case "ExportAsPdf":
+        ExportManager.exportAsPDF(User.shoppingLists.firstWhere((x) => x.id == id), context);
         break;
     }
   }
@@ -615,6 +683,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<Null> crossOutMainListItem(ShoppingItem x) async {
     setState(() => x.crossedOut = !x.crossedOut);
     await User.currentList.save();
+
+    if (!isReorderingItems) {
+      sortAndOrderCrossedOut();
+    }
   }
 
   void _addWithoutSearchDialog() {
@@ -643,7 +715,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase);
       var product = ChangeListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
-      setState(() { same.first.amount = product.amount; same.first.changed =product.changed;});
+      setState(() {
+        same.first.amount = product.amount;
+        same.first.changed = product.changed;
+      });
       same.first;
     } else {
       var res = await ShoppingListSync.addProduct(list.id, value, null, 1, cont);
@@ -654,6 +729,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ..id = product.productId
         ..amount = 1
         ..crossedOut = false));
+      updateOrderIndicies();
     }
   }
 
@@ -665,6 +741,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {
       for (var item in sublist) list.shoppingItems.remove(item);
     });
+    updateOrderIndicies();
     list.save();
     showInSnackBar(NSSLStrings.of(context).messageDeleteAllCrossedOut(),
         duration: new Duration(seconds: 10),
@@ -677,6 +754,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               for (var item in sublist) ownHash += item.id + item.amount;
               if (ownHash == hashResult.hash) {
                 setState(() => list.shoppingItems.addAll(sublist));
+                updateOrderIndicies();
                 list.save();
               } else
                 _handleListRefresh(list.id);
