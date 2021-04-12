@@ -1,6 +1,6 @@
 import 'package:intl/message_lookup_by_library.dart';
 
-final messages = new MessageLookup();
+final messages = MessageLookup();
 
 class MessageLookup extends MessageLookupByLibrary {
   get localeName => 'en';

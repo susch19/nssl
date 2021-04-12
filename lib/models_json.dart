@@ -7,18 +7,18 @@ class User {
   toJson() => {"username": username, "email": email, "pwhash": password};
 
   static User fromJson(Map data) =>
-      new User(data["username"], data["email"], data["pwhash"]);
+      User(data["username"], data["email"], data["pwhash"]);
 }
 
 class Product {
   String gtin;
   String name;
-  int quantity;
+  int  quantity;
   String unit;
 
   toJson() => {"gtin": gtin, "name": name, "quantity": quantity, "unit": unit};
 
-  static Product fromJson(Map data) => new Product()
+  static Product fromJson(Map data) => Product()
     ..quantity = data["quantity"]
     ..name = data["name"]
     ..gtin = data["gtin"]
@@ -26,31 +26,33 @@ class Product {
 }
 
 class ShoppingItem {
-  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created) : super();
+  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created, this.sortOrder) : super();
   int id;
   int amount;
   String name;
-  DateTime changed;
-  DateTime created;
+  DateTime  changed;
+  DateTime  created;
+  int sortOrder;
 
-  toJson() => {"id": id, "amount": amount, "name": name, "changed" :changed, "created" :created};
+  toJson() => {"id": id, "amount": amount, "name": name, "changed" :changed, "created" :created, "sortOrder" : sortOrder};
 
   static ShoppingItem fromJson(Map data) =>
-      new ShoppingItem(data["id"], data["amount"], data["name"], data["changed"], data["created"]);
+      ShoppingItem(data["id"], data["amount"], data["name"], data["changed"], data["created"], data["sortOrder"]);
 }
 
 class ShoppingList {
   List<ShoppingItem> products;
-  int id;
+  int  id;
   String name;
 
   toJson() => {
-        "products": products.map((p) => p.toJson()).toList(growable: false),
+
+        "products": products?.map((p) => p.toJson())?.toList(growable: false),
         "id": id,
         "name": name
       };
 
-  static ShoppingList fromJson(Map data) => new ShoppingList()
+  static ShoppingList fromJson(Map data) => ShoppingList()
     ..id = data["id"]
     ..name = data["name"]
     ..products =
@@ -65,5 +67,5 @@ class Contributor {
 
   toJson() => {"id": id, "listId": listId, "name": name};
   static Contributor fromJson(Map data) =>
-      new Contributor(data["id"], data["listId"], data["name"]);
+      Contributor(data["id"], data["listId"], data["name"]);
 }

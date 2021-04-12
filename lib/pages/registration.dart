@@ -14,29 +14,27 @@ class Registration extends StatefulWidget {
   static const String routeName = '/Registration';
 
   @override
-  RegistrationState createState() => new RegistrationState();
+  RegistrationState createState() => RegistrationState();
 }
 
 class RegistrationState extends State<Registration> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  bool _autovalidate = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  var nameInput = new ForInput();
-  var emailInput = new ForInput();
-  var pwInput = new ForInput();
-  var pw2Input = new ForInput();
-  var submit = new ForInput();
+  var nameInput = ForInput();
+  var emailInput = ForInput();
+  var pwInput = ForInput();
+  var pw2Input = ForInput();
+  var submit = ForInput();
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value), duration: new Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(value), duration: Duration(seconds: 3)));
   }
 
   Future _handleSubmitted() async {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
-      _autovalidate = true;
       return;
     }
 
@@ -49,7 +47,7 @@ class RegistrationState extends State<Registration> {
     String p2i = _validatePassword2(pw2Input.textEditingController.text);
 
     if (ni != null) {
-      nameInput.decoration = new InputDecoration(
+      nameInput.decoration = InputDecoration(
           labelText: nameInput.decoration.labelText,
           helperText: nameInput.decoration.helperText,
           errorText: ni);
@@ -57,7 +55,7 @@ class RegistrationState extends State<Registration> {
       error = true;
     }
     if (ei != null) {
-      emailInput.decoration = new InputDecoration(
+      emailInput.decoration = InputDecoration(
           labelText: emailInput.decoration.labelText,
           helperText: emailInput.decoration.helperText,
           errorText: ei);
@@ -65,7 +63,7 @@ class RegistrationState extends State<Registration> {
       error = true;
     }
     if (pi != null) {
-      pwInput.decoration = new InputDecoration(
+      pwInput.decoration = InputDecoration(
           labelText: pwInput.decoration.labelText,
           helperText: pwInput.decoration.helperText,
           errorText: pi);
@@ -73,7 +71,7 @@ class RegistrationState extends State<Registration> {
       error = true;
     }
     if (p2i != null) {
-      pw2Input.decoration = new InputDecoration(
+      pw2Input.decoration = InputDecoration(
           labelText: pw2Input.decoration.labelText,
           helperText: pw2Input.decoration.helperText,
           errorText: p2i);
@@ -82,7 +80,7 @@ class RegistrationState extends State<Registration> {
     }
     if (pwInput.textEditingController.text !=
         pw2Input.textEditingController.text) {
-      pw2Input.decoration = new InputDecoration(
+      pw2Input.decoration = InputDecoration(
           labelText: pw2Input.decoration.labelText,
           helperText: pw2Input.decoration.helperText,
           errorText: NSSLStrings.of(context).passwordsDontMatchError());
@@ -121,7 +119,7 @@ class RegistrationState extends State<Registration> {
 
       await User.save();
       Navigator.pop(context);
-      runApp(new NSSL());
+      runApp(NSSL());
     }
   }
 
@@ -135,7 +133,7 @@ class RegistrationState extends State<Registration> {
 
   String _validateEmail(String value) {
     if (value.isEmpty) return NSSLStrings.of(context).emailEmptyError();
-    RegExp email = new RegExp(
+    RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value))
       return NSSLStrings.of(context).emailIncorrectFormatError();
@@ -161,18 +159,18 @@ class RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
-    return new Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
-            title: new Text(NSSLStrings.of(context).registrationTitle())),
-        body: new Form(
+        appBar: AppBar(
+            title: Text(NSSLStrings.of(context).registrationTitle())),
+        body: Form(
             key: _formKey,
-            autovalidate: _autovalidate,
-            child: new ListView(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: ListView(
 //              physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 children: [
-                  new TextFormField(
+                  TextFormField(
                       decoration: nameInput.decoration,
                       controller: nameInput.textEditingController,
                       autofocus: true,
@@ -183,7 +181,7 @@ class RegistrationState extends State<Registration> {
                             .of(context)
                             .requestFocus(emailInput.focusNode);
                       }),
-                  new TextFormField(
+                  TextFormField(
                       key: emailInput.key,
                       decoration: emailInput.decoration,
                       controller: emailInput.textEditingController,
@@ -194,11 +192,11 @@ class RegistrationState extends State<Registration> {
                       onSaved: (s) {
                         FocusScope.of(context).requestFocus(pwInput.focusNode);
                       }),
-                  new Row(
+                  Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        new Flexible(
-                            child: new TextFormField(
+                        Flexible(
+                            child: TextFormField(
                                 key: pwInput.key,
                                 decoration: pwInput.decoration,
                                 controller: pwInput.textEditingController,
@@ -211,9 +209,9 @@ class RegistrationState extends State<Registration> {
                                       .of(context)
                                       .requestFocus(pw2Input.focusNode);
                                 })),
-                        new SizedBox(width: 16.0),
-                        new Flexible(
-                            child: new TextFormField(
+                        SizedBox(width: 16.0),
+                        Flexible(
+                            child: TextFormField(
                                 key: pw2Input.key,
                                 decoration: pw2Input.decoration,
                                 controller: pw2Input.textEditingController,
@@ -225,14 +223,14 @@ class RegistrationState extends State<Registration> {
                                   _handleSubmitted();
                                 })),
                       ]),
-                  new Row(children: [
-                    new Flexible(
-                        child: new Container(
+                  Row(children: [
+                    Flexible(
+                        child: Container(
                       padding: const EdgeInsets.only(top: 20.0),
                       alignment: const FractionalOffset(0.5, 0.5),
-                      child: new RaisedButton(
-                        child: new Center(
-                          child: new Text(
+                      child: ElevatedButton(
+                        child: Center(
+                          child: Text(
                               NSSLStrings.of(context).registerButton()),
                         ),
                         onPressed: _handleSubmitted,
@@ -240,16 +238,16 @@ class RegistrationState extends State<Registration> {
                     ))
                   ])
                   /*
-                   new Container(
+                   Container(
                     padding: const EdgeInsets.all(20.0),
                     alignment: const FractionalOffset(0.5, 0.5),
                     child:
-                  new RaisedButton(
+                  ElevatedButton(
                     key: submit.key,
-                    child: new SizedBox.expand(
-                      child: new Center(
+                    child: SizedBox.expand(
+                      child: Center(
                         child:
-                            new Text(NSSLStrings.of(context).registerButton()),
+                            Text(NSSLStrings.of(context).registerButton()),
                       ),
                     ),
                     onPressed: _handleSubmitted,
@@ -259,19 +257,19 @@ class RegistrationState extends State<Registration> {
   }
 
   _resetInput() {
-    nameInput.decoration = new InputDecoration(
+    nameInput.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).usernameRegisterHint(),
         labelText: NSSLStrings.of(context).username());
 
-    emailInput.decoration = new InputDecoration(
+    emailInput.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).emailRegisterHint(),
         labelText: NSSLStrings.of(context).emailTitle());
 
-    pwInput.decoration = new InputDecoration(
+    pwInput.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).passwordRegisterHint(),
         labelText: NSSLStrings.of(context).password());
 
-    pw2Input.decoration = new InputDecoration(
+    pw2Input.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).retypePasswordHint(),
         labelText: NSSLStrings.of(context).retypePasswordTitle());
   }

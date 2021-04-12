@@ -16,7 +16,7 @@ class LoginPage extends StatefulWidget {
 
   final GlobalKey<ScaffoldState> scaffoldKey;
   @override
-  LoginPageState createState() => new LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
 class PersonData {
@@ -26,24 +26,24 @@ class PersonData {
 }
 
 class ForInput {
-  TextEditingController textEditingController = new TextEditingController();
+  TextEditingController textEditingController = TextEditingController();
   String errorText = '';
-  GlobalKey key = new GlobalKey();
+  GlobalKey key = GlobalKey();
   InputDecoration decoration;
-  FocusNode focusNode = new FocusNode();
+  FocusNode focusNode = FocusNode();
 }
 
 class LoginPageState extends State<LoginPage> {
   LoginPageState() : super();
-  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  bool _autovalidate = false;
-  var nameInput = new ForInput();
-  var pwInput = new ForInput();
-  var submit = new ForInput();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  var nameInput = ForInput();
+  var pwInput = ForInput();
+  var submit = ForInput();
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value), duration: new Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
   }
 
   Future _handleSubmitted() async {
@@ -51,20 +51,19 @@ class LoginPageState extends State<LoginPage> {
     //_resetInput();
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
-      _autovalidate = true;
       return;
     }
     //form.save();
     /*  var validate = _validateName(nameInput.textEditingController.text);
     if (validate != null) {
-      nameInput.decoration = new InputDecoration(
+      nameInput.decoration = InputDecoration(
           labelText: nameInput.decoration.labelText,
           helperText: nameInput.decoration.helperText,
           errorText: validate);
       error = true;
     }
     if (_validatePassword(pwInput.textEditingController.text) != null) {
-      pwInput.decoration = new InputDecoration(
+      pwInput.decoration = InputDecoration(
           labelText: pwInput.decoration.labelText,
           helperText: pwInput.decoration.helperText,
           errorText: _validatePassword(pwInput.textEditingController.text));
@@ -111,7 +110,7 @@ class LoginPageState extends State<LoginPage> {
         User.currentListIndex = 1;
         await User.save();
       }
-      runApp(new NSSL());
+      runApp(NSSL());
     } else
       Navigator.pop(context);
   }
@@ -130,7 +129,7 @@ class LoginPageState extends State<LoginPage> {
 
   String _validateEmail(String value) {
     if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
-    RegExp email = new RegExp(
+    RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
@@ -143,9 +142,9 @@ class LoginPageState extends State<LoginPage> {
 
   _resetInput() {
     nameInput.decoration =
-        new InputDecoration(helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(), labelText: NSSLStrings.of(context).usernameOrEmailTitle());
+        InputDecoration(helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(), labelText: NSSLStrings.of(context).usernameOrEmailTitle());
 
-    pwInput.decoration = new InputDecoration(helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
+    pwInput.decoration = InputDecoration(helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
   }
 
   @override
@@ -157,75 +156,77 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
-//    return new ListView(children: <Widget>[new (child: new Scaffold(
-    return new Scaffold(
+//    return ListView(children: <Widget>[new (child: Scaffold(
+    return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomPadding: true,
-      appBar: new AppBar(title: new Text(NSSLStrings.of(context).login())),
-      body: new Form(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(title: Text(NSSLStrings.of(context).login())),
+      body: Form(
         key: _formKey,
-        autovalidate: _autovalidate,
-        child: new ListView(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: ListView(
 //              physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             children: [
-              new ListTile(
-                  title: new TextFormField(
+              ListTile(
+                  title: TextFormField(
                       key: nameInput.key,
                       decoration: nameInput.decoration,
                       //onChanged: (input) => nameInput.errorText = _validateName(input),
                       controller: nameInput.textEditingController,
                       keyboardType: TextInputType.emailAddress,
+                      autofillHints: [AutofillHints.username, AutofillHints.email],
                       autocorrect: false,
                       autofocus: true,
                       validator: _validateName,
                       onSaved: (val) {
                         FocusScope.of(context).requestFocus(pwInput.focusNode);
                       })),
-              new ListTile(
-                  title: new TextFormField(
+              ListTile(
+                  title: TextFormField(
                       key: pwInput.key,
                       decoration: pwInput.decoration,
                       focusNode: pwInput.focusNode,
                       obscureText: true,
                       autocorrect: false,
+                      autofillHints: [AutofillHints.password],
                       controller: pwInput.textEditingController,
                       validator: _validatePassword,
                       onSaved: (val) {
                         _handleSubmitted();
                       })),
-              new ListTile(
-                title: new Container(
-                    child: new RaisedButton(
+              ListTile(
+                title: Container(
+                    child: ElevatedButton(
                       key: submit.key,
-                      child: new Center(child: new Text(NSSLStrings.of(context).loginButton())),
+                      child: Center(child: Text(NSSLStrings.of(context).loginButton())),
                       onPressed: _handleSubmitted,
                     ),
                     padding: const EdgeInsets.only(top: 16.0)),
               ),
-              new ListTile(
-                title: new Container(
+              ListTile(
+                title: Container(
                   padding: const EdgeInsets.only(top: 40.0),
-                  child: new FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       User.username == null ? Navigator.pushNamed(context, "/registration") : Navigator.popAndPushNamed(context, "/registration");
                     },
-                    child: new Text(NSSLStrings.of(context).registerTextOnLogin()),
+                    child: Text(NSSLStrings.of(context).registerTextOnLogin()),
                   ),
                 ),
               ),
-//              new ListTile(
-//                title: new Container(
-//                  child: new FlatButton(
+//              ListTile(
+//                title: Container(
+//                  child: TextButton(
 //                    onPressed: () {
 //                      Navigator.pushNamed(context, "/forgot_password");
 //                    },
 //                    child:
-//                        new Text(NSSLStrings.of(context).forgotPassword()),
+//                        Text(NSSLStrings.of(context).forgotPassword()),
 //                  ),
 //                ),
 //              ),
-              //padding: new EdgeInsets.only(
+              //padding: EdgeInsets.only(
               //    top: MediaQuery.of(context).size.height / 5),
             ]
             //]),

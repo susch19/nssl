@@ -11,19 +11,19 @@ class ChangePasswordPage extends StatefulWidget {
 
   final GlobalKey<ScaffoldState> scaffoldKey;
   @override
-  ChangePasswordPageState createState() => new ChangePasswordPageState();
+  ChangePasswordPageState createState() => ChangePasswordPageState();
 }
 
 class ChangePasswordPageState extends State<ChangePasswordPage> {
   ChangePasswordPageState() : super();
-  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  var oldPwInput = new ForInput();
-  var newPwInput = new ForInput();
-  var newPw2Input = new ForInput();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  var oldPwInput = ForInput();
+  var newPwInput = ForInput();
+  var newPw2Input = ForInput();
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value), duration: new Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(value), duration: Duration(seconds: 3)));
   }
 
   void _handleSubmitted() {
@@ -31,21 +31,21 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     _resetInput();
 
     if (_validateEmpty(oldPwInput.textEditingController)) {
-      oldPwInput.decoration = new InputDecoration(
+      oldPwInput.decoration = InputDecoration(
           labelText: oldPwInput.decoration.labelText,
           helperText: oldPwInput.decoration.helperText,
           errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPwInput.textEditingController)) {
-      newPwInput.decoration = new InputDecoration(
+      newPwInput.decoration = InputDecoration(
           labelText: newPwInput.decoration.labelText,
           helperText: newPwInput.decoration.helperText,
           errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPw2Input.textEditingController)) {
-      newPw2Input.decoration = new InputDecoration(
+      newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration.labelText,
           helperText: newPw2Input.decoration.helperText,
           errorText: NSSLStrings.of(context).passwordEmptyError());
@@ -55,7 +55,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     if (error == true) return;
     if (newPwInput.textEditingController.text !=
         newPw2Input.textEditingController.text) {
-      newPw2Input.decoration = new InputDecoration(
+      newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration.labelText,
           helperText: newPw2Input.decoration.helperText,
           errorText: NSSLStrings.of(context).passwordsDontMatchError());
@@ -75,26 +75,26 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
         User.token,
         context);
     if (res.statusCode != 200) {
-      _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          content: new Text(res.reasonPhrase),
-          duration: new Duration(seconds: 3)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(res.reasonPhrase),
+          duration: Duration(seconds: 3)));
       return;
     }
     var obj = Result.fromJson(res.body);
     if (!obj.success) {
-      _scaffoldKey.currentState.showSnackBar(new SnackBar(
-          content: new Text(obj.error), duration: new Duration(seconds: 3)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(obj.error), duration: Duration(seconds: 3)));
       return;
     }
-    var dialog = new AlertDialog(
-        title: new Text(NSSLStrings.of(context).successful()),
-        content: new SingleChildScrollView(
-          child: new ListBody(
-            children: <Widget>[new Text(NSSLStrings.of(context).passwordSet())],
+    var dialog = AlertDialog(
+        title: Text(NSSLStrings.of(context).successful()),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[Text(NSSLStrings.of(context).passwordSet())],
           ),
         ),
         actions: <Widget>[
-          new FlatButton(
+          TextButton(
               child: const Text("OK"),
               onPressed: () => Navigator.popUntil(context, (r) => r.isFirst)),
         ]);
@@ -102,13 +102,13 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   _resetInput() {
-    oldPwInput.decoration = new InputDecoration(
+    oldPwInput.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).oldPasswordHint(),
         labelText: NSSLStrings.of(context).oldPassword());
-    newPwInput.decoration = new InputDecoration(
+    newPwInput.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).newPasswordHint(),
         labelText: NSSLStrings.of(context).newPassword());
-    newPw2Input.decoration = new InputDecoration(
+    newPw2Input.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).new2PasswordHint(),
         labelText: NSSLStrings.of(context).new2Password());
   }
@@ -121,17 +121,16 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
-    return new Scaffold(
+    return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomPadding: false,
-      appBar: new AppBar(
-          title: new Text(NSSLStrings.of(context).changePasswordPD())),
-      body: new Container(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+          title: Text(NSSLStrings.of(context).changePasswordPD())),
+      body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
-            new Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          new Flexible(
-            child: new TextField(
+            Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Flexible(child: TextField(
               key: oldPwInput.key,
               decoration: oldPwInput.decoration,
               focusNode: oldPwInput.focusNode,
@@ -142,8 +141,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               },
             ),
           ),
-          new Flexible(
-            child: new TextField(
+          Flexible(child:  TextField(
               key: newPwInput.key,
               decoration: newPwInput.decoration,
               focusNode: newPwInput.focusNode,
@@ -154,8 +152,8 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               },
             ),
           ),
-          new Flexible(
-            child: new TextField(
+          Flexible(
+           child: TextField(
               key: newPw2Input.key,
               decoration: newPw2Input.decoration,
               focusNode: newPw2Input.focusNode,
@@ -166,31 +164,31 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               },
             ),
           ),
-          new Flexible(
-            child: new Container(
+          Flexible(
+           child: Container(
               padding: const EdgeInsets.only(top: 32.0),
-              child: new RaisedButton(
-//                child: new Center(
-                  child: new Text(
+              child: ElevatedButton(
+//                child: Center(
+                  child: Text(
                     NSSLStrings.of(context).changePasswordButton(),
                   ),
 //                ),
                 onPressed: _handleSubmitted,
             ),
               /*
-              new FlatButton(
+              TextButton(
                 onPressed: () {
                       Navigator.pushNamed(context, "/forgot_password");
                 },
-                child: new Text(NSSLStrings.of(context).forgotPassword()),
+                child: Text(NSSLStrings.of(context).forgotPassword()),
               )*/
 
-              //padding: new EdgeInsets.only(
+              //padding: EdgeInsets.only(
               //    top: MediaQuery.of(context).size.height / 5),
             ),
           ),
-//          new Flexible(
-//            child: new Container(
+//          Flexible(
+//            child: Container(
 //
 //                padding: const EdgeInsets.only(top: 16.0)),
 //          ),

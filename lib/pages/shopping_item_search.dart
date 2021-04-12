@@ -16,7 +16,7 @@ class ProductAddPage extends StatefulWidget {
   _ProductAddPageState createState() => new _ProductAddPageState();
 
   static ProductResult fromJson(Map data) {
-    var r = new ProductResult();
+    var r = ProductResult();
     r.success = data["success"];
     r.error = data["error"];
     r.gtin = data["gtin"];
@@ -30,17 +30,17 @@ class ProductAddPage extends StatefulWidget {
 
 class _ProductAddPageState extends State<ProductAddPage> {
   final GlobalKey<ScaffoldState> _mainScaffoldKey =
-      new GlobalKey<ScaffoldState>();
-  GlobalKey _iff = new GlobalKey();
-  GlobalKey _ib = new GlobalKey();
-  TextEditingController tec = new TextEditingController();
-  List<ProductResult> prList = new List<ProductResult>();
+      GlobalKey<ScaffoldState>();
+  GlobalKey _iff = GlobalKey();
+  GlobalKey _ib = GlobalKey();
+  TextEditingController tec = TextEditingController();
+  List<ProductResult> prList = <ProductResult>[];
   int k = 1;
 
   Future _addProductToList(String name, String gtin) async {
     var list = User.currentList;
     if (list != null) {
-      if (list.shoppingItems == null) list.shoppingItems = new List();
+      if (list.shoppingItems == null) list.shoppingItems = [];
 
       var item = list.shoppingItems
           .firstWhere((x) => x.name == name, orElse: () => null);
@@ -54,10 +54,11 @@ class _ProductAddPageState extends State<ProductAddPage> {
           item.changed = p.changed;
         });
       } else {
+            
         var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
                 list.id, name, gtin ?? '-', 1, context))
             .body);
-        afterAdd = new ShoppingItem(p.name)
+        afterAdd = ShoppingItem(p.name)
           ..amount = 1
           ..id = p.productId;
         setState(() => list.shoppingItems.add(afterAdd));
@@ -67,8 +68,8 @@ class _ProductAddPageState extends State<ProductAddPage> {
           item == null
               ? NSSLStrings.of(context).addedProduct() + "$name"
               : "$name" + NSSLStrings.of(context).productWasAlreadyInList(),
-          duration: new Duration(seconds: item == null ? 2 : 4),
-          action: new SnackBarAction(
+          duration: Duration(seconds: item == null ? 2 : 4),
+          action: SnackBarAction(
               label: NSSLStrings.of(context).undo(),
               onPressed: () async {
                 var res = item == null
@@ -94,14 +95,14 @@ class _ProductAddPageState extends State<ProductAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
         key: _mainScaffoldKey,
-        appBar: new AppBar(
-            title: new Form(
-                child: new TextField(
+        appBar: AppBar(
+            title: Form(
+                child: TextField(
                     key: _iff,
                     decoration:
-                        new InputDecoration(hintText: NSSLStrings.of(context).searchProductHint()),
+                        InputDecoration(hintText: NSSLStrings.of(context).searchProductHint()),
                     onSubmitted: (x) => _searchProducts(x, 1),
                     autofocus: true,
                     controller: tec,
@@ -113,11 +114,11 @@ class _ProductAddPageState extends State<ProductAddPage> {
                           noMoreProducts = false;
                           oldValue = s;
                     })))),
-        floatingActionButton: new FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: () => {},
-          child: new IconButton(
+          child: IconButton(
             key: _ib,
-            icon: new Icon(Icons.search),
+            icon: Icon(Icons.search),
             onPressed: () {
               _searchProducts(tec.text, 1);
             },
@@ -135,35 +136,35 @@ class _ProductAddPageState extends State<ProductAddPage> {
       if (!noMoreProducts && z.length <= 0) {
       noMoreProducts = true;
       showInSnackBar(NSSLStrings.of(context).noMoreProductsMessage(),
-          duration: new Duration(seconds: 3));
+          duration: Duration(seconds: 3));
     } else
-      setState(() => prList.addAll(z.map((f)=>new ProductResult()..unit=f["unit"]..name=f["name"]..quantity=f["quantity"]).toList()));
+      setState(() => prList.addAll(z.map((f)=>ProductResult()..unit=f["unit"]..name=f["name"]..quantity=f["quantity"]).toList()));
   }
 
   Widget buildBody() {
     if (prList.length > 0) {
-      var listView = new ListView.builder(
+      var listView = ListView.builder(
           itemBuilder: (c, i) {
             if (!noMoreProducts && i + 20 > lastLength) {
               continueList();
               lastLength = prList.length;
             }
-            return new ListTile(
-                title: new Text(prList[i].name),
+            return ListTile(
+                title: Text(prList[i].name),
                 onTap: () => _addProductToList(prList[i].name, prList[i].gtin));
           },
           itemCount: prList.length);
       return listView;
     } else
-      return new Text("");
+      return Text("");
   }
 
   void showInSnackBar(String value,
       {Duration duration, SnackBarAction action}) {
-    _mainScaffoldKey.currentState.removeCurrentSnackBar();
-    _mainScaffoldKey.currentState.showSnackBar(new SnackBar(
-        content: new Text(value),
-        duration: duration ?? new Duration(seconds: 3),
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(value),
+        duration: duration ?? Duration(seconds: 3),
         action: action));
   }
 }

@@ -4,11 +4,17 @@ import 'package:nssl/models/user.dart';
 
 class JWT {
   static Future<bool> newToken() async {
-    //JsonWebToken jwt = new JsonWebToken.decode(User.token);
-    String jwt = tokenToJson();
-    var exp = jwt.substring(jwt.indexOf("expires"), jwt.indexOf('Z\",\n'));
-    DateTime expires = DateTime.parse(exp.substring(11, exp.indexOf(".")));
-    if ((new DateTime.now()).add(new Duration(days: 29)).isAfter(expires))
+    //JsonWebToken jwt = JsonWebToken.decode(User.token);
+    var jwt = jsonDecode(tokenToJson());
+
+    
+    // var expiresEnd = jwt.indexOf('Z\",\n');
+    // if(expiresEnd == -1)
+    //     expiresEnd = jwt.indexOf('Z\",\r\n');
+
+    // var exp = jwt.substring(jwt.indexOf("expires"), jwt.indexOf('Z\",\n'));
+    DateTime expires = DateTime.parse(jwt["expires"]);
+    if ((DateTime.now()).add(Duration(days: 29)).isAfter(expires))
       return true;
     return false;
   }
@@ -23,7 +29,7 @@ class JWT {
   }
 
   static Future<int> getIdFromToken(String token) async {
-    //JsonWebToken jwt = new JsonWebToken.decode(token);
+    //JsonWebToken jwt = JsonWebToken.decode(token);
     //var map = jwt.payload.toJson();
     //return int.parse(map["id"]);
     String jwt = tokenToJson();

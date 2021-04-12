@@ -7,9 +7,9 @@ import 'package:nssl/localization/nssl_messages_de.dart' as m_de;
 import 'package:nssl/localization/nssl_messages_en.dart' as m_en;
 
 Map<String, Function> _deferredLibraries = {
-  'en': () => new Future.value(null),
-  'de': () => new Future.value(null),
-  'es': () => new Future.value(null),
+  'en': () => Future.value(null),
+  'de': () => Future.value(null),
+  'es': () => Future.value(null),
 };
 
 MessageLookupByLibrary _findExact(localeName) {
@@ -28,9 +28,9 @@ MessageLookupByLibrary _findExact(localeName) {
 /// User programs should call this before using [localeName] for messages.
 Future initializeMessages(String localeName) {
   var lib = _deferredLibraries[Intl.canonicalizedLocale(localeName)];
-  var load = lib == null ? new Future.value(false) : new Future.value(null);
+  var load = lib == null ? Future.value(false) : Future.value(null);
   return load.then((_) {
-    initializeInternalMessageLookup(() => new CompositeMessageLookup());
+    initializeInternalMessageLookup(() => CompositeMessageLookup());
     messageLookup.addLocale(localeName, _findGeneratedMessagesFor);
   });
 }

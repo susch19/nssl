@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'package:nssl/models_json.dart';
 
 class BaseResult {
-  bool success;
+  bool  success;
   String error;
 }
 
 class CreateResult extends BaseResult {
-  int id;
+  int  id;
   String username;
   String eMail;
   static CreateResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
   static CreateResult _fromJson(Map data) {
-    var r = new CreateResult();
+    var r = CreateResult();
     r.success = data["success"];
     r.error = data["error"];
     r.id = data["id"];
@@ -27,14 +27,14 @@ class CreateResult extends BaseResult {
 }
 
 class LoginResult extends BaseResult {
-  int id;
+  int  id;
   String username;
   String eMail;
   String token;
   static LoginResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
   static LoginResult _fromJson(Map data) {
-    var r = new LoginResult();
+    var r = LoginResult();
     r.success = data["success"];
     r.error = data["error"];
     r.id = data["id"];
@@ -47,12 +47,12 @@ class LoginResult extends BaseResult {
 
 class AddContributorResult extends BaseResult {
   String name;
-  int id;
+  int  id;
   static AddContributorResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
   static AddContributorResult _fromJson(Map data) {
-    var r = new AddContributorResult();
+    var r = AddContributorResult();
     r.success = data["success"];
     r.error = data["error"];
     r.id = data["id"];
@@ -63,8 +63,8 @@ class AddContributorResult extends BaseResult {
 
 class ContributorResult {
   String name;
-  int userId;
-  bool isAdmin;
+  int  userId;
+  bool  isAdmin;
 }
 
 class GetContributorsResult extends BaseResult {
@@ -74,12 +74,12 @@ class GetContributorsResult extends BaseResult {
       _fromJson(jsonDecode(dataString));
 
   static GetContributorsResult _fromJson(Map data) {
-    var r = new GetContributorsResult();
+    var r = GetContributorsResult();
     r.success = data["success"];
     r.error = data["error"];
-    List<dynamic> unMaped = data["contributors"] ?? new List<dynamic>();
+    List<dynamic> unMaped = data["contributors"] ?? <dynamic>[];
     r.contributors = unMaped
-        .map((x) => new ContributorResult()
+        .map((x) => ContributorResult()
           ..name = x["name"]
           ..isAdmin = x["isAdmin"]
           ..userId = x["userId"])
@@ -97,7 +97,7 @@ class ProductResult extends BaseResult{
       _fromJson(jsonDecode(dataString));
 
   static ProductResult _fromJson(Map data) {
-    var r = new ProductResult();
+    var r = ProductResult();
     r.success = data["success"];
     r.error = data["error"];
     r.gtin = data["gtin"];
@@ -109,14 +109,14 @@ class ProductResult extends BaseResult{
 }
 
 class AddListItemResult extends BaseResult{
-  int productId;
+  int  productId;
   String name;
   String gtin;
   static AddListItemResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
   static AddListItemResult _fromJson(Map data) {
-    var r = new AddListItemResult();
+    var r = AddListItemResult();
     r.success = data["success"];
     r.error = data["error"];
     r.productId = data["productId"];
@@ -128,15 +128,15 @@ class AddListItemResult extends BaseResult{
 
 class ChangeListItemResult extends BaseResult{
   String name;
-  int id;
-  int amount;
-  int listId;
-  DateTime changed;
+  int  id;
+  int  amount;
+  int  listId;
+  DateTime  changed;
   static ChangeListItemResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
   static ChangeListItemResult _fromJson(Map data) {
-    var r = new ChangeListItemResult();
+    var r = ChangeListItemResult();
     r.success = data["success"];
     r.error = data["error"];
     r.id = data["id"];
@@ -149,13 +149,13 @@ class ChangeListItemResult extends BaseResult{
 }
 
 class AddListResult extends BaseResult{
-  int id;
+  int  id;
   String name;
   static AddListResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
   static AddListResult _fromJson(Map data) {
-    var r = new AddListResult();
+    var r = AddListResult();
     r.success = data["success"];
     r.error = data["error"];
     r.id = data["id"];
@@ -165,12 +165,12 @@ class AddListResult extends BaseResult{
 }
 
 class GetListResult {
-  int id;
+  int  id;
   String name;
-  int userId;
+  int  userId;
   String owner;
-  DateTime changed;
-  DateTime created;
+  DateTime  changed;
+  DateTime  created;
   Iterable<ShoppingItem> products;
   String contributors;
 
@@ -178,15 +178,15 @@ class GetListResult {
       _fromJson(jsonDecode(dataString));
 
   static GetListResult _fromJson(Map data) {
-    var r = new GetListResult();
+    var r = GetListResult();
     r.id = data["id"];
     r.name = data["name"];
     r.userId = data["userId"];
     r.owner = data["owner"];
-    var unMaped = data["products"] ?? new List<Map>();
+    var unMaped = data["products"] ?? <Map>[];
     r.products =
         unMaped.map<ShoppingItem>((x) =>
-          new ShoppingItem(x["id"], x["amount"], x["name"], DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"])));
+          ShoppingItem(x["id"], x["amount"], x["name"], DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]), x["sortOrder"]));
          
     r.contributors = data["contributors"];
 
@@ -201,12 +201,12 @@ class GetListsResult {
       _fromJson(jsonDecode(dataString));
 
   static GetListsResult _fromJson(Map data) {
-    var r = new GetListsResult();
+    var r = GetListsResult();
 
     List<dynamic> unmappedShoppingLists = data["lists"];
-    r.shoppingLists = unmappedShoppingLists.map((s) => new ShoppingList()
+    r.shoppingLists = unmappedShoppingLists.map((s) => ShoppingList()
       ..products = s["products"]
-          .map((x) => new ShoppingItem(x["id"], x["amount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]))).toList().cast<ShoppingItem>()
+          .map((x) => ShoppingItem(x["id"], x["amount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]), x["sortOrder"])).toList().cast<ShoppingItem>()
       ..id = s["id"]
       ..name = s["name"]);
 
@@ -215,7 +215,7 @@ class GetListsResult {
 }
 
 class GetBoughtListResult{
-  int id;
+  int  id;
   String name;
   Iterable<ShoppingItem> products;
 
@@ -223,19 +223,19 @@ class GetBoughtListResult{
       _fromJson(jsonDecode(dataString));
 
   static GetBoughtListResult _fromJson(Map data) {
-    var r = new GetBoughtListResult();
+    var r = GetBoughtListResult();
     r.id = data["id"];
     r.name = data["name"];
-    List<dynamic> unMaped = data["products"] ?? new List<Map>();
+    List<dynamic> unMaped = data["products"] ?? <Map>[];
     r.products =
-        unMaped.map((x) => new ShoppingItem(x["id"], x["boughtAmount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"])));
+        unMaped.map((x) => ShoppingItem(x["id"], x["boughtAmount"], x["name"],DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]), x["sortOrder"]));
     return r;
   }
 }
 
 
 class InfoResult {
-  int id;
+  int  id;
   String username;
   String eMail;
   List<int> listIds;
@@ -243,22 +243,22 @@ class InfoResult {
       _fromJson(jsonDecode(dataString));
 
   static InfoResult _fromJson(Map data) {
-    var r = new InfoResult();
+    var r = InfoResult();
     r.id = data["id"];
     r.username = data["username"];
     r.eMail = data["eMail"];
-    r.listIds = data["listIds"]; //TODO listids richtig geschrieben?
+    r.listIds = data["listIds"];
     return r;
   }
 }
 
 class HashResult extends Result {
-  int hash;
+  int  hash;
 
   static HashResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
   static HashResult _fromJson(Map data) {
-    var r = new HashResult();
+    var r = HashResult();
     r.success = data["success"];
     r.error = data["error"];
     r.hash = data["hash"];
@@ -271,7 +271,7 @@ class Result extends BaseResult{
       _fromJson(jsonDecode(dataString));
 
   static Result _fromJson(Map data) {
-    var r = new Result();
+    var r = Result();
     r.success = data["success"];
     r.error = data["error"];
     return r;
@@ -284,7 +284,7 @@ class SessionRefreshResult {
       _fromJson(jsonDecode(dataString));
 
   static SessionRefreshResult _fromJson(Map data) {
-    var r = new SessionRefreshResult();
+    var r = SessionRefreshResult();
     r.token = data["token"];
     return r;
   }

@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
@@ -7,19 +11,32 @@ import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Startup.initializeMinFunction();
+  //Startup.remoteMessages.add(message);
+  var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
+  var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
+  await file.writeAsString(jsonEncode(message.data));
+}
+
+
+Future<void> main() async {
 // iWonderHowLongThisTakes();
-  Startup.initialize().then((s) {
-    //if (s) Startup.initializeNewListsFromServer();
-    runApp(new NSSLPage());
-  });
+  await Startup.initialize();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  runApp(NSSLPage());
+  
 }
 
 class NSSL extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new NSSLPage();
+    return NSSLPage();
   }
 }
 
@@ -29,64 +46,90 @@ class NSSLPage extends StatefulWidget {
   static _NSSLState state;
   @override
   _NSSLState createState() {
-    state = new _NSSLState();
-    return state;
+    var localState = new _NSSLState();
+    state = localState;
+    return localState;
   }
 }
 
 class _NSSLState extends State<NSSLPage> {
   _NSSLState() : super();
-  final GlobalKey<ScaffoldState> _mainScaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
 
   String ean = "";
   bool performanceOverlay = false;
   bool materialGrid = false;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    firebaseMessaging.configure(onMessage: (x) => CloudMessaging.onMessage(x, setState));
+
+    subscribeFirebase(context);
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      CloudMessaging.onMessage(message, setState);
+    });
+
+    FirebaseMessaging.onMessage.listen((event) {
+      CloudMessaging.onMessage(event, setState);
+    });
+    // FirebaseMessaging.onBackgroundMessage((message) async {
+    //   return;
+    // });
+    // FirebaseMessaging.onBackgroundMessage((message) => CloudMessaging.onMessage(message, setState));
+    // firebaseMessaging.configure(
+    //     onMessage: (x) => CloudMessaging.onMessage(x, setState), onLaunch: (x) => Startup.initialize());
     for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
+  }
+
+  Future subscribeFirebase(BuildContext context) async {
+    var initMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initMessage != null) {
+      CloudMessaging.onMessage(initMessage, setState);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'NSSL',
-      color: Colors.grey[500],
-      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-        new _NSSLLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: const <Locale>[
-        const Locale('en', 'US'),
-        const Locale('de', 'DE'),
-      ],
-      theme: Themes.themes.first,
-      home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
-      routes: <String, WidgetBuilder>{
-        '/login': (BuildContext context) => new LoginPage(),
-        '/registration': (BuildContext context) => new Registration(),
-        '/search': (BuildContext context) => new ProductAddPage(),
-        '/forgot_password': (BuildContext context) => new CustomThemePage(),
-      },
-      showPerformanceOverlay: performanceOverlay,
-      showSemanticsDebugger: false,
-      debugShowMaterialGrid: materialGrid,
-    );
+    return AdaptiveTheme(
+        light: Themes.lightTheme.theme,
+        dark: Themes.darkTheme.theme,
+        initial: AdaptiveThemeMode.system,
+        builder: (theme, darkTheme) => MaterialApp(
+              title: 'NSSL',
+              color: Colors.grey[500],
+              localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+                new _NSSLLocalizationsDelegate(),
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              supportedLocales: const <Locale>[
+                const Locale('en', 'US'),
+                const Locale('de', 'DE'),
+              ],
+              theme: theme,
+              darkTheme: darkTheme,
+              home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
+              routes: <String, WidgetBuilder>{
+                '/login': (BuildContext context) => LoginPage(),
+                '/registration': (BuildContext context) => Registration(),
+                '/search': (BuildContext context) => ProductAddPage(),
+                '/forgot_password': (BuildContext context) => CustomThemePage(),
+              },
+              showPerformanceOverlay: performanceOverlay,
+              showSemanticsDebugger: false,
+              debugShowMaterialGrid: materialGrid,
+            ));
   }
 
-  Scaffold mainAppHome() => new Scaffold(
-      key: _mainScaffoldKey,
-      resizeToAvoidBottomPadding: false,
-      body: new MainPage() //new CustomThemePage()//LoginPage(),
+  Scaffold mainAppHome() => Scaffold(
+      key: _mainScaffoldKey, resizeToAvoidBottomInset: false, body: MainPage() //CustomThemePage()//LoginPage(),
       );
 
-  Scaffold mainAppLoginRegister() => new Scaffold(
+  Scaffold mainAppLoginRegister() => Scaffold(
         key: _mainScaffoldKey,
-        resizeToAvoidBottomPadding: false,
-        body: new LoginPage(),
+        resizeToAvoidBottomInset: false,
+        body: LoginPage(),
       );
 }
 

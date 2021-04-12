@@ -14,5 +14,5 @@ class ProductSync
   =>  HelperMethods.get("$productsPath/$name?page=$page", context);
 
    static Future<Response> addNewProduct(String gtin, String name, double quantity, String unit, BuildContext context)
-  =>  HelperMethods.post("$productsPath/", context, new AddNewProductArgs(gtin, name, unit, quantity));
+  =>  HelperMethods.post("$productsPath/", context, AddNewProductArgs(gtin, name, unit, quantity));
 }

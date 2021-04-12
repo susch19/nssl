@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/options/themes.dart';
@@ -7,28 +8,29 @@ class CustomThemePage extends StatefulWidget {
   CustomThemePage();
 
   @override
-  CustomThemePageState createState() => new CustomThemePageState();
+  CustomThemePageState createState() => CustomThemePageState();
 }
 
 class CustomThemePageState extends State<CustomThemePage> {
-Color pickerColor = Color(0xff443a49);
-Color currentColor = Color(0xff443a49);
-void changeColor(Color color) {
-  setState(() => pickerColor = color);
-}
+  Color pickerColor = Color(0xff443a49);
+  Color currentColor = Color(0xff443a49);
+  void changeColor(Color color) {
+    setState(() => pickerColor = color);
+  }
+
   CustomThemePageState();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _saveNeeded = false;
-  TextEditingController tec = new TextEditingController();
+  TextEditingController tec = TextEditingController();
 
-  MaterialColor primary = Colors.blue;
-  MaterialAccentColor accent = Colors.blueAccent;
-  Brightness primaryBrightness = Brightness.light;
-  Brightness accentBrightness = Brightness.dark;
+  MaterialColor primary;
+  MaterialAccentColor accent;
+  Brightness primaryBrightness;
+  Brightness accentBrightness;
 
-  ThemeData td = Themes.themes.first;
+  ThemeData td;
 
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
@@ -39,101 +41,148 @@ void changeColor(Color color) {
     if (!_saveNeeded) return true;
 
     final ThemeData theme = Theme.of(context);
-    final TextStyle dialogTextStyle = theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle = theme.textTheme.subtitle1.copyWith(color: theme.textTheme.caption.color);
 
     return await showDialog<bool>(
             context: context,
-            builder: (BuildContext context) => new AlertDialog(
-                    content: new Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
+            builder: (BuildContext context) => AlertDialog(
+                    content: Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
                     actions: <Widget>[
-                      new FlatButton(
-                          child: new Text(NSSLStrings.of(context).cancelButton()),
+                      TextButton(
+                          child: Text(NSSLStrings.of(context).cancelButton()),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           }),
-                      new FlatButton(
-                          child: new Text(NSSLStrings.of(context).discardButton()),
+                      TextButton(
+                          child: Text(NSSLStrings.of(context).discardButton()),
                           onPressed: () {
                             Navigator.of(context).pop(true);
-                          })
+                          }),
                     ])) ??
         false;
   }
 
   void _handleSubmitted() {
-    Themes.themes.clear();
     Themes.saveTheme(td, primary, accent);
-    setState(() {
-      Themes.themes.add(td);
-    });
+    if (td.brightness == Brightness.dark) {
+      AdaptiveTheme.of(context).setThemeMode(AdaptiveThemeMode.dark);
+      Themes.darkTheme = NSSLThemeData(td, primaryColorSlider.round(), accentColorSlider.round());
+    } else {
+      AdaptiveTheme.of(context).setThemeMode(AdaptiveThemeMode.light);
+      Themes.lightTheme = NSSLThemeData(td, primaryColorSlider.round(), accentColorSlider.round());
+    }
     Navigator.of(context).pop();
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var textColorTheme = new TextStyle(color: td.textTheme.title.color);
-    return new Scaffold(
-      floatingActionButton: new FloatingActionButton(
-          child: new IconButton(
-              icon: new Icon(
+    if (td == null) {
+      var darkTheme = Themes.tm == ThemeMode.system
+          ? MediaQuery.of(context).platformBrightness == Brightness.dark
+          : Themes.tm == ThemeMode.dark;
+      // print(Themes.tm);
+      td = darkTheme ? Themes.darkTheme.theme : Themes.lightTheme.theme;
+      primaryColorCheckbox = darkTheme;
+      accentColorCheckbox = td.accentColorBrightness == Brightness.dark;
+      primary =
+          Colors.primaries[darkTheme ? Themes.darkTheme.primarySwatchIndex : Themes.lightTheme.primarySwatchIndex];
+      accent = Colors.accents[darkTheme ? Themes.darkTheme.accentSwatchIndex : Themes.lightTheme.accentSwatchIndex];
+
+      primaryBrightness = td.brightness;
+      accentBrightness = td.accentColorBrightness;
+      primaryColorSlider = Colors.primaries.indexOf(primary).toDouble();
+      accentColorSlider = Colors.accents.indexOf(accent).toDouble();
+    }
+
+    // var textColorTheme = TextStyle(color: td.textTheme.headline6.color);
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          child: IconButton(
+              icon: Icon(
                 Icons.save,
-                color: td.accentIconTheme.color,
+                // color: td.accentIconTheme.color,
               ),
               onPressed: null),
-          backgroundColor: td.accentColor,
+          // backgroundColor: td.accentColor,
           onPressed: _handleSubmitted),
-      backgroundColor: td.scaffoldBackgroundColor,
+      // backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
-      appBar: new AppBar(
-          title: new Text(NSSLStrings.of(context).changeTheme(), style: textColorTheme),
-          backgroundColor: td.primaryColor,
-          iconTheme: td.iconTheme,
-          textTheme: td.textTheme,
+      appBar: AppBar(
+          title: Text(NSSLStrings.of(context).changeTheme()
+              // , style: textColorTheme
+              ),
+          // backgroundColor: td.primaryColor,
+          // iconTheme: td.iconTheme,
+          // textTheme: td.textTheme,
           actions: <Widget>[
-            new FlatButton(
-                child: new Text(NSSLStrings.of(context).saveButton(), style: textColorTheme),
+            TextButton(
+                child: Text(
+                  NSSLStrings.of(context).saveButton(),
+                  // style: td.textTheme.subtitle1
+                ),
                 onPressed: () => _handleSubmitted())
           ]),
-      body: new Form(
+      body: Form(
           key: _formKey,
           onWillPop: _onWillPop,
-          child: new ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
-            new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              new Text(
+          child: ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
+            Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              Text(
                 NSSLStrings.of(context).changePrimaryColor(),
-                style: textColorTheme,
+                // style: td.textTheme.subtitle1,
               ),
-              new Slider(
+              Slider(
                 value: primaryColorSlider,
                 max: (Colors.primaries).length.ceilToDouble() - 1.0,
                 divisions: Colors.primaries.length - 1,
                 onChanged: onChangedPrimarySlider,
-                activeColor: td.accentColor,
+                // activeColor: td.accentColor,
               ),
             ]),
-            new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              new Text(NSSLStrings.of(context).changeAccentColor(), style: textColorTheme),
-              new Slider(
-                  value: accentColorSlider,
-                  max: Colors.accents.length.ceilToDouble() - 1.0,
-                  divisions: Colors.accents.length - 1,
-                  onChanged: onChangedSecondarySlider,
-                  activeColor: td.accentColor),
+            Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              Text(
+                NSSLStrings.of(context).changeAccentColor(),
+                //  style: td.textTheme.subtitle1,
+              ),
+              Slider(
+                value: accentColorSlider,
+                max: Colors.accents.length.ceilToDouble() - 1.0,
+                divisions: Colors.accents.length - 1,
+                onChanged: onChangedSecondarySlider,
+                // activeColor: td.accentColor
+              ),
             ]),
-            new Row(children: [
-              new Text(NSSLStrings.of(context).changeDarkTheme(), style: textColorTheme),
-              new Checkbox(
-                  value: primaryColorCheckbox, onChanged: primaryBrightnessChange, activeColor: td.accentColor),
+            Row(children: [
+              Text(
+                NSSLStrings.of(context).changeDarkTheme(),
+                // style: td.textTheme.subtitle1,
+              ),
+              Checkbox(
+                value: primaryColorCheckbox,
+                onChanged: primaryBrightnessChange,
+                // activeColor: td.accentColor,
+              ),
             ]),
-            new Row(children: [
-              new Text(NSSLStrings.of(context).changeAccentTextColor(), style: textColorTheme),
-              new Checkbox(
-                  value: accentColorCheckbox, onChanged: secondaryBrightnessChange, activeColor: td.accentColor),
-            ]),
-            new Row(children: [
-              new Text('Demo', style: textColorTheme),
-              new Checkbox(value: true, onChanged: (v) {}, activeColor: td.accentColor),
-            ]),
+            // Row(children: [
+            //   Text(
+            //     NSSLStrings.of(context).changeAccentTextColor(),
+            //     // style: td.textTheme.subtitle1,
+            //   ),
+            //   Checkbox(
+            //     value: accentColorCheckbox,
+            //     onChanged: secondaryBrightnessChange,
+            //     // activeColor: td.accentColor,
+            //   ),
+            // ]),
+            // Row(children: [
+            //   Text('Demo', style: textColorTheme),
+            //   Checkbox(value: true, onChanged: (v) {}, activeColor: td.accentColor),
+            // ]),
             // ColorPicker(
             //   pickerColor: pickerColor,
             //   onColorChanged: changeColor,
@@ -145,27 +194,32 @@ void changeColor(Color color) {
   }
 
   void onChangedPrimarySlider(double value) {
-    int index = value.floor();
+    int index = value.round();
     primaryColorSlider = value;
     primary = Colors.primaries[index];
     setColors();
   }
 
   void onChangedSecondarySlider(double value) {
-    int index = value.floor();
+    int index = value.round();
     accentColorSlider = value;
     accent = Colors.accents[index];
     setColors();
   }
 
-  void setColors() => setState(() {
-        _saveNeeded = true;
-        td = new ThemeData(
-            primarySwatch: primary,
-            accentColor: accent,
-            brightness: primaryBrightness,
-            accentColorBrightness: accentBrightness);
-      });
+  void setColors() {
+    _saveNeeded = true;
+    // print(primary);
+    // print(accent);
+    // print(primaryBrightness);
+    // print(accentBrightness);
+    td = ThemeData(
+        primarySwatch: primary,
+        accentColor: accent,
+        brightness: primaryBrightness,
+        accentColorBrightness: accentBrightness);
+    AdaptiveTheme.of(context).setTheme(light: td);
+  }
 
   void primaryBrightnessChange(bool value) {
     primaryColorCheckbox = value;
@@ -180,35 +234,34 @@ void changeColor(Color color) {
   }
 
   buildBody() {
-    return new Scaffold(
-        appBar: new AppBar(
+    return Scaffold(
+        appBar: AppBar(
           title: const Text("Theme"),
         ),
-        floatingActionButton: new FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: () => {},
-          child: new IconButton(
-            icon: new Icon(Icons.search),
+          child: IconButton(
+            icon: Icon(Icons.search),
             onPressed: () {},
           ),
         ),
-        body: new ListView(
+        body: ListView(
           children: <Widget>[
-            new RaisedButton(
+            ElevatedButton(
               onPressed: () {},
               child: const Text("Theme"),
             ),
-            new Divider(),
-            new FlatButton(
+            Divider(),
+            TextButton(
               onPressed: () {},
               child: const Text("Theme"),
             ),
-            new Divider(),
-            new TextField(
+            Divider(),
+            TextField(
               controller: tec,
             ),
-            
           ],
         ),
-        persistentFooterButtons: [new FlatButton(child: const Text("Theme"), onPressed: () {})]);
+        persistentFooterButtons: [TextButton(child: const Text("Theme"), onPressed: () {})]);
   }
 }

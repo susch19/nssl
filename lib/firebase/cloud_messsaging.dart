@@ -3,79 +3,79 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:nssl/models/model_export.dart';
 
-final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
 class CloudMessaging {
-  static Future onMessage(
-      Map<String, dynamic> message, Function setState) async {
-    int listId = int.parse(message["listId"]);
-    if (User.ownId == int.parse(message["userId"])) {
+  static Future onMessage(RemoteMessage message, Function setState) async {
+   
+    final dynamic data = message.data;
+
+    int listId = int.parse(data["listId"]);
+    if (User.ownId == int.parse(data["userId"])) {
       return null;
     }
-    if (User.shoppingLists
-            .firstWhere((x) => x.id == listId, orElse: () => null) ==
-        null) {
-      var mapp = jsonDecode(message["items"]);
+
+    if (User.shoppingLists.firstWhere((x) => x.id == listId, orElse: () => ShoppingList.empty) == ShoppingList.empty) {
+      var mapp = jsonDecode(data["items"]);
       //User was added to new list
-      User.shoppingLists.add(new ShoppingList()
-        ..id = listId
-        ..name = message["Name"]
+      User.shoppingLists.add(ShoppingList(listId, data["name"])
         ..shoppingItems = mapp
-            .map((x) => new ShoppingItem(x["Name"])
-              ..id = x["Id"]
-              ..amount = x["Amount"])
+            .map((x) => ShoppingItem(x["name"])
+              ..id = x["id"]
+              ..amount = x["amount"]
+              ..sortOrder = x["sortOrder"])
             .toList());
-      firebaseMessaging
-          .subscribeToTopic(listId.toString() + "shoppingListTopic");
-    } else if (message.length == 1) {
+      firebaseMessaging.subscribeToTopic(listId.toString() + "shoppingListTopic");
+    } else if (data.length == 1) {
       //List deleted
       User.shoppingLists.removeWhere((x) => x.id == listId);
-      firebaseMessaging
-          .unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
+      firebaseMessaging.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
     } else {
-      var action = message["action"];
+      var action = data["action"];
       var list = User.shoppingLists.firstWhere((x) => x.id == listId);
       switch (action) {
         case "ItemChanged": //Id, Amount, action
-          var id = int.parse(message["Id"]);
-          list.shoppingItems.firstWhere((x) => x.id == id).amount =
-              int.parse(message["Amount"]);
+          var id = int.parse(data["id"]);
+          list.shoppingItems.firstWhere((x) => x.id == id).amount = int.parse(data["amount"]);
           list.save();
           break;
         case "ItemDeleted": //Id, action
-          var id = int.parse(message["Id"]);
+          var id = int.parse(data["id"]);
           list.shoppingItems.removeWhere((x) => x.id == id);
           list.save();
           break;
         case "NewItemAdded": //Id, Name, Gtin, Amount, action
-          if (list.shoppingItems.firstWhere(
-                  (x) => x.id == int.parse(message["Id"]),
-                  orElse: () => null) !=
-              null) break;
-          list.shoppingItems.add(new ShoppingItem(message["Name"])
-            ..id = int.parse(message["Id"])
-            ..amount = int.parse(message["Amount"])
-            ..crossedOut = false);
+          if (list.shoppingItems.firstWhere((x) => x.id == int.parse(data["id"]), orElse: () => null) != null) break;
+          list.shoppingItems.add(ShoppingItem(data["name"])
+            ..id = int.parse(data["id"])
+            ..amount = int.parse(data["amount"])
+            ..crossedOut = false
+            ..sortOrder = int.parse(data["sortOrder"]));
           list.save();
           break;
         case "ListRename": //Name, action
-          list.name = message["Name"];
+          list.name = data["name"];
           list.save();
           break;
         case "Refresh": //action
           await list.refresh();
           break;
         case "ItemRenamed": //product.Id, product.Name
-          list.shoppingItems
-              .firstWhere((x) => x.id == int.parse(message["Id"]))
-              .name = message["Name"];
+          list.shoppingItems.firstWhere((x) => x.id == int.parse(data["id"])).name = data["name"];
+          list.save();
+          break;
+        case "OrderChanged":
+          var id = int.parse(data["id"]);
+          list.shoppingItems.firstWhere((x) => x.id == id).sortOrder = int.parse(data["sortOrder"]);
           list.save();
           break;
       }
     }
-    var args = new List();
-    args.add(() {});
-    Function.apply(setState, args);
+    if (setState != null) {
+      var args = [];
+      args.add(() {});
+      Function.apply(setState, args);
+    }
 
     return null;
   }

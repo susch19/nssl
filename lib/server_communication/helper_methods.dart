@@ -8,29 +8,23 @@ import 'package:nssl/server_communication/jwt.dart';
 import 'user_sync.dart';
 
 class HelperMethods {
-  static const String url = "https://nssl.susch.eu";
+  static const String scheme = "https";
+  static const String host = "nssl.susch.eu";
+  // static const String url = "http://192.168.49.22:4344";
 
-  static Future<http.Response> post(String path, BuildContext context,
-      [Object body, skipTokenRefresh = false]) async {
+  static Future<http.Response> post(String path, BuildContext context, [Object body, skipTokenRefresh = false]) async {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
-    var g = http.post("$url/$path", body: jsonEncode(body), headers: {
-      "Content-Type": "application/json",
-      User.token == null ? "X-foo" : "X-Token": User.token
-    });
-    http.Response res;
-    await g.then((x) => res = x);
+    var res = await http.post(Uri(host: host, scheme: scheme, path: path),
+        body: jsonEncode(body),
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
 
   static Future<http.Response> get(String path, BuildContext context) async {
     await handleTokenRefresh(context);
-    var g = http.get("$url/$path", headers: {
-      "Content-Type": "application/json",
-      User.token == null ? "X-foo" : "X-Token": User.token
-    });
-    http.Response res;
-    await g.then((x) => res = x);
+    var res = await http.get(Uri(host: host, scheme: scheme, path: path),
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
@@ -38,24 +32,18 @@ class HelperMethods {
   static Future<http.Response> put(String path, BuildContext context,
       [Object body, bool skipTokenRefresh = false]) async {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
-    var g = http.put("$url/$path", body: jsonEncode(body), headers: {
-      "Content-Type": "application/json",
-      User.token == null ? "X-foo" : "X-Token": User.token
-    });
-    http.Response res;
-    await g.then((x) => res = x);
+    var res = await http.put(Uri(host: host, scheme: scheme, path: path),
+        body: jsonEncode(body),
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
 
   static Future<http.Response> delete(String path, BuildContext context) async {
     await handleTokenRefresh(context);
-    var g = http.delete("$url/$path", headers: {
-      "Content-Type": "application/json",
-      User.token == null ? "X-foo" : "X-Token": User.token
-    });
-    http.Response res;
-    await g.then((x) => res = x);
+    var res = await http.delete(Uri(host: host, scheme: scheme, path: path),
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
+
     reactToRespone(res, context);
     return res;
   }
@@ -65,24 +53,28 @@ class HelperMethods {
     print(jsonString);
   }
 
-  static bool reactToRespone(http.Response respone, BuildContext context,
-      {ScaffoldState scaffoldState}) {
+
+  static bool reactToRespone(http.Response respone, BuildContext context, {ScaffoldState scaffoldState}) {
+    if (context == null) return false;
     if (respone.statusCode == 500) {
-      throw new Exception();
+      throw Exception();
     } else if (respone.statusCode == 401) {
-      var ad = new AlertDialog(
-        title: new Text(NSSLStrings.of(context).tokenExpired()),
-        content: new Text(NSSLStrings.of(context).tokenExpiredExplanation()),
-        actions: [
-          new MaterialButton(
-            onPressed: () async {
-              Navigator.pushReplacementNamed(context, "/login");
-            },
-            child: const Text("OK"),
-          )
-        ],
-      );
-      showDialog(child: ad, context: context);
+      showDialog(
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(NSSLStrings.of(context).tokenExpired()),
+              content: Text(NSSLStrings.of(context).tokenExpiredExplanation()),
+              actions: [
+                MaterialButton(
+                  onPressed: () async {
+                    Navigator.pushReplacementNamed(context, "/login");
+                  },
+                  child: const Text("OK"),
+                )
+              ],
+            );
+          },
+          context: context);
     }
     return true;
   }
@@ -90,6 +82,7 @@ class HelperMethods {
   static handleTokenRefresh(BuildContext context) async {
     if (await JWT.newToken()) {
       var t = await UserSync.refreshToken(context);
+      if (t.body == "") return;
       var m = jsonDecode(t.body);
       var to = m["token"];
       User.token = to;

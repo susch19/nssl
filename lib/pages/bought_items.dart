@@ -14,11 +14,10 @@ class BoughtItemsPage extends StatefulWidget {
 }
 
 class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _mainScaffoldKey = new GlobalKey<ScaffoldState>();
-  GlobalKey _iff = new GlobalKey();
-  GlobalKey _ib = new GlobalKey();
-  var tec = new TextEditingController();
-  var shoppingItems = new List<ShoppingItem>();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
+
+  var tec = TextEditingController();
+  var shoppingItems = <ShoppingItem>[];
   var shoppingItemsGrouped = new Map<DateTime, List<ShoppingItem>>();
   int k = 1;
   int listId;
@@ -37,16 +36,16 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
 
   _BoughtItemsPagePageState(int listId) {
     this.listId = listId;
-    ShoppingListSync.getList(listId, context, bought: true).then((o) {
+    ShoppingListSync.getList(listId, null, bought: true).then((o) {
       if (o.statusCode == 500) {
         showInSnackBar("Internal Server Error");
         return;
       }
       var z = GetBoughtListResult.fromJson(o.body);
       if (z.products.length <= 0)
-        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(), duration: new Duration(seconds: 10));
+        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(), duration: Duration(seconds: 10));
       else {
-        shoppingItems.addAll(z.products.map((f) => new ShoppingItem(f.name)
+        shoppingItems.addAll(z.products.map((f) => ShoppingItem(f.name)
           ..id = f.id
           ..amount = f.amount
           ..changed = f.changed
@@ -57,7 +56,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
         for (var item in shoppingItems) {
           date = dateTimeToDate(item.changed);
           if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed)))
-            shoppingItemsGrouped[date] = new List<ShoppingItem>();
+            shoppingItemsGrouped[date] = <ShoppingItem>[];
           shoppingItemsGrouped[date].add(item);
         }
       }
@@ -83,11 +82,11 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
       body: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          new Container(
-            child: new SizedBox(
+          Container(
+            child: SizedBox(
                 width: 40.0,
                 height: 40.0,
-                child: new CircularProgressIndicator()),
+                child: CircularProgressIndicator()),
             padding: const EdgeInsets.only(top: 16.0),
           )
         ],
@@ -130,13 +129,13 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
   }
 
   void showInSnackBar(String value, {Duration duration, SnackBarAction action}) {
-    _mainScaffoldKey.currentState.removeCurrentSnackBar();
-    _mainScaffoldKey.currentState.showSnackBar(
-        new SnackBar(content: new Text(value), duration: duration ?? new Duration(seconds: 3), action: action));
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(value), duration: duration ?? Duration(seconds: 3), action: action));
   }
 
   List<Tab> createTabs() {
-    var tabs = new List<Tab>();
+    var tabs = <Tab>[];
     for (var item in shoppingItemsGrouped.keys) {
       tabs.add(Tab(text: "${item.year}-${item.month}-${item.day}"));
     }
@@ -144,7 +143,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
   }
 
   List<Widget> createChildren() {
-    var children = new List<Widget>();
+    var children = <Widget>[];
     for (var item in shoppingItemsGrouped.keys) {
       children.add(SafeArea(
         top: false,

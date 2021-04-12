@@ -12,14 +12,14 @@ class UserSync {
   static Future<Response> create(
           String username, String email, String password, BuildContext context) =>
       HelperMethods.post("registration", context,
-          new LoginArgs(username: username, pwHash: password, eMail: email), true);
+          LoginArgs(username: username, pwHash: password, eMail: email), true);
 
   static Future<Response> login(String username, String password, BuildContext context) =>
       HelperMethods.post(
-          path2, context, new LoginArgs(username: username, pwHash: password), true);
+          path2, context, LoginArgs(username: username, pwHash: password), true);
 
   static Future<Response> loginEmail(String email, String password, BuildContext context) =>
-      HelperMethods.post(path2, context, new LoginArgs(eMail: email, pwHash: password), true);
+      HelperMethods.post(path2, context, LoginArgs(eMail: email, pwHash: password), true);
 
   static Future<Response> info(BuildContext context) => HelperMethods.get(path, context);
 
@@ -27,5 +27,5 @@ class UserSync {
       HelperMethods.put(path2, context, null, true);
 
   static Future<Response> changePassword(String oldPassword, String newPassword, String token, BuildContext context) =>
-      HelperMethods.put(path, context, new ChangePasswordArgs(oldPassword, newPassword));
+      HelperMethods.put(path, context, ChangePasswordArgs(oldPassword, newPassword));
 }
