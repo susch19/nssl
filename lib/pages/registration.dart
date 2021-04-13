@@ -26,6 +26,7 @@ class RegistrationState extends State<Registration> {
   var pwInput = ForInput();
   var pw2Input = ForInput();
   var submit = ForInput();
+  var validateMode = AutovalidateMode.disabled;
 
   void showInSnackBar(String value) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -35,6 +36,7 @@ class RegistrationState extends State<Registration> {
   Future _handleSubmitted() async {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
+      validateMode = AutovalidateMode.onUserInteraction;
       return;
     }
 
@@ -165,7 +167,7 @@ class RegistrationState extends State<Registration> {
             title: Text(NSSLStrings.of(context).registrationTitle())),
         body: Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: validateMode,
             child: ListView(
 //              physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),

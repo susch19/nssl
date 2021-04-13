@@ -9,29 +9,29 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  path_provider:
-  intl:
-  file:
+  path_provider: ^2.0.1
+  intl: ^0.17.0
+  file: ^6.1.0
   # intl_translation:
-  shared_preferences:
+  shared_preferences: ^2.0.5
  # jwt:
  #   git: git://github.com/susch19/dart-json_web_token.git
   #jaguar_jwt: "^1.1.5"
-  crypto: 
-  firebase_core: "^0.7.0"
-  firebase_messaging:
-  flutter_local_notifications:
-  http: 
-  sqflite:
-  permission_handler: 
+  crypto: ^3.0.1 
+  firebase_core: ^1.0.3
+  firebase_messaging: ^9.1.1
+  flutter_local_notifications: ^5.0.0+1
+  http: ^0.13.1 
+  sqflite: ^2.0.0+3
+  permission_handler: ^6.1.1 
   scandit:
     path: ../Plugins/scandit
   # scandit_flutter_datacapture_barcode: ^6.7.0
   # scandit_flutter_datacapture_core: ^6.7.0
   # flutter_scandit: ^0.1.0
-  pdf:
-  flutter_colorpicker: 
-  adaptive_theme:
+  pdf: ^3.2.0
+  flutter_colorpicker: ^0.4.0 
+  adaptive_theme: ^2.1.1
 
     #git: https://github.com/tekartik/sqflite.git
 

@@ -41,6 +41,7 @@ class LoginPageState extends State<LoginPage> {
   var nameInput = ForInput();
   var pwInput = ForInput();
   var submit = ForInput();
+  var validateMode = AutovalidateMode.disabled;
 
   void showInSnackBar(String value) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
@@ -51,6 +52,7 @@ class LoginPageState extends State<LoginPage> {
     //_resetInput();
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
+      validateMode = AutovalidateMode.onUserInteraction;
       return;
     }
     //form.save();
@@ -163,7 +165,7 @@ class LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: Text(NSSLStrings.of(context).login())),
       body: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: validateMode,
         child: ListView(
 //              physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 32.0),

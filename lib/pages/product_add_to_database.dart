@@ -37,6 +37,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
   String productName;
   String brandName;
   String weight;
+  var validateMode = AutovalidateMode.disabled;
 
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
@@ -78,6 +79,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
       showInSnackBar(NSSLStrings.of(context).fixErrorsBeforeSubmittingPrompt());
+      validateMode = AutovalidateMode.onUserInteraction;
       return false;
     } else {
       form.save();
@@ -146,7 +148,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       body: Form(
           key: _formKey,
           onWillPop: _onWillPop,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: validateMode,
           child: ListView(padding: const EdgeInsets.all(16.0), children: <
               Widget>[
             Container(

@@ -21,9 +21,9 @@ class HelperMethods {
     return res;
   }
 
-  static Future<http.Response> get(String path, BuildContext context) async {
+  static Future<http.Response> get(String path, BuildContext context, [String query = ""]) async {
     await handleTokenRefresh(context);
-    var res = await http.get(Uri(host: host, scheme: scheme, path: path),
+    var res = await http.get(Uri(host: host, scheme: scheme, path: path, query: query),
         headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
