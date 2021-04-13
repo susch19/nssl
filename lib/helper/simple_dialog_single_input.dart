@@ -3,13 +3,13 @@ import 'package:nssl/localization/nssl_strings.dart';
 
 class SimpleDialogSingleInput {
   static AlertDialog create({
-    String hintText,
-    String labelText,
-    String title,
+    String? hintText,
+    String? labelText,
+    required String title,
     String defaultText = "",
     int maxLines = 1,
-    ValueChanged<String> onSubmitted,
-    BuildContext context,
+    ValueChanged<String>? onSubmitted,
+    BuildContext? context,
   }) {
     var tec = TextEditingController();
     tec.text = defaultText;
@@ -25,19 +25,19 @@ class SimpleDialogSingleInput {
                   maxLines: maxLines,
                   autofocus: true,
                   onSubmitted: (s) {
-                    Navigator.pop(context);
-                    onSubmitted(s);
+                    Navigator.pop(context!);
+                    onSubmitted!(s);
                   }),
             ],
           ),
         ),
         actions: <Widget>[
-          TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
+          TextButton(child: Text(NSSLStrings.of(context)!.cancelButton()), onPressed: () => Navigator.pop(context!, "")),
           TextButton(
-              child: Text(NSSLStrings.of(context).acceptButton()),
+              child: Text(NSSLStrings.of(context)!.acceptButton()),
               onPressed: () {
-                Navigator.pop(context, "");
-                onSubmitted(tec.text);
+                Navigator.pop(context!, "");
+                onSubmitted!(tec.text);
               })
         ]);
   }

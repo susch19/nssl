@@ -25,46 +25,46 @@ class CustomThemePageState extends State<CustomThemePage> {
   bool _saveNeeded = false;
   TextEditingController tec = TextEditingController();
 
-  MaterialColor primary;
-  MaterialAccentColor accent;
-  Brightness primaryBrightness;
-  Brightness accentBrightness;
+  MaterialColor? primary;
+  MaterialAccentColor? accent;
+  Brightness? primaryBrightness;
+  Brightness? accentBrightness;
 
-  ThemeData td;
+  ThemeData? td;
 
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
-  bool primaryColorCheckbox = false;
+  bool? primaryColorCheckbox = false;
   bool accentColorCheckbox = true;
 
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
 
     final ThemeData theme = Theme.of(context);
-    final TextStyle dialogTextStyle = theme.textTheme.subtitle1.copyWith(color: theme.textTheme.caption.color);
+    final TextStyle dialogTextStyle = theme.textTheme.subtitle1!.copyWith(color: theme.textTheme.caption!.color);
 
-    return await showDialog<bool>(
+    return await (showDialog<bool>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-                    content: Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
+                    content: Text(NSSLStrings.of(context)!.discardNewTheme(), style: dialogTextStyle),
                     actions: <Widget>[
                       TextButton(
-                          child: Text(NSSLStrings.of(context).cancelButton()),
+                          child: Text(NSSLStrings.of(context)!.cancelButton()),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           }),
                       TextButton(
-                          child: Text(NSSLStrings.of(context).discardButton()),
+                          child: Text(NSSLStrings.of(context)!.discardButton()),
                           onPressed: () {
                             Navigator.of(context).pop(true);
                           }),
-                    ])) ??
+                    ])) as FutureOr<bool>?) ??
         false;
   }
 
   void _handleSubmitted() {
-    Themes.saveTheme(td, primary, accent);
-    if (td.brightness == Brightness.dark) {
+    Themes.saveTheme(td!, primary, accent);
+    if (td!.brightness == Brightness.dark) {
       AdaptiveTheme.of(context).setThemeMode(AdaptiveThemeMode.dark);
       Themes.darkTheme = NSSLThemeData(td, primaryColorSlider.round(), accentColorSlider.round());
     } else {
@@ -88,15 +88,15 @@ class CustomThemePageState extends State<CustomThemePage> {
       // print(Themes.tm);
       td = darkTheme ? Themes.darkTheme.theme : Themes.lightTheme.theme;
       primaryColorCheckbox = darkTheme;
-      accentColorCheckbox = td.accentColorBrightness == Brightness.dark;
+      accentColorCheckbox = td!.accentColorBrightness == Brightness.dark;
       primary =
-          Colors.primaries[darkTheme ? Themes.darkTheme.primarySwatchIndex : Themes.lightTheme.primarySwatchIndex];
-      accent = Colors.accents[darkTheme ? Themes.darkTheme.accentSwatchIndex : Themes.lightTheme.accentSwatchIndex];
+          Colors.primaries[darkTheme ? Themes.darkTheme.primarySwatchIndex! : Themes.lightTheme.primarySwatchIndex!];
+      accent = Colors.accents[darkTheme ? Themes.darkTheme.accentSwatchIndex! : Themes.lightTheme.accentSwatchIndex!];
 
-      primaryBrightness = td.brightness;
-      accentBrightness = td.accentColorBrightness;
-      primaryColorSlider = Colors.primaries.indexOf(primary).toDouble();
-      accentColorSlider = Colors.accents.indexOf(accent).toDouble();
+      primaryBrightness = td!.brightness;
+      accentBrightness = td!.accentColorBrightness;
+      primaryColorSlider = Colors.primaries.indexOf(primary!).toDouble();
+      accentColorSlider = Colors.accents.indexOf(accent!).toDouble();
     }
 
     // var textColorTheme = TextStyle(color: td.textTheme.headline6.color);
@@ -113,7 +113,7 @@ class CustomThemePageState extends State<CustomThemePage> {
       // backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
       appBar: AppBar(
-          title: Text(NSSLStrings.of(context).changeTheme()
+          title: Text(NSSLStrings.of(context)!.changeTheme()
               // , style: textColorTheme
               ),
           // backgroundColor: td.primaryColor,
@@ -122,7 +122,7 @@ class CustomThemePageState extends State<CustomThemePage> {
           actions: <Widget>[
             TextButton(
                 child: Text(
-                  NSSLStrings.of(context).saveButton(),
+                  NSSLStrings.of(context)!.saveButton(),
                   // style: td.textTheme.subtitle1
                 ),
                 onPressed: () => _handleSubmitted())
@@ -133,7 +133,7 @@ class CustomThemePageState extends State<CustomThemePage> {
           child: ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
             Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
               Text(
-                NSSLStrings.of(context).changePrimaryColor(),
+                NSSLStrings.of(context)!.changePrimaryColor(),
                 // style: td.textTheme.subtitle1,
               ),
               Slider(
@@ -146,7 +146,7 @@ class CustomThemePageState extends State<CustomThemePage> {
             ]),
             Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
               Text(
-                NSSLStrings.of(context).changeAccentColor(),
+                NSSLStrings.of(context)!.changeAccentColor(),
                 //  style: td.textTheme.subtitle1,
               ),
               Slider(
@@ -159,7 +159,7 @@ class CustomThemePageState extends State<CustomThemePage> {
             ]),
             Row(children: [
               Text(
-                NSSLStrings.of(context).changeDarkTheme(),
+                NSSLStrings.of(context)!.changeDarkTheme(),
                 // style: td.textTheme.subtitle1,
               ),
               Checkbox(
@@ -218,12 +218,12 @@ class CustomThemePageState extends State<CustomThemePage> {
         accentColor: accent,
         brightness: primaryBrightness,
         accentColorBrightness: accentBrightness);
-    AdaptiveTheme.of(context).setTheme(light: td);
+    AdaptiveTheme.of(context).setTheme(light: td!);
   }
 
-  void primaryBrightnessChange(bool value) {
+  void primaryBrightnessChange(bool? value) {
     primaryColorCheckbox = value;
-    primaryBrightness = value ? Brightness.dark : Brightness.light;
+    primaryBrightness = value! ? Brightness.dark : Brightness.light;
     setColors();
   }
 

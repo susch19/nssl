@@ -12,9 +12,9 @@ import 'package:nssl/server_communication/s_c.dart';
 import 'package:nssl/server_communication/user_sync.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key, this.scaffoldKey}) : super(key: key);
+  LoginPage({Key? key, this.scaffoldKey}) : super(key: key);
 
-  final GlobalKey<ScaffoldState> scaffoldKey;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
   @override
   LoginPageState createState() => LoginPageState();
 }
@@ -29,7 +29,7 @@ class ForInput {
   TextEditingController textEditingController = TextEditingController();
   String errorText = '';
   GlobalKey key = GlobalKey();
-  InputDecoration decoration;
+  InputDecoration? decoration;
   FocusNode focusNode = FocusNode();
 }
 
@@ -50,7 +50,7 @@ class LoginPageState extends State<LoginPage> {
   Future _handleSubmitted() async {
     //bool error = false;
     //_resetInput();
-    final FormState form = _formKey.currentState;
+    final FormState form = _formKey.currentState!;
     if (!form.validate()) {
       validateMode = AutovalidateMode.onUserInteraction;
       return;
@@ -79,13 +79,13 @@ class LoginPageState extends State<LoginPage> {
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
       var res = await UserSync.login(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey?.currentState))
+      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey.currentState))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
     } else {
       var res = await UserSync.loginEmail(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey?.currentState))
+      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey.currentState))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
@@ -93,18 +93,18 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _handleLoggedIn(LoginResult res) async {
-    if (!res.success) {
-      showInSnackBar(res.error);
+    if (!res.success!) {
+      showInSnackBar(res.error!);
       return;
     }
-    showInSnackBar(NSSLStrings.of(context).loginSuccessfulMessage());
+    showInSnackBar(NSSLStrings.of(context)!.loginSuccessfulMessage());
     bool firstBoot = User.username == null;
     User.token = res.token;
     User.username = res.username;
     User.eMail = res.eMail;
     User.ownId = res.id;
     await User.save();
-    firebaseMessaging.subscribeToTopic(res.username + "userTopic");
+    firebaseMessaging.subscribeToTopic(res.username! + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
       if (User.shoppingLists != null && User.shoppingLists.length > 0) {
@@ -122,31 +122,31 @@ class LoginPageState extends State<LoginPage> {
     setState(() => {});
   }
 
-  String _validateName(String value) {
-    if (value.isEmpty) return NSSLStrings.of(context).nameEmailRequiredError();
-    if (value.length < 4) return NSSLStrings.of(context).usernameToShortError();
+  String? _validateName(String? value) {
+    if (value!.isEmpty) return NSSLStrings.of(context)!.nameEmailRequiredError();
+    if (value.length < 4) return NSSLStrings.of(context)!.usernameToShortError();
 
     return null;
   }
 
-  String _validateEmail(String value) {
-    if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
+  String? _validateEmail(String value) {
+    if (value.isEmpty) return NSSLStrings.of(context)!.emailRequiredError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return NSSLStrings.of(context)!.emailIncorrectFormatError();
     return null;
   }
 
-  String _validatePassword(String value) {
-    if (pwInput.textEditingController == null || pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).passwordEmptyError();
+  String? _validatePassword(String? value) {
+    if (pwInput.textEditingController == null || pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context)!.passwordEmptyError();
     return null;
   }
 
   _resetInput() {
     nameInput.decoration =
-        InputDecoration(helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(), labelText: NSSLStrings.of(context).usernameOrEmailTitle());
+        InputDecoration(helperText: NSSLStrings.of(context)!.usernameOrEmailForLoginHint(), labelText: NSSLStrings.of(context)!.usernameOrEmailTitle());
 
-    pwInput.decoration = InputDecoration(helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
+    pwInput.decoration = InputDecoration(helperText: NSSLStrings.of(context)!.choosenPasswordHint(), labelText: NSSLStrings.of(context)!.password());
   }
 
   @override
@@ -162,7 +162,7 @@ class LoginPageState extends State<LoginPage> {
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: Text(NSSLStrings.of(context).login())),
+      appBar: AppBar(title: Text(NSSLStrings.of(context)!.login())),
       body: Form(
         key: _formKey,
         autovalidateMode: validateMode,
@@ -201,7 +201,7 @@ class LoginPageState extends State<LoginPage> {
                 title: Container(
                     child: ElevatedButton(
                       key: submit.key,
-                      child: Center(child: Text(NSSLStrings.of(context).loginButton())),
+                      child: Center(child: Text(NSSLStrings.of(context)!.loginButton())),
                       onPressed: _handleSubmitted,
                     ),
                     padding: const EdgeInsets.only(top: 16.0)),
@@ -213,7 +213,7 @@ class LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       User.username == null ? Navigator.pushNamed(context, "/registration") : Navigator.popAndPushNamed(context, "/registration");
                     },
-                    child: Text(NSSLStrings.of(context).registerTextOnLogin()),
+                    child: Text(NSSLStrings.of(context)!.registerTextOnLogin()),
                   ),
                 ),
               ),

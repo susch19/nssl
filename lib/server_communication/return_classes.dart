@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:nssl/models_json.dart';
 
 class BaseResult {
-  bool  success;
-  String error;
+  bool?  success;
+  String? error;
 }
 
 class CreateResult extends BaseResult {
-  int  id;
-  String username;
-  String eMail;
+  int?  id;
+  String? username;
+  String? eMail;
   static CreateResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -27,10 +27,10 @@ class CreateResult extends BaseResult {
 }
 
 class LoginResult extends BaseResult {
-  int  id;
-  String username;
-  String eMail;
-  String token;
+  int?  id;
+  String? username;
+  String? eMail;
+  String? token;
   static LoginResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
   static LoginResult _fromJson(Map data) {
@@ -46,8 +46,8 @@ class LoginResult extends BaseResult {
 }
 
 class AddContributorResult extends BaseResult {
-  String name;
-  int  id;
+  String? name;
+  int?  id;
   static AddContributorResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -62,13 +62,13 @@ class AddContributorResult extends BaseResult {
 }
 
 class ContributorResult {
-  String name;
-  int  userId;
-  bool  isAdmin;
+  String? name;
+  int?  userId;
+  bool?  isAdmin;
 }
 
 class GetContributorsResult extends BaseResult {
-  List<ContributorResult> contributors;
+  late List<ContributorResult> contributors;
 
   static GetContributorsResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
@@ -89,10 +89,10 @@ class GetContributorsResult extends BaseResult {
 }
 
 class ProductResult extends BaseResult{
-  String name;
-  String gtin;
-  double quantity;
-  String unit;
+  String? name;
+  String? gtin;
+  double? quantity;
+  String? unit;
   static ProductResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -109,9 +109,9 @@ class ProductResult extends BaseResult{
 }
 
 class AddListItemResult extends BaseResult{
-  int  productId;
-  String name;
-  String gtin;
+  int?  productId;
+  String? name;
+  String? gtin;
   static AddListItemResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -127,11 +127,11 @@ class AddListItemResult extends BaseResult{
 }
 
 class ChangeListItemResult extends BaseResult{
-  String name;
-  int  id;
-  int  amount;
-  int  listId;
-  DateTime  changed;
+  String? name;
+  int?  id;
+  int?  amount;
+  int?  listId;
+  DateTime?  changed;
   static ChangeListItemResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -149,8 +149,8 @@ class ChangeListItemResult extends BaseResult{
 }
 
 class AddListResult extends BaseResult{
-  int  id;
-  String name;
+  int?  id;
+  String? name;
   static AddListResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -165,14 +165,14 @@ class AddListResult extends BaseResult{
 }
 
 class GetListResult {
-  int  id;
-  String name;
-  int  userId;
-  String owner;
-  DateTime  changed;
-  DateTime  created;
-  Iterable<ShoppingItem> products;
-  String contributors;
+  int?  id;
+  String? name;
+  int?  userId;
+  String? owner;
+  DateTime?  changed;
+  DateTime?  created;
+  Iterable<ShoppingItem>? products;
+  String? contributors;
 
   static GetListResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
@@ -195,7 +195,7 @@ class GetListResult {
 }
 
 class GetListsResult {
-  Iterable<ShoppingList> shoppingLists;
+  late Iterable<ShoppingList> shoppingLists;
 
   static GetListsResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
@@ -215,9 +215,9 @@ class GetListsResult {
 }
 
 class GetBoughtListResult{
-  int  id;
-  String name;
-  Iterable<ShoppingItem> products;
+  int?  id;
+  String? name;
+  late Iterable<ShoppingItem> products;
 
   static GetBoughtListResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
@@ -235,10 +235,10 @@ class GetBoughtListResult{
 
 
 class InfoResult {
-  int  id;
-  String username;
-  String eMail;
-  List<int> listIds;
+  int?  id;
+  String? username;
+  String? eMail;
+  List<int>? listIds;
   static InfoResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 
@@ -253,7 +253,7 @@ class InfoResult {
 }
 
 class HashResult extends Result {
-  int  hash;
+  int?  hash;
 
   static HashResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
@@ -279,7 +279,7 @@ class Result extends BaseResult{
 }
 
 class SessionRefreshResult {
-  String token;
+  String? token;
   static SessionRefreshResult fromJson(String dataString) =>
       _fromJson(jsonDecode(dataString));
 

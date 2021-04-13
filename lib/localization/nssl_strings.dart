@@ -16,7 +16,7 @@ class NSSLStrings {
     });
   }
 
-  static NSSLStrings of(BuildContext context) {
+  static NSSLStrings? of(BuildContext? context) {
     if (context == null) return null;
 
     return Localizations.of<NSSLStrings>(context, NSSLStrings);

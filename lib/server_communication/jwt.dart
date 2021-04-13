@@ -20,7 +20,7 @@ class JWT {
   }
 
   static String tokenToJson() {
-    var s = User.token;
+    var s = User.token!;
     var temps = s
         .substring(s.indexOf(".")+1, s.lastIndexOf("."));
     if(temps.length % 4 != 0)
@@ -28,7 +28,7 @@ class JWT {
     return Utf8Decoder().convert(Base64Codec().decode(temps));
   }
 
-  static Future<int> getIdFromToken(String token) async {
+  static Future<int> getIdFromToken(String? token) async {
     //JsonWebToken jwt = JsonWebToken.decode(token);
     //var map = jwt.payload.toJson();
     //return int.parse(map["id"]);

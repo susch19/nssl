@@ -12,10 +12,10 @@ import 'package:nssl/server_communication/shopping_list_sync.dart';
 class ShoppingList {
   static ShoppingList empty = ShoppingList.messaging(1, "", false);
 
-  int id;
+  int? id;
 
-  String name;
-  List<ShoppingItem> shoppingItems = <ShoppingItem>[];
+  String? name;
+  List<ShoppingItem?>? shoppingItems = <ShoppingItem?>[];
   bool messagingEnabled = true;
 
   ShoppingList(this.id, this.name);
@@ -28,18 +28,18 @@ class ShoppingList {
       await z.execute('INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
           [id, name, messagingEnabled ? 1 : 0, User.ownId]);
 
-      await z.rawDelete("DELETE FROM ShoppingItems WHERE id not in (?)", [shoppingItems.map((e) => e.id).join(",")]);
-      for (var item in shoppingItems) {
+      await z.rawDelete("DELETE FROM ShoppingItems WHERE id not in (?)", [shoppingItems!.map((e) => e!.id).join(",")]);
+      for (var item in shoppingItems!) {
         await z.execute(
             "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
-            [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, id, item.sortOrder]);
+            [item!.id, item.name, item.amount, item.crossedOut ? 1 : 0, id, item.sortOrder]);
       }
     });
   }
 
   Future addSingleItem(ShoppingItem item, {int index = -1}) async {
-    if (index < 0) index = shoppingItems.length;
-    shoppingItems.insert(index, item);
+    if (index < 0) index = shoppingItems!.length;
+    shoppingItems!.insert(index, item);
     if (!Platform.isAndroid) return;
     await DatabaseManager.database.execute(
         "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
@@ -47,7 +47,7 @@ class ShoppingList {
   }
 
   Future deleteSingleItem(ShoppingItem item) async {
-    shoppingItems.remove(item);
+    shoppingItems!.remove(item);
     if (!Platform.isAndroid) return;
     await DatabaseManager.database.rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
   }
@@ -76,20 +76,20 @@ class ShoppingList {
     //     .toList();
 
     return lists
-        .map((x) => ShoppingList(x["id"], x["name"])
+        .map((x) => ShoppingList(x["id"] as int?, x["name"] as String?)
           ..messagingEnabled = x["messaging"] == 0 ? false : true
           ..shoppingItems = items
               .where((y) => y["res_list_id"] == x["id"])
-              .map((y) => ShoppingItem(y["name"])
-                ..amount = y["amount"]
+              .map((y) => ShoppingItem(y["name"] as String?)
+                ..amount = y["amount"] as int?
                 ..crossedOut = y["crossed"] == 0 ? false : true
-                ..id = y["id"]
-                ..sortOrder = y["sortorder"])
+                ..id = y["id"] as int?
+                ..sortOrder = y["sortorder"] as int?)
               .toList())
         .toList();
   }
 
-  Future refresh([BuildContext context]) async {
+  Future refresh([BuildContext? context]) async {
     var res = await ShoppingListSync.getList(id, context);
 //    if (res.statusCode == 401) {
 //      showInSnackBar(loc.notLoggedInYet() + res.reasonPhrase);
@@ -107,9 +107,9 @@ class ShoppingList {
     else
       items = <Map<String, dynamic>>[];
 
-    shoppingItems.clear();
-    for (var item in newList.products)
-      shoppingItems.add(ShoppingItem(item.name)
+    shoppingItems!.clear();
+    for (var item in newList.products!)
+      shoppingItems!.add(ShoppingItem(item.name)
         ..id = item.id
         ..amount = item.amount
         ..changed = item.changed
@@ -118,11 +118,11 @@ class ShoppingList {
             (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true)
         ..sortOrder = item.sortOrder);
 
-    shoppingItems.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
     save();
   }
 
-  static Future<Null> reloadAllLists([BuildContext cont]) async {
+  static Future<Null> reloadAllLists([BuildContext? cont]) async {
     var result = GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
     User.shoppingLists.clear();
 
@@ -138,18 +138,18 @@ class ShoppingList {
     for (var res in result.shoppingLists) {
       var list = ShoppingList(res.id, res.name);
 
-      for (var item in res.products)
-        list.shoppingItems.add(ShoppingItem(item.name)
+      for (var item in res.products!)
+        list.shoppingItems!.add(ShoppingItem(item.name)
           ..id = item.id
           ..amount = item.amount
           ..crossedOut =
               (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true)
           ..sortOrder = (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"sortorder": 0})["sortorder"]));
 
-      if (list.shoppingItems.any((element) => element.sortOrder == null))
-        for (int i = 0; i < list.shoppingItems.length; i++) list.shoppingItems[i].sortOrder = i;
+      if (list.shoppingItems!.any((element) => element!.sortOrder == null))
+        for (int i = 0; i < list.shoppingItems!.length; i++) list.shoppingItems![i]!.sortOrder = i;
 
-      list.shoppingItems.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+      list.shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
       User.shoppingLists.add(list);
 
       list.subscribeForFirebaseMessaging();

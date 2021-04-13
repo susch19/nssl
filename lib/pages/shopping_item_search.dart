@@ -9,8 +9,8 @@ import 'package:http/http.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 
 class ProductAddPage extends StatefulWidget {
-  ProductAddPage({Key key, this.title}) : super(key: key);
-  final String title;
+  ProductAddPage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _ProductAddPageState createState() => new _ProductAddPageState();
@@ -29,59 +29,51 @@ class ProductAddPage extends StatefulWidget {
 }
 
 class _ProductAddPageState extends State<ProductAddPage> {
-  final GlobalKey<ScaffoldState> _mainScaffoldKey =
-      GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey _iff = GlobalKey();
   GlobalKey _ib = GlobalKey();
   TextEditingController tec = TextEditingController();
   List<ProductResult> prList = <ProductResult>[];
   int k = 1;
 
-  Future _addProductToList(String name, String gtin) async {
+  Future _addProductToList(String? name, String? gtin) async {
     var list = User.currentList;
     if (list != null) {
       if (list.shoppingItems == null) list.shoppingItems = [];
 
-      var item = list.shoppingItems
-          .firstWhere((x) => x.name == name, orElse: () => null);
-      ShoppingItem afterAdd;
+      var item = list.shoppingItems!.firstWhere((x) => x!.name == name, orElse: () => null);
+      ShoppingItem? afterAdd;
       if (item != null) {
-        var answer =
-            await ShoppingListSync.changeProductAmount(list.id, item.id, 1, context);
+        var answer = await ShoppingListSync.changeProductAmount(list.id!, item.id!, 1, context);
         var p = ChangeListItemResult.fromJson((answer).body);
         setState(() {
           item.amount = p.amount;
           item.changed = p.changed;
         });
       } else {
-            
-        var p = AddListItemResult.fromJson((await ShoppingListSync.addProduct(
-                list.id, name, gtin ?? '-', 1, context))
-            .body);
+        var p = AddListItemResult.fromJson(
+            (await ShoppingListSync.addProduct(list.id!, name!, gtin ?? '-', 1, context)).body);
         afterAdd = ShoppingItem(p.name)
           ..amount = 1
           ..id = p.productId;
-        setState(() => list.shoppingItems.add(afterAdd));
+        setState(() => list.shoppingItems!.add(afterAdd));
       }
 
       showInSnackBar(
           item == null
-              ? NSSLStrings.of(context).addedProduct() + "$name"
-              : "$name" + NSSLStrings.of(context).productWasAlreadyInList(),
+              ? NSSLStrings.of(context)!.addedProduct() + "$name"
+              : "$name" + NSSLStrings.of(context)!.productWasAlreadyInList(),
           duration: Duration(seconds: item == null ? 2 : 4),
           action: SnackBarAction(
-              label: NSSLStrings.of(context).undo(),
+              label: NSSLStrings.of(context)!.undo(),
               onPressed: () async {
                 var res = item == null
-                    ? await ShoppingListSync.deleteProduct(
-                        list.id, afterAdd.id, context)
-                    : await ShoppingListSync.changeProductAmount(
-                        list.id, item.id, -1, context);
-                if (Result.fromJson(res.body).success) {
+                    ? await ShoppingListSync.deleteProduct(list.id!, afterAdd!.id!, context)
+                    : await ShoppingListSync.changeProductAmount(list.id!, item.id!, -1, context);
+                if (Result.fromJson(res.body).success!) {
                   if (item == null)
-                    list.shoppingItems.remove(afterAdd);
-                  else
-                    item.amount--;
+                    list.shoppingItems!.remove(afterAdd);
+                  else if (item.amount != null) item.amount = item.amount! - 1;
                 }
               }));
       list.save();
@@ -101,8 +93,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
             title: Form(
                 child: TextField(
                     key: _iff,
-                    decoration:
-                        InputDecoration(hintText: NSSLStrings.of(context).searchProductHint()),
+                    decoration: InputDecoration(hintText: NSSLStrings.of(context)!.searchProductHint()),
                     onSubmitted: (x) => _searchProducts(x, 1),
                     autofocus: true,
                     controller: tec,
@@ -113,7 +104,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
                           lastLength = 0;
                           noMoreProducts = false;
                           oldValue = s;
-                    })))),
+                        })))),
         floatingActionButton: FloatingActionButton(
           onPressed: () => {},
           child: IconButton(
@@ -131,14 +122,18 @@ class _ProductAddPageState extends State<ProductAddPage> {
 
   Future _searchProducts(String value, int page) async {
     Response o = await ProductSync.getProducts(value, page, context);
-
-      List z = jsonDecode(o.body);// .decode(o.body);
-      if (!noMoreProducts && z.length <= 0) {
+    if (o.body.length < 1) return;
+    List? z = jsonDecode(o.body); // .decode(o.body);
+    if (!noMoreProducts && z!.length <= 0) {
       noMoreProducts = true;
-      showInSnackBar(NSSLStrings.of(context).noMoreProductsMessage(),
-          duration: Duration(seconds: 3));
+      showInSnackBar(NSSLStrings.of(context)!.noMoreProductsMessage(), duration: Duration(seconds: 3));
     } else
-      setState(() => prList.addAll(z.map((f)=>ProductResult()..unit=f["unit"]..name=f["name"]..quantity=f["quantity"]).toList()));
+      setState(() => prList.addAll(z!
+          .map((f) => ProductResult()
+            ..unit = f["unit"]
+            ..name = f["name"]
+            ..quantity = f["quantity"])
+          .toList()));
   }
 
   Widget buildBody() {
@@ -150,8 +145,7 @@ class _ProductAddPageState extends State<ProductAddPage> {
               lastLength = prList.length;
             }
             return ListTile(
-                title: Text(prList[i].name),
-                onTap: () => _addProductToList(prList[i].name, prList[i].gtin));
+                title: Text(prList[i].name!), onTap: () => _addProductToList(prList[i].name, prList[i].gtin));
           },
           itemCount: prList.length);
       return listView;
@@ -159,12 +153,9 @@ class _ProductAddPageState extends State<ProductAddPage> {
       return Text("");
   }
 
-  void showInSnackBar(String value,
-      {Duration duration, SnackBarAction action}) {
+  void showInSnackBar(String value, {Duration? duration, SnackBarAction? action}) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value),
-        duration: duration ?? Duration(seconds: 3),
-        action: action));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(value), duration: duration ?? Duration(seconds: 3), action: action));
   }
 }

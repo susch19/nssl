@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:nssl/models/model_export.dart';
 
 class DatabaseManager {
-  static Database database;
+  static late Database database;
 
   static int _version = 3;
 
@@ -25,7 +25,7 @@ class DatabaseManager {
   static Future _upgradeDatabase(Database db, int oldVersion, int newVersion) async {
     //user_id new on ShoppingLists and Themes
     var list = (await db.rawQuery("SELECT * FROM User LIMIT 1"));
-    if (list.length != 0) User.ownId = list.first["own_id"];
+    if (list.length != 0) User.ownId = list.first["own_id"] as int?;
 
     bool userExists = list.length != 0;
     if (oldVersion == 1) {

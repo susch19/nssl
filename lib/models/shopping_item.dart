@@ -1,6 +1,6 @@
 class TestClass{
   int test;
-  String o;
+  String? o;
 
   TestClass(this.test, this.o);
 
@@ -9,19 +9,19 @@ class TestClass{
 
 class ShoppingItem {
   //extends JsonDecoder{
-  int amount;
-  String name;
-  int id;
-  DateTime  created;
-  DateTime  changed;
+  int? amount;
+  String? name;
+  int? id;
+  DateTime?  created;
+  DateTime?  changed;
   bool crossedOut = false;
-  int  sortOrder;
+  int?  sortOrder;
 
   ShoppingItem(this.name);
 
   @override
   String toString() {
-    return name + "\u{1F}" + amount.toString() + "\u{1F}" + id.toString();
+    return name! + "\u{1F}" + amount.toString() + "\u{1F}" + id.toString();
   }
 
   ShoppingItem clone(){

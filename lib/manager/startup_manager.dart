@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file/local.dart';
 
 class Startup {
-  static SharedPreferences sharedPreferences;
+  static SharedPreferences? sharedPreferences;
   static List<RemoteMessage> remoteMessages = <RemoteMessage>[];
   static const LocalFileSystem fs = const LocalFileSystem();
 
@@ -120,10 +120,10 @@ class Startup {
       var crossedOut =
           (await DatabaseManager.database.rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
       result.shoppingLists.forEach((resu) {
-        var list = ShoppingList(resu.id, resu.name)..shoppingItems = <ShoppingItem>[];
+        var list = ShoppingList(resu.id, resu.name)..shoppingItems = <ShoppingItem?>[];
 
-        for (var item in resu.products)
-          list.shoppingItems.add(ShoppingItem(item.name)
+        for (var item in resu.products!)
+          list.shoppingItems!.add(ShoppingItem(item.name)
             ..id = item.id
             ..amount = item.amount
             ..crossedOut =

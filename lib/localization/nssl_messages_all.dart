@@ -12,7 +12,7 @@ Map<String, Function> _deferredLibraries = {
   'es': () => Future.value(null),
 };
 
-MessageLookupByLibrary _findExact(localeName) {
+MessageLookupByLibrary? _findExact(localeName) {
   switch (localeName) {
     case 'en':
       return m_en.messages;
@@ -43,7 +43,7 @@ bool _messagesExistFor(String locale) {
   return messages != null;
 }
 
-MessageLookupByLibrary _findGeneratedMessagesFor(locale) {
+MessageLookupByLibrary? _findGeneratedMessagesFor(locale) {
   var actualLocale =
       Intl.verifiedLocale(locale, _messagesExistFor, onFailure: (_) => null);
   if (actualLocale == null) return null;

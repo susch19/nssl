@@ -6,23 +6,23 @@ import 'package:nssl/models/shopping_list.dart';
 import 'package:nssl/server_communication/jwt.dart';
 
 class User {
-  static String username;
-  static String eMail;
+  static String? username;
+  static String? eMail;
   static List<ShoppingList> shoppingLists = <ShoppingList>[];
-  static String token;
-  static int currentListIndex;
-  static ShoppingList currentList;
-  static int ownId;
+  static String? token;
+  static int? currentListIndex;
+  static ShoppingList? currentList;
+  static int? ownId;
 
   static Future load() async {
     if (!Platform.isAndroid) return;
     var list = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1"));
     if (list.length == 0) return;
     var z = list.first;
-    User.username = z["username"];
-    User.eMail = z["email"];
-    User.token = z["token"];
-    User.currentListIndex = z["current_list_index"];
+    User.username = z["username"] as String?;
+    User.eMail = z["email"] as String?;
+    User.token = z["token"] as String?;
+    User.currentListIndex = z["current_list_index"] as int?;
     if (!z.containsKey("own_id")) {
       await DatabaseManager.database.execute("DROP TABLE User");
       await DatabaseManager.database.execute(
@@ -30,7 +30,7 @@ class User {
       User.ownId = await JWT.getIdFromToken(User.token);
       await save();
     } else
-      User.ownId = z["own_id"];
+      User.ownId = z["own_id"] as int?;
   }
 
   static Future save() async {

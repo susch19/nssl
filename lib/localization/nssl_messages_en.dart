@@ -5,7 +5,7 @@ final messages = MessageLookup();
 class MessageLookup extends MessageLookupByLibrary {
   get localeName => 'en';
 
-  final messages = _notInlinedMessages(_notInlinedMessages);
+  final Map<String, dynamic> messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => {
         "options": MessageLookupByLibrary.simpleMessage("Options"),
         "changeTheme": MessageLookupByLibrary.simpleMessage("Change Theme"),

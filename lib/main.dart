@@ -41,9 +41,9 @@ class NSSL extends StatelessWidget {
 }
 
 class NSSLPage extends StatefulWidget {
-  NSSLPage({Key key}) : super(key: key);
+  NSSLPage({Key? key}) : super(key: key);
 
-  static _NSSLState state;
+  static _NSSLState? state;
   @override
   _NSSLState createState() {
     var localState = new _NSSLState();
@@ -92,7 +92,7 @@ class _NSSLState extends State<NSSLPage> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveTheme(
-        light: Themes.lightTheme.theme,
+        light: Themes.lightTheme.theme!,
         dark: Themes.darkTheme.theme,
         initial: AdaptiveThemeMode.system,
         builder: (theme, darkTheme) => MaterialApp(

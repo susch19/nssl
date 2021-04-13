@@ -36,17 +36,17 @@ class CloudMessaging {
       switch (action) {
         case "ItemChanged": //Id, Amount, action
           var id = int.parse(data["id"]);
-          list.shoppingItems.firstWhere((x) => x.id == id).amount = int.parse(data["amount"]);
+          list.shoppingItems!.firstWhere((x) => x!.id == id)!.amount = int.parse(data["amount"]);
           list.save();
           break;
         case "ItemDeleted": //Id, action
           var id = int.parse(data["id"]);
-          list.shoppingItems.removeWhere((x) => x.id == id);
+          list.shoppingItems!.removeWhere((x) => x!.id == id);
           list.save();
           break;
         case "NewItemAdded": //Id, Name, Gtin, Amount, action
-          if (list.shoppingItems.firstWhere((x) => x.id == int.parse(data["id"]), orElse: () => null) != null) break;
-          list.shoppingItems.add(ShoppingItem(data["name"])
+          if (list.shoppingItems!.firstWhere((x) => x!.id == int.parse(data["id"]), orElse: () => null) != null) break;
+          list.shoppingItems!.add(ShoppingItem(data["name"])
             ..id = int.parse(data["id"])
             ..amount = int.parse(data["amount"])
             ..crossedOut = false
@@ -61,12 +61,12 @@ class CloudMessaging {
           await list.refresh();
           break;
         case "ItemRenamed": //product.Id, product.Name
-          list.shoppingItems.firstWhere((x) => x.id == int.parse(data["id"])).name = data["name"];
+          list.shoppingItems!.firstWhere((x) => x!.id == int.parse(data["id"]))!.name = data["name"];
           list.save();
           break;
         case "OrderChanged":
           var id = int.parse(data["id"]);
-          list.shoppingItems.firstWhere((x) => x.id == id).sortOrder = int.parse(data["sortOrder"]);
+          list.shoppingItems!.firstWhere((x) => x!.id == id)!.sortOrder = int.parse(data["sortOrder"]);
           list.save();
           break;
       }

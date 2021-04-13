@@ -12,37 +12,37 @@ class HelperMethods {
   static const String host = "nssl.susch.eu";
   // static const String url = "http://192.168.49.22:4344";
 
-  static Future<http.Response> post(String path, BuildContext context, [Object body, skipTokenRefresh = false]) async {
+  static Future<http.Response> post(String path, BuildContext? context, [Object? body, skipTokenRefresh = false]) async {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
     var res = await http.post(Uri(host: host, scheme: scheme, path: path),
         body: jsonEncode(body),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
     reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> get(String path, BuildContext context, [String query = ""]) async {
+  static Future<http.Response> get(String path, BuildContext? context, [String query = ""]) async {
     await handleTokenRefresh(context);
     var res = await http.get(Uri(host: host, scheme: scheme, path: path, query: query),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token":User.token ?? ""});
     reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> put(String path, BuildContext context,
-      [Object body, bool skipTokenRefresh = false]) async {
+  static Future<http.Response> put(String path, BuildContext? context,
+      [Object? body, bool skipTokenRefresh = false]) async {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
     var res = await http.put(Uri(host: host, scheme: scheme, path: path),
         body: jsonEncode(body),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
     reactToRespone(res, context);
     return res;
   }
 
-  static Future<http.Response> delete(String path, BuildContext context) async {
+  static Future<http.Response> delete(String path, BuildContext? context) async {
     await handleTokenRefresh(context);
     var res = await http.delete(Uri(host: host, scheme: scheme, path: path),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token});
+        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
 
     reactToRespone(res, context);
     return res;
@@ -54,7 +54,7 @@ class HelperMethods {
   }
 
 
-  static bool reactToRespone(http.Response respone, BuildContext context, {ScaffoldState scaffoldState}) {
+  static bool reactToRespone(http.Response respone, BuildContext? context, {ScaffoldState? scaffoldState}) {
     if (context == null) return false;
     if (respone.statusCode == 500) {
       throw Exception();
@@ -62,8 +62,8 @@ class HelperMethods {
       showDialog(
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(NSSLStrings.of(context).tokenExpired()),
-              content: Text(NSSLStrings.of(context).tokenExpiredExplanation()),
+              title: Text(NSSLStrings.of(context)!.tokenExpired()),
+              content: Text(NSSLStrings.of(context)!.tokenExpiredExplanation()),
               actions: [
                 MaterialButton(
                   onPressed: () async {
@@ -79,7 +79,7 @@ class HelperMethods {
     return true;
   }
 
-  static handleTokenRefresh(BuildContext context) async {
+  static handleTokenRefresh(BuildContext? context) async {
     if (await JWT.newToken()) {
       var t = await UserSync.refreshToken(context);
       if (t.body == "") return;

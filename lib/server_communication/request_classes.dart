@@ -1,8 +1,8 @@
 class LoginArgs {
   LoginArgs({this.username, this.eMail, this.pwHash});
-  String username;
-  String eMail;
-  String pwHash;
+  String? username;
+  String? eMail;
+  String? pwHash;
   toJson() => {"username": username, "eMail": eMail, "pwHash": pwHash};
 }
 
@@ -27,15 +27,15 @@ class TransferOwnershipArgs {
 
 class ChangeProductArgs {
   ChangeProductArgs({this.change, this.newName});
-  int change;
-  String newName;
+  int? change;
+  String? newName;
   toJson() => {"change": "$change", "newName" : "$newName"};
 }
 
 class ChangeProductsArgs {
   ChangeProductsArgs(this.productIds, this.change);
-  List<int> productIds;
-  List<int> change;
+  List<int?> productIds;
+  List<int?> change;
   toJson() => {"amount": change, "productIds": productIds};
 }
 
@@ -59,9 +59,9 @@ class DeleteProductArgs {
 }
 
 class AddProductArgs {
-  String productName;
-  String gtin;
-  int amount;
+  String? productName;
+  String? gtin;
+  int? amount;
   toJson() =>
       {"productName": "$productName", "gtin": "$gtin", "amount": "$amount"};
 }
@@ -69,8 +69,8 @@ class AddProductArgs {
 class AddNewProductArgs {
   AddNewProductArgs(this.name, this.gtin, this.unit, this.quantity);
   String name;
-  String gtin;
-  String unit;
+  String? gtin;
+  String? unit;
   double quantity;
   toJson() => {
         "name": "$name",
@@ -88,6 +88,6 @@ class GetProductsArgs {
 
 class DeleteProductsArgs {
   DeleteProductsArgs(this.productIds);
-  List<int> productIds;
+  List<int?> productIds;
   toJson() => {"productIds": productIds};
 }

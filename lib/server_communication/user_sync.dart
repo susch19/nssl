@@ -23,9 +23,9 @@ class UserSync {
 
   static Future<Response> info(BuildContext context) => HelperMethods.get(path, context);
 
-  static Future<Response> refreshToken(BuildContext context) =>
+  static Future<Response> refreshToken(BuildContext? context) =>
       HelperMethods.put(path2, context, null, true);
 
-  static Future<Response> changePassword(String oldPassword, String newPassword, String token, BuildContext context) =>
+  static Future<Response> changePassword(String oldPassword, String newPassword, String? token, BuildContext context) =>
       HelperMethods.put(path, context, ChangePasswordArgs(oldPassword, newPassword));
 }

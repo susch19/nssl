@@ -24,9 +24,9 @@ class Themes {
       0);
   static ThemeMode tm = ThemeMode.system;
 
-  static Future saveTheme(ThemeData t, MaterialColor primary, MaterialAccentColor accent) async {
+  static Future saveTheme(ThemeData t, MaterialColor? primary, MaterialAccentColor? accent) async {
     // await DatabaseManager.database.rawDelete("DELETE FROM Themes");
-    var id = ((t.brightness == Brightness.light ? 1 : 2) << 32) + User.ownId;
+    var id = ((t.brightness == Brightness.light ? 1 : 2) << 32) + User.ownId!;
     (await SharedPreferences.getInstance()).setInt("lastTheme", id);
     tm = t.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
     if (!Platform.isAndroid) return;
@@ -34,8 +34,8 @@ class Themes {
         "INSERT OR REPLACE INTO Themes(id, primary_color, accent_color, brightness, accent_color_brightness, user_id) VALUES(?, ?, ?, ?, ?, ?)",
         [
           id,
-          Colors.primaries.indexOf(primary),
-          Colors.accents.indexOf(accent),
+          Colors.primaries.indexOf(primary!),
+          Colors.accents.indexOf(accent!),
           t.brightness.toString(),
           t.accentColorBrightness.toString(),
           User.ownId
@@ -44,27 +44,26 @@ class Themes {
 
   static Future loadTheme() async {
     if (!Platform.isAndroid) return;
-    var t;
+    late var t;
     var lastId = (await SharedPreferences.getInstance()).getInt("lastTheme") ?? 0;
     try {
       if (User.ownId != null)
         t = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes where user_id = ?", [User.ownId]));
     } catch (e) {
-      var temp = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes"))?.first;
-      if(temp == null)
-        return;
+      var temp = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes")).first;
+ 
       await DatabaseManager.database.execute("DROP TABLE Themes");
       await DatabaseManager.database.execute(
           "CREATE TABLE Themes (id INTEGER PRIMARY KEY, primary_color INTEGER, accent_color INTEGER, brightness TEXT, accent_color_brightness TEXT, user_id INTEGER)");
       saveTheme(
           ThemeData(
-              primarySwatch: Colors.primaries[temp["primary_color"]],
-              accentColor: Colors.accents[temp["accent_color"]],
+              primarySwatch: Colors.primaries[temp["primary_color"] as int],
+              accentColor: Colors.accents[temp["accent_color"] as int],
               brightness: temp["brightness"].toString().toLowerCase().contains("dark") ? Brightness.dark : Brightness.light,
               accentColorBrightness:
                   temp["accent_color_brightness"].toString().toLowerCase().contains("dark") ? Brightness.dark : Brightness.light),
-          temp["primary_color"],
-          temp["accent_color"]);
+          temp["primary_color"] as MaterialColor?,
+          temp["accent_color"] as MaterialAccentColor?);
     }
     if (t.length == 0) return;
     for (var t2 in t) {
@@ -98,9 +97,9 @@ class Themes {
 }
 
 class NSSLThemeData {
-  ThemeData theme;
-  int primarySwatchIndex;
-  int accentSwatchIndex;
+  ThemeData? theme;
+  int? primarySwatchIndex;
+  int? accentSwatchIndex;
 
   NSSLThemeData(this.theme, this.primarySwatchIndex, this.accentSwatchIndex);
 }

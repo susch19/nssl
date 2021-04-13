@@ -7,9 +7,9 @@ import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
 
 class ChangePasswordPage extends StatefulWidget {
-  ChangePasswordPage({Key key, this.scaffoldKey}) : super(key: key);
+  ChangePasswordPage({Key? key, this.scaffoldKey}) : super(key: key);
 
-  final GlobalKey<ScaffoldState> scaffoldKey;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
   @override
   ChangePasswordPageState createState() => ChangePasswordPageState();
 }
@@ -32,23 +32,23 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
 
     if (_validateEmpty(oldPwInput.textEditingController)) {
       oldPwInput.decoration = InputDecoration(
-          labelText: oldPwInput.decoration.labelText,
-          helperText: oldPwInput.decoration.helperText,
-          errorText: NSSLStrings.of(context).passwordEmptyError());
+          labelText: oldPwInput.decoration!.labelText,
+          helperText: oldPwInput.decoration!.helperText,
+          errorText: NSSLStrings.of(context)!.passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPwInput.textEditingController)) {
       newPwInput.decoration = InputDecoration(
-          labelText: newPwInput.decoration.labelText,
-          helperText: newPwInput.decoration.helperText,
-          errorText: NSSLStrings.of(context).passwordEmptyError());
+          labelText: newPwInput.decoration!.labelText,
+          helperText: newPwInput.decoration!.helperText,
+          errorText: NSSLStrings.of(context)!.passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPw2Input.textEditingController)) {
       newPw2Input.decoration = InputDecoration(
-          labelText: newPw2Input.decoration.labelText,
-          helperText: newPw2Input.decoration.helperText,
-          errorText: NSSLStrings.of(context).passwordEmptyError());
+          labelText: newPw2Input.decoration!.labelText,
+          helperText: newPw2Input.decoration!.helperText,
+          errorText: NSSLStrings.of(context)!.passwordEmptyError());
       error = true;
     }
     setState(() => {});
@@ -56,9 +56,9 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     if (newPwInput.textEditingController.text !=
         newPw2Input.textEditingController.text) {
       newPw2Input.decoration = InputDecoration(
-          labelText: newPw2Input.decoration.labelText,
-          helperText: newPw2Input.decoration.helperText,
-          errorText: NSSLStrings.of(context).passwordsDontMatchError());
+          labelText: newPw2Input.decoration!.labelText,
+          helperText: newPw2Input.decoration!.helperText,
+          errorText: NSSLStrings.of(context)!.passwordsDontMatchError());
       setState(() => {});
       return;
     }
@@ -76,21 +76,21 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
         context);
     if (res.statusCode != 200) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(res.reasonPhrase),
+          content: Text(res.reasonPhrase!),
           duration: Duration(seconds: 3)));
       return;
     }
     var obj = Result.fromJson(res.body);
-    if (!obj.success) {
+    if (!obj.success!) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(obj.error), duration: Duration(seconds: 3)));
+          content: Text(obj.error!), duration: Duration(seconds: 3)));
       return;
     }
     var dialog = AlertDialog(
-        title: Text(NSSLStrings.of(context).successful()),
+        title: Text(NSSLStrings.of(context)!.successful()),
         content: SingleChildScrollView(
           child: ListBody(
-            children: <Widget>[Text(NSSLStrings.of(context).passwordSet())],
+            children: <Widget>[Text(NSSLStrings.of(context)!.passwordSet())],
           ),
         ),
         actions: <Widget>[
@@ -103,14 +103,14 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
 
   _resetInput() {
     oldPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).oldPasswordHint(),
-        labelText: NSSLStrings.of(context).oldPassword());
+        helperText: NSSLStrings.of(context)!.oldPasswordHint(),
+        labelText: NSSLStrings.of(context)!.oldPassword());
     newPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).newPasswordHint(),
-        labelText: NSSLStrings.of(context).newPassword());
+        helperText: NSSLStrings.of(context)!.newPasswordHint(),
+        labelText: NSSLStrings.of(context)!.newPassword());
     newPw2Input.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).new2PasswordHint(),
-        labelText: NSSLStrings.of(context).new2Password());
+        helperText: NSSLStrings.of(context)!.new2PasswordHint(),
+        labelText: NSSLStrings.of(context)!.new2Password());
   }
 
   @override
@@ -125,7 +125,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-          title: Text(NSSLStrings.of(context).changePasswordPD())),
+          title: Text(NSSLStrings.of(context)!.changePasswordPD())),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child:
@@ -170,7 +170,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               child: ElevatedButton(
 //                child: Center(
                   child: Text(
-                    NSSLStrings.of(context).changePasswordButton(),
+                    NSSLStrings.of(context)!.changePasswordButton(),
                   ),
 //                ),
                 onPressed: _handleSubmitted,

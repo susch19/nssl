@@ -6,8 +6,8 @@ import 'package:nssl/server_communication//s_c.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 
 class BoughtItemsPage extends StatefulWidget {
-  BoughtItemsPage(this.listId, {Key key, this.title}) : super(key: key);
-  final String title;
+  BoughtItemsPage(this.listId, {Key? key, this.title}) : super(key: key);
+  final String? title;
   final int listId;
   @override
   _BoughtItemsPagePageState createState() => new _BoughtItemsPagePageState(listId);
@@ -20,8 +20,8 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
   var shoppingItems = <ShoppingItem>[];
   var shoppingItemsGrouped = new Map<DateTime, List<ShoppingItem>>();
   int k = 1;
-  int listId;
-  TabController _controller;
+  int? listId;
+  TabController? _controller;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -43,7 +43,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
       }
       var z = GetBoughtListResult.fromJson(o.body);
       if (z.products.length <= 0)
-        showInSnackBar(NSSLStrings.of(context).nothingBoughtYet(), duration: Duration(seconds: 10));
+        showInSnackBar(NSSLStrings.of(context)!.nothingBoughtYet(), duration: Duration(seconds: 10));
       else {
         shoppingItems.addAll(z.products.map((f) => ShoppingItem(f.name)
           ..id = f.id
@@ -52,12 +52,12 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
           ..created = f.created
           ..crossedOut = false));
         DateTime date;
-        shoppingItems.sort((x, y) => y.changed.compareTo(x.changed));
+        shoppingItems.sort((x, y) => y.changed!.compareTo(x.changed!));
         for (var item in shoppingItems) {
-          date = dateTimeToDate(item.changed);
-          if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed)))
+          date = dateTimeToDate(item.changed!);
+          if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed!)))
             shoppingItemsGrouped[date] = <ShoppingItem>[];
-          shoppingItemsGrouped[date].add(item);
+          shoppingItemsGrouped[date]!.add(item);
         }
       }
 
@@ -76,7 +76,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
     if (_controller == null)
       return Scaffold(
         appBar: AppBar(
-          title: Text(NSSLStrings.of(context).boughtProducts()),
+          title: Text(NSSLStrings.of(context)!.boughtProducts()),
           actions: <Widget>[],
         ), 
       body: Row(
@@ -95,7 +95,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
     return Scaffold(
       key: _mainScaffoldKey,
       appBar: AppBar(
-        title: Text(NSSLStrings.of(context).boughtProducts()),
+        title: Text(NSSLStrings.of(context)!.boughtProducts()),
         actions: <Widget>[],
         bottom: TabBar(
           controller: _controller,
@@ -128,7 +128,7 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
     );
   }
 
-  void showInSnackBar(String value, {Duration duration, SnackBarAction action}) {
+  void showInSnackBar(String value, {Duration? duration, SnackBarAction? action}) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(value), duration: duration ?? Duration(seconds: 3), action: action));
@@ -154,9 +154,9 @@ class _BoughtItemsPagePageState extends State<BoughtItemsPage> with SingleTicker
           child: Card(
             child: Center(
               child: ListView(
-                children: shoppingItemsGrouped[item]
+                children: shoppingItemsGrouped[item]!
                     .map((i) => ListTile(
-                          title: Text(i.name),
+                          title: Text(i.name!),
                           leading: Text(i.amount.toString() + "x"),
                         ))
                     .toList(growable: false),
