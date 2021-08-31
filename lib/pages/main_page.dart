@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:scandit/scandit.dart';
 import 'package:nssl/helper/simple_dialog.dart';
 import 'package:nssl/manager/export_manager.dart';
 import 'package:nssl/options/themes.dart';
@@ -17,6 +16,7 @@ import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 
 import '../main.dart';
+import 'barcode_scanner_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -54,9 +54,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     WidgetsBinding.instance!.addObserver(this);
     Startup.deleteMessagesFromFolder();
     Startup.initializeNewListsFromServer(setState);
-    Scandit.initialize(
-        // "AbSu+KCBNOZSIJKYgD8ilucp58OiO9OS/wQDuWxIzWGmKj0lJnhlQ4tOORhTc8xAfXzeS8lSDbjPeXgRYHZe65xlKoyLSSaDVlUdTjFV4+SBPhO9n1Cg39JdFMoRa1ZbljR2QxYZ9lm2I1baTB98T9mwnJkPlIVVaZ3Fg8B1pxoaXOoPqHxFLatrBPaZ4DXEsuMG73639nSP428oouVQhh1uvN+lg96amRah/JPF15fgmanNUXJYAVSvTl94yz2UnFoSW2kSwrVIbvG8HPrtVUU5NamDm6Wq/z523+HmGpDhr79nMrHdkxIW8z5PAOT72xN3aR5/X08XChA6F7BkEj+/InlLuv4TkwhqR4mTaibZBog+AuCjRRhHgV+KAaK4M2KaHHm/5UDMz5Mt1/tBhbSfU/4QYWixmm4qGHY2l7dVVz299nQ7gjLIi3dqlDBTa3GzpX24b/6bXUdWLNZ7sjFCu3qN+J90Lz+xVEZf06BmSx1eo5epWbanrpKTgMQ7zipTpQgU2VtEymOoRnF94Lt9LgBR99u8fzXGSaBFP7Z0tQJ6wboQQVtEbFLRjxKOhpKXngOsBbWBo6N8TZCnyRxFpe6phtlikF8b0amIUvX8HRs5rJGt7Xlf7cjZy7FNLuywhqBOnIK631v4Xx+LQv1Mop2n1Whz+THSGirO/jBqgRfgdsMokqA3uF15lPSnGi20PKCKqfpHF4jkVBY/NJzoCkvIkONKzs07PO0QaSxwkayhoi+zZUFzd0aSG5xUqtcxzswlGd3hk2VR/oyFH9DEfgsUdoPx4ed7u/X5DCztcVx3FTLw/wGeLmuAG40="
-        "11mJ4cu0zha9TnWXAIS++vah3g75SMeQrtacun7qFJQ"); //11mJ4cu0zha9TnWXAIS++vah3g75SMeQrtacun7qFJQ
+    
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -337,12 +335,13 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
       });
 
   Future<Null> _getEAN() async {
-    // var barcodeResult = await FlutterScandit(
-    //     licenseKey: "AbSu+KCBNOZSIJKYgD8ilucp58OiO9OS/wQDuWxIzWGmKj0lJnhlQ4tOORhTc8xAfXzeS8lSDbjPeXgRYHZe65xlKoyLSSaDVlUdTjFV4+SBPhO9n1Cg39JdFMoRa1ZbljR2QxYZ9lm2I1baTB98T9mwnJkPlIVVaZ3Fg8B1pxoaXOoPqHxFLatrBPaZ4DXEsuMG73639nSP428oouVQhh1uvN+lg96amRah/JPF15fgmanNUXJYAVSvTl94yz2UnFoSW2kSwrVIbvG8HPrtVUU5NamDm6Wq/z523+HmGpDhr79nMrHdkxIW8z5PAOT72xN3aR5/X08XChA6F7BkEj+/InlLuv4TkwhqR4mTaibZBog+AuCjRRhHgV+KAaK4M2KaHHm/5UDMz5Mt1/tBhbSfU/4QYWixmm4qGHY2l7dVVz299nQ7gjLIi3dqlDBTa3GzpX24b/6bXUdWLNZ7sjFCu3qN+J90Lz+xVEZf06BmSx1eo5epWbanrpKTgMQ7zipTpQgU2VtEymOoRnF94Lt9LgBR99u8fzXGSaBFP7Z0tQJ6wboQQVtEbFLRjxKOhpKXngOsBbWBo6N8TZCnyRxFpe6phtlikF8b0amIUvX8HRs5rJGt7Xlf7cjZy7FNLuywhqBOnIK631v4Xx+LQv1Mop2n1Whz+THSGirO/jBqgRfgdsMokqA3uF15lPSnGi20PKCKqfpHF4jkVBY/NJzoCkvIkONKzs07PO0QaSxwkayhoi+zZUFzd0aSG5xUqtcxzswlGd3hk2VR/oyFH9DEfgsUdoPx4ed7u/X5DCztcVx3FTLw/wGeLmuAG40=",
-    //     symbologies: [Symbology.EAN8, Symbology.EAN13_UPCA]).scanBarcode();
 
-    // ean = barcodeResult.data;
-    ean = await Scandit.scan();
+    ean = await Navigator.push(
+            cont!,
+            MaterialPageRoute<String>(
+              builder: (BuildContext context) => BarcodeScannerScreen(),
+              fullscreenDialog: true,
+            ));
 
     if (ean == null || ean == "" || ean == "Permissions denied") return;
 

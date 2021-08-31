@@ -10,6 +10,7 @@ import 'package:nssl/models/model_export.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
+import 'package:scandit_flutter_datacapture_barcode/scandit_flutter_datacapture_barcode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file/local.dart';
 
@@ -20,9 +21,7 @@ class Startup {
 
   static Future<bool> initializeMinFunction() async {
     if (!Platform.isAndroid) return true;
-    await Firebase.initializeApp();
-
-    return true;
+    return Firebase.initializeApp().then((value) async => await ScanditFlutterDataCaptureBarcode.initialize()).then((value) => true);
   }
 
   static Future<void> loadMessagesFromFolder(Function setState) async {
@@ -56,7 +55,7 @@ class Startup {
   static Future<bool> initialize() async {
     // var t = SharedPreferences.getInstance();
     WidgetsFlutterBinding.ensureInitialized();
-    await initializeMinFunction();
+    var f1 = initializeMinFunction();
     await DatabaseManager.initialize();
     await User.load();
     // sharedPreferences = await t;
@@ -68,6 +67,7 @@ class Startup {
     if (User.shoppingLists.length == 0) return true;
     User.currentList =
         User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
+    await f1;
     return true;
 
     // FileManager.createFolder("ShoppingListsCo");

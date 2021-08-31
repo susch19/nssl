@@ -27,8 +27,8 @@ dependencies:
   sqflite_common_ffi:
   process_run: 
   permission_handler: 
-  scandit:
-    path: ../Plugins/scandit3
+  scandit_flutter_datacapture_barcode:
+  flutter_platform_widgets: 
   # scandit_flutter_datacapture_barcode: ^6.7.0
   # scandit_flutter_datacapture_core: ^6.7.0
   # flutter_scandit: ^0.1.0

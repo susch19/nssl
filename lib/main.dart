@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
@@ -110,35 +111,37 @@ class _NSSLState extends State<NSSLPage> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveTheme(
-        light: Themes.lightTheme.theme!,
-        dark: Themes.darkTheme.theme,
-        initial: AdaptiveThemeMode.system,
-        builder: (theme, darkTheme) => MaterialApp(
-              scrollBehavior: CustomScrollBehavior(),
-              title: 'NSSL',
-              color: Colors.grey[500],
-              localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-                new _NSSLLocalizationsDelegate(),
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-              ],
-              supportedLocales: const <Locale>[
-                const Locale('en', 'US'),
-                const Locale('de', 'DE'),
-              ],
-              theme: theme,
-              darkTheme: darkTheme,
-              home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
-              routes: <String, WidgetBuilder>{
-                '/login': (BuildContext context) => LoginPage(),
-                '/registration': (BuildContext context) => Registration(),
-                '/search': (BuildContext context) => ProductAddPage(),
-                '/forgot_password': (BuildContext context) => CustomThemePage(),
-              },
-              showPerformanceOverlay: performanceOverlay,
-              showSemanticsDebugger: false,
-              debugShowMaterialGrid: materialGrid,
-            ));
+      light: Themes.lightTheme.theme!,
+      dark: Themes.darkTheme.theme,
+      initial: AdaptiveThemeMode.system,
+      builder: (theme, darkTheme) => MaterialApp(
+        scrollBehavior: CustomScrollBehavior(),
+        title: 'NSSL',
+        color: Colors.grey[500],
+        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+          new _NSSLLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const <Locale>[
+          const Locale('en', 'US'),
+          const Locale('de', 'DE'),
+        ],
+        theme: theme,
+        darkTheme: darkTheme,
+        debugShowMaterialGrid: materialGrid,
+        home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
+        routes: <String, WidgetBuilder>{
+          '/login': (BuildContext context) => LoginPage(),
+          '/registration': (BuildContext context) => Registration(),
+          '/search': (BuildContext context) => ProductAddPage(),
+          '/forgot_password': (BuildContext context) => CustomThemePage(),
+        },
+        showPerformanceOverlay: performanceOverlay,
+        showSemanticsDebugger: false,
+      ),
+      // debugShowMaterialGrid: materialGrid,
+    );
   }
 
   Scaffold mainAppHome() => Scaffold(
