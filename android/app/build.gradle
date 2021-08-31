@@ -16,7 +16,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     lintOptions {
         checkReleaseBuilds false // Add this
@@ -27,8 +27,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         applicationId 'de.susch19.nssl'
         resValue "string", "app_name", "NSSL"
+        multiDexEnabled true
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
     }
 
     buildTypes {
@@ -54,14 +55,14 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
-
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def requested = details.requested
-        if (requested.group == 'com.android.support') {
-            if (!requested.name.startsWith("multidex")) {
-                details.useVersion '27.0.0'
-            }
-        }
-    }
-}
+//
+//configurations.all {
+//    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+//        def requested = details.requested
+//        if (requested.group == 'com.android.support') {
+//            if (!requested.name.startsWith("multidex")) {
+//                details.useVersion '27.0.0'
+//            }
+//        }
+//    }
+//}

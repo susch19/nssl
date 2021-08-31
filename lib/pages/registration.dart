@@ -143,15 +143,13 @@ class RegistrationState extends State<Registration> {
   }
 
   String? _validatePassword(String? value) {
-    if (pwInput.textEditingController == null ||
-        pwInput.textEditingController.text.isEmpty)
+    if (pwInput.textEditingController.text.isEmpty)
       return NSSLStrings.of(context)!.chooseAPasswordPrompt();
     return null;
   }
 
   String? _validatePassword2(String? value) {
-    if (pw2Input.textEditingController == null ||
-        pwInput.textEditingController.text.isEmpty)
+    if (pwInput.textEditingController.text.isEmpty)
       return NSSLStrings.of(context)!.reenterPasswordPrompt();
     if (pwInput.textEditingController.text != value)
       return NSSLStrings.of(context)!.passwordsDontMatchError();

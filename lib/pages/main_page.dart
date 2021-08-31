@@ -26,8 +26,8 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> with TickerProviderStateMixin, WidgetsBindingObserver {
   BuildContext? cont;
 
-  final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _drawerScaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _mainController = ScrollController();
+  final ScrollController _drawerController = ScrollController();
 
   String? ean = "";
   bool performanceOverlay = false;
@@ -77,10 +77,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _mainScaffoldKey,
         appBar: AppBar(
             title: Text(
-              User?.currentList?.name ?? NSSLStrings.of(context)!.noListLoaded(),
+              User.currentList?.name ?? NSSLStrings.of(context)!.noListLoaded(),
             ),
             actions: isReorderingItems
                 ? <Widget>[]
@@ -122,20 +121,23 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     var lv;
     if (User.currentList!.shoppingItems!.length > 0) {
       var mainList = User.currentList!.shoppingItems!.map((x) {
+        if (x == null || x.name == null) return Text("Null");
+        // return Text(x.name!);
+
         var lt = ListTile(
-          key: ValueKey(x!.id),
-          title: Row(children: [
-            Expanded(
-                child: Text(
-              x.name ?? "",
-              maxLines: 2,
-              softWrap: true,
-              style: TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
-            )),
-          ]),
+          key: ValueKey(x),
+          title: Wrap(
+            children: [
+              Text(
+                x.name ?? "",
+                maxLines: 2,
+                softWrap: true,
+                style: TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
+              ),
+            ],
+          ),
           leading: PopupMenuButton<String>(
-            child: Flexible(
-              // width: 38.0,
+            child: FittedBox(
               child: Row(children: [
                 Text(x.amount.toString() + "x"),
                 const Icon(Icons.expand_more, size: 16.0),
@@ -160,11 +162,13 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
             onDismissed: (DismissDirection d) => handleDismissMain(d, x),
             direction: DismissDirection.startToEnd,
             background: Container(
-                decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-                child: ListTile(
-                    leading: Icon(Icons.delete,
-                        //  color: Theme.of(context).accentIconTheme.color,
-                        size: 36.0))),
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: ListTile(
+                leading: Icon(Icons.delete,
+                    //  color: Theme.of(context).accentIconTheme.color,
+                    size: 36.0),
+              ),
+            ),
           );
         }
       }).toList(growable: true);
@@ -173,6 +177,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         lv = ReorderableListView(onReorder: _onReorderItems, scrollDirection: Axis.vertical, children: mainList);
       } else {
         lv = CustomScrollView(
+          controller: _mainController,
           slivers: [
             SliverFixedExtentList(
                 delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -183,7 +188,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                 }, childCount: mainList.length),
                 itemExtent: 50.0)
           ],
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
         );
       }
     } else
@@ -198,7 +203,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
   }
 
   void _onReorderItems(int oldIndex, int newIndex) {
-    if (User?.currentList == null) return;
+    if (User.currentList == null) return;
 
     ShoppingItem? item = User.currentList!.shoppingItems![oldIndex];
     if (item?.crossedOut ?? false) return;
@@ -222,11 +227,14 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
   void sortAndOrderCrossedOut() {
     final crossedOffset = 0xFFFFFFFF;
     setState(() {
-      for (var crossedOut in User?.currentList?.shoppingItems?.where((x) => x!.crossedOut && x.sortOrder! < crossedOffset) ?? <ShoppingItem>[]) {
+      for (var crossedOut
+          in User.currentList?.shoppingItems?.where((x) => x!.crossedOut && x.sortOrder! < crossedOffset) ??
+              <ShoppingItem>[]) {
         crossedOut?.sortOrder = crossedOut.sortOrder! + crossedOffset;
       }
       for (var notCrossedOut
-          in User?.currentList?.shoppingItems?.where((x) => !x!.crossedOut && x.sortOrder! > crossedOffset)?? <ShoppingItem>[] ) {
+          in User.currentList?.shoppingItems?.where((x) => !x!.crossedOut && x.sortOrder! > crossedOffset) ??
+              <ShoppingItem>[]) {
         notCrossedOut!.sortOrder = notCrossedOut.sortOrder! - crossedOffset;
       }
     });
@@ -234,7 +242,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
 
   void updateOrderIndiciesAndSave({bool syncToServer = false}) async {
     var i = 1;
-    for (var item in User?.currentList?.shoppingItems ?? <ShoppingItem>[]) {
+    for (var item in User.currentList?.shoppingItems ?? <ShoppingItem>[]) {
       item?.sortOrder = i;
       i++;
     }
@@ -336,7 +344,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     // ean = barcodeResult.data;
     ean = await Scandit.scan();
 
-    if (ean == "" || ean == "Permissions denied") return;
+    if (ean == null || ean == "" || ean == "Permissions denied") return;
 
     var list = User.currentList;
     var firstRequest = await ProductSync.getProduct(ean, cont);
@@ -403,19 +411,23 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     var newList = ShoppingList(newListRes.id, newListRes.name);
     setState(() => User.shoppingLists.add(newList));
     changeCurrentList(User.shoppingLists.indexOf(newList));
-    firebaseMessaging.subscribeToTopic(newList.id.toString() + "shoppingListTopic");
+    firebaseMessaging?.subscribeToTopic(newList.id.toString() + "shoppingListTopic");
     newList.save();
   }
 
   Widget _buildDrawer(BuildContext context) {
+    var isDarkTheme = AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark;
     var userheader = UserAccountsDrawerHeader(
       accountName: Text(User.username ?? NSSLStrings.of(context)!.notLoggedInYet()),
       accountEmail: Text(User.eMail ?? NSSLStrings.of(context)!.notLoggedInYet()),
       currentAccountPicture: CircleAvatar(
-          child: Text(User.username?.substring(0, 2).toUpperCase() ?? ""),
-          backgroundColor: MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? Themes.darkTheme.theme!.accentColor
-              : Themes.lightTheme.theme!.accentColor),
+          child: Text(
+            User.username?.substring(0, 2).toUpperCase() ?? "",
+            style: TextStyle(color: isDarkTheme ? Colors.black : Colors.white),
+          ),
+          backgroundColor: isDarkTheme
+              ? Themes.darkTheme.theme!.floatingActionButtonTheme.backgroundColor
+              : Themes.lightTheme.theme!.floatingActionButtonTheme.backgroundColor),
       onDetailsPressed: () {
         _showDrawerContents = !_showDrawerContents;
         _showDrawerContents ? _controller!.reverse() : _controller!.forward();
@@ -425,7 +437,6 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     var list = User.shoppingLists.isNotEmpty
         ? User.shoppingLists
             .map((x) => ListTile(
-                  key: ValueKey(x),
                   title: Text(x.name ?? ""),
                   onTap: () =>
                       changeCurrentList(User.shoppingLists.indexOf(User.shoppingLists.firstWhere((y) => y.id == x.id))),
@@ -448,7 +459,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                                 // NSSLStrings.of(context)!.contributors()),
                               ),
                             ),
-                            //Deactivated, because it's not working at the moment 
+                            //Deactivated, because it's not working at the moment
                             // PopupMenuItem<String>(
                             //   value: x.id.toString() + "\u{1E}" + 'ExportAsPdf',
                             //   child: ListTile(
@@ -482,9 +493,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         title: const Text(("")),
       ));
     var d = Scaffold(
-        key: _drawerScaffoldKey,
         body: RefreshIndicator(
             child: ListView(
+              controller: _drawerController,
               children: <Widget>[
                 userheader,
                 Stack(
@@ -503,6 +514,11 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                           children: <Widget>[
                             ListTile(
                               leading: const Icon(Icons.sync),
+                              title: Text(NSSLStrings.of(context)!.refresh()),
+                              onTap: () => _handleDrawerRefresh(),
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.restore_page_outlined),
                               title: Text(
                                 NSSLStrings.of(context)!.changePasswordPD(),
                               ),
@@ -565,8 +581,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
             context: cont!,
             barrierDismissible: false,
             builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
-                title: NSSLStrings.of(cont)?.deleteListTitle()??"" + deleteList.name!,
-                text: NSSLStrings.of(cont)?.deleteListText()??"",
+                title: NSSLStrings.of(cont)?.deleteListTitle() ?? "" + deleteList.name!,
+                text: NSSLStrings.of(cont)?.deleteListText() ?? "",
                 onSubmitted: (s) async {
                   var res = Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
                   if (!(res.success ?? false))

@@ -66,7 +66,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   bool _validateEmpty(TextEditingController value) =>
-      (value == null || value.text.isEmpty);
+      (value.text.isEmpty);
 
   _changePassword() async {
     var res = await UserSync.changePassword(

@@ -131,5 +131,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "boughtProducts": MessageLookupByLibrary.simpleMessage('Bought Products'),
         "nothingBoughtYet": MessageLookupByLibrary.simpleMessage('Nothing bought yet'),
         "reorderItems": MessageLookupByLibrary.simpleMessage('Reorder'),
+        "refresh": MessageLookupByLibrary.simpleMessage('Refresh'),
       };
 }

@@ -192,6 +192,8 @@ class NSSLStrings {
   String boughtProducts() => Intl.message('Bought Products', name: 'boughtProducts', locale: _localeName);
   String nothingBoughtYet() => Intl.message('Nothing bought yet', name: 'nothingBoughtYet', locale: _localeName);
   String reorderItems() => Intl.message('Reorder', name: 'reorderItems', locale: _localeName);
+
+  String refresh() => Intl.message('Refresh', name: "refresh", locale: _localeName);
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 }

@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:nssl/manager/file_manager.dart';
+import 'package:nssl/manager/database_manager.dart';
 import 'package:nssl/models/shopping_list.dart';
 import 'package:nssl/server_communication/jwt.dart';
 
@@ -15,7 +13,6 @@ class User {
   static int? ownId;
 
   static Future load() async {
-    if (!Platform.isAndroid) return;
     var list = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1"));
     if (list.length == 0) return;
     var z = list.first;
@@ -34,7 +31,6 @@ class User {
   }
 
   static Future save() async {
-    if (!Platform.isAndroid) return;
     await DatabaseManager.database.rawDelete("DELETE FROM User");
     await DatabaseManager.database.execute(
         "INSERT INTO User(own_id, username, email, token, current_list_index) VALUES(?, ?, ?, ?, ?)",
@@ -42,7 +38,6 @@ class User {
   }
 
   static Future delete() async {
-    if (!Platform.isAndroid) return;
     await DatabaseManager.database.rawDelete("DELETE FROM User where own_id = ?", [ownId]);
   }
 }

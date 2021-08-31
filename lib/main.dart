@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,6 +15,14 @@ import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+      };
+}
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -24,13 +34,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await file.writeAsString(jsonEncode(message.data));
 }
 
-
 Future<void> main() async {
 // iWonderHowLongThisTakes();
-  await Startup.initialize();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(NSSLPage());
-  
+
+  runApp(FutureBuilder(
+    builder: (c, t) {
+      if (t.connectionState == ConnectionState.done)
+        return NSSLPage();
+      else
+        return Container(color: Colors.green);
+    },
+    future: Startup.initialize()
+        .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
+  ));
 }
 
 class NSSL extends StatelessWidget {
@@ -82,6 +98,8 @@ class _NSSLState extends State<NSSLPage> {
   }
 
   Future subscribeFirebase(BuildContext context) async {
+    if (!Platform.isAndroid) return;
+
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initMessage != null) {
@@ -96,6 +114,7 @@ class _NSSLState extends State<NSSLPage> {
         dark: Themes.darkTheme.theme,
         initial: AdaptiveThemeMode.system,
         builder: (theme, darkTheme) => MaterialApp(
+              scrollBehavior: CustomScrollBehavior(),
               title: 'NSSL',
               color: Colors.grey[500],
               localizationsDelegates: <LocalizationsDelegate<dynamic>>[

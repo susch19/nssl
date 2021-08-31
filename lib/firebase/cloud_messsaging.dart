@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:nssl/models/model_export.dart';
 
-final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+FirebaseMessaging? get firebaseMessaging => Platform.isAndroid ? FirebaseMessaging.instance : null;
 
 class CloudMessaging {
   static Future onMessage(RemoteMessage message, Function setState) async {
@@ -25,11 +26,11 @@ class CloudMessaging {
               ..amount = x["amount"]
               ..sortOrder = x["sortOrder"])
             .toList());
-      firebaseMessaging.subscribeToTopic(listId.toString() + "shoppingListTopic");
+      firebaseMessaging!.subscribeToTopic(listId.toString() + "shoppingListTopic");
     } else if (data.length == 1) {
       //List deleted
       User.shoppingLists.removeWhere((x) => x.id == listId);
-      firebaseMessaging.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
+      firebaseMessaging!.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
     } else {
       var action = data["action"];
       var list = User.shoppingLists.firstWhere((x) => x.id == listId);
@@ -71,11 +72,9 @@ class CloudMessaging {
           break;
       }
     }
-    if (setState != null) {
-      var args = [];
-      args.add(() {});
-      Function.apply(setState, args);
-    }
+    var args = [];
+    args.add(() {});
+    Function.apply(setState, args);
 
     return null;
   }

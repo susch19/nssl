@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
-import 'package:nssl/manager/file_manager.dart';
+import 'package:nssl/manager/database_manager.dart';
 import 'package:nssl/models/model_export.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/server_communication/return_classes.dart';
@@ -54,8 +54,6 @@ class Startup {
   }
 
   static Future<bool> initialize() async {
-    if (!Platform.isAndroid) return true;
-
     // var t = SharedPreferences.getInstance();
     WidgetsFlutterBinding.ensureInitialized();
     await initializeMinFunction();
@@ -137,11 +135,9 @@ class Startup {
     User.currentList =
         User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
 
-    if (setState != null) {
-      var args = [];
-      args.add(() {});
-      Function.apply(setState, args);
-    }
+    var args = [];
+    args.add(() {});
+    Function.apply(setState, args);
     return true;
   }
 }

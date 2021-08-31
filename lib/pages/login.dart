@@ -104,10 +104,10 @@ class LoginPageState extends State<LoginPage> {
     User.eMail = res.eMail;
     User.ownId = res.id;
     await User.save();
-    firebaseMessaging.subscribeToTopic(res.username! + "userTopic");
+    firebaseMessaging?.subscribeToTopic(res.username! + "userTopic");
     if (firstBoot) {
       await _getAllListsInit();
-      if (User.shoppingLists != null && User.shoppingLists.length > 0) {
+      if (User.shoppingLists.length > 0) {
         User.currentList = User.shoppingLists.first;
         User.currentListIndex = 1;
         await User.save();
@@ -138,7 +138,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   String? _validatePassword(String? value) {
-    if (pwInput.textEditingController == null || pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context)!.passwordEmptyError();
+    if (pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context)!.passwordEmptyError();
     return null;
   }
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/models/shopping_item.dart';
@@ -23,12 +21,11 @@ class ShoppingList {
   ShoppingList.messaging(this.id, this.name, this.messagingEnabled);
 
   Future save() async {
-    if (!Platform.isAndroid) return;
     await DatabaseManager.database.transaction((z) async {
       await z.execute('INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
           [id, name, messagingEnabled ? 1 : 0, User.ownId]);
 
-      await z.rawDelete("DELETE FROM ShoppingItems WHERE id not in (?)", [shoppingItems!.map((e) => e!.id).join(",")]);
+      await z.rawDelete("DELETE FROM ShoppingItems WHERE res_list_id = ? and id not in (?)", [id, shoppingItems!.map((e) => e!.id).join(",")]);
       for (var item in shoppingItems!) {
         await z.execute(
             "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
@@ -40,7 +37,6 @@ class ShoppingList {
   Future addSingleItem(ShoppingItem item, {int index = -1}) async {
     if (index < 0) index = shoppingItems!.length;
     shoppingItems!.insert(index, item);
-    if (!Platform.isAndroid) return;
     await DatabaseManager.database.execute(
         "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
         [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, id, item.sortOrder]);
@@ -48,12 +44,10 @@ class ShoppingList {
 
   Future deleteSingleItem(ShoppingItem item) async {
     shoppingItems!.remove(item);
-    if (!Platform.isAndroid) return;
     await DatabaseManager.database.rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
   }
 
   static Future<List<ShoppingList>> load() async {
-    if (!Platform.isAndroid) return <ShoppingList>[];
     var lists = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingLists WHERE user_id = ?", [User.ownId]);
 
     var items = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingItems ORDER BY res_list_id, sortorder");
@@ -101,11 +95,8 @@ class ShoppingList {
 //    }
     var newList = GetListResult.fromJson(res.body);
     List<Map<String, dynamic>> items;
-    if (Platform.isAndroid)
-      items = (await DatabaseManager.database
-          .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?", [id]));
-    else
-      items = <Map<String, dynamic>>[];
+    items = (await DatabaseManager.database
+        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?", [id]));
 
     shoppingItems!.clear();
     for (var item in newList.products!)
@@ -126,15 +117,12 @@ class ShoppingList {
     var result = GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
     User.shoppingLists.clear();
 
-    if (Platform.isAndroid)
-      await DatabaseManager.database.delete("ShoppingLists", where: "user_id = ?", whereArgs: [User.ownId]);
+    await DatabaseManager.database.delete("ShoppingLists", where: "user_id = ?", whereArgs: [User.ownId]);
     //await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
 
     List<Map<String, dynamic>> items;
-    if (Platform.isAndroid)
-      items = (await DatabaseManager.database.rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems"));
-    else
-      items = <Map<String, dynamic>>[];
+    items = (await DatabaseManager.database.rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems"));
+
     for (var res in result.shoppingLists) {
       var list = ShoppingList(res.id, res.name);
 
@@ -158,10 +146,10 @@ class ShoppingList {
   }
 
   void subscribeForFirebaseMessaging() {
-    if (Platform.isAndroid) firebaseMessaging.subscribeToTopic(id.toString() + "shoppingListTopic");
+    firebaseMessaging?.subscribeToTopic(id.toString() + "shoppingListTopic");
   }
 
   void unsubscribeFromFirebaseMessaging() {
-    if (Platform.isAndroid) firebaseMessaging.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
+    firebaseMessaging?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
   }
 }

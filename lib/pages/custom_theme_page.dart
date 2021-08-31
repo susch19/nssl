@@ -25,10 +25,10 @@ class CustomThemePageState extends State<CustomThemePage> {
   bool _saveNeeded = false;
   TextEditingController tec = TextEditingController();
 
-  MaterialColor? primary;
-  MaterialAccentColor? accent;
-  Brightness? primaryBrightness;
-  Brightness? accentBrightness;
+  MaterialColor primary = Colors.blue;
+  MaterialAccentColor accent  = Colors.tealAccent;
+  Brightness? primaryBrightness = Brightness.dark;
+  Brightness? accentBrightness = Brightness.dark;
 
   ThemeData? td;
 
@@ -44,21 +44,23 @@ class CustomThemePageState extends State<CustomThemePage> {
     final TextStyle dialogTextStyle = theme.textTheme.subtitle1!.copyWith(color: theme.textTheme.caption!.color);
 
     return await (showDialog<bool>(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-                    content: Text(NSSLStrings.of(context)!.discardNewTheme(), style: dialogTextStyle),
-                    actions: <Widget>[
-                      TextButton(
-                          child: Text(NSSLStrings.of(context)!.cancelButton()),
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          }),
-                      TextButton(
-                          child: Text(NSSLStrings.of(context)!.discardButton()),
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          }),
-                    ])) as FutureOr<bool>?) ??
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            content: Text(NSSLStrings.of(context)!.discardNewTheme(), style: dialogTextStyle),
+            actions: <Widget>[
+              TextButton(
+                  child: Text(NSSLStrings.of(context)!.cancelButton()),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  }),
+              TextButton(
+                  child: Text(NSSLStrings.of(context)!.discardButton()),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  }),
+            ],
+          ),
+        )) ??
         false;
   }
 
@@ -88,45 +90,34 @@ class CustomThemePageState extends State<CustomThemePage> {
       // print(Themes.tm);
       td = darkTheme ? Themes.darkTheme.theme : Themes.lightTheme.theme;
       primaryColorCheckbox = darkTheme;
-      accentColorCheckbox = td!.accentColorBrightness == Brightness.dark;
       primary =
           Colors.primaries[darkTheme ? Themes.darkTheme.primarySwatchIndex! : Themes.lightTheme.primarySwatchIndex!];
       accent = Colors.accents[darkTheme ? Themes.darkTheme.accentSwatchIndex! : Themes.lightTheme.accentSwatchIndex!];
 
       primaryBrightness = td!.brightness;
-      accentBrightness = td!.accentColorBrightness;
-      primaryColorSlider = Colors.primaries.indexOf(primary!).toDouble();
-      accentColorSlider = Colors.accents.indexOf(accent!).toDouble();
+      primaryColorSlider = Colors.primaries.indexOf(primary).toDouble();
+      accentColorSlider = Colors.accents.indexOf(accent).toDouble();
     }
 
     // var textColorTheme = TextStyle(color: td.textTheme.headline6.color);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          child: IconButton(
-              icon: Icon(
-                Icons.save,
-                // color: td.accentIconTheme.color,
-              ),
-              onPressed: null),
+          child: Icon(
+            Icons.save,
+            // color: td.accentIconTheme.color,
+          ),
           // backgroundColor: td.accentColor,
           onPressed: _handleSubmitted),
       // backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
       appBar: AppBar(
-          title: Text(NSSLStrings.of(context)!.changeTheme()
-              // , style: textColorTheme
-              ),
-          // backgroundColor: td.primaryColor,
-          // iconTheme: td.iconTheme,
-          // textTheme: td.textTheme,
-          actions: <Widget>[
-            TextButton(
-                child: Text(
-                  NSSLStrings.of(context)!.saveButton(),
-                  // style: td.textTheme.subtitle1
-                ),
-                onPressed: () => _handleSubmitted())
-          ]),
+        title: Text(NSSLStrings.of(context)!.changeTheme()
+            // , style: textColorTheme
+            ),
+        // backgroundColor: td.primaryColor,
+        // iconTheme: td.iconTheme,
+        // textTheme: td.textTheme,
+      ),
       body: Form(
           key: _formKey,
           onWillPop: _onWillPop,
@@ -204,6 +195,7 @@ class CustomThemePageState extends State<CustomThemePage> {
     int index = value.round();
     accentColorSlider = value;
     accent = Colors.accents[index];
+    // accent = Colors.greenAccent;
     setColors();
   }
 
@@ -213,12 +205,45 @@ class CustomThemePageState extends State<CustomThemePage> {
     // print(accent);
     // print(primaryBrightness);
     // print(accentBrightness);
-    td = ThemeData(
-        primarySwatch: primary,
-        accentColor: accent,
+    if (primaryBrightness == Brightness.light)
+      td = ThemeData(
         brightness: primaryBrightness,
-        accentColorBrightness: accentBrightness);
-    AdaptiveTheme.of(context).setTheme(light: td!);
+        primarySwatch: primary,
+        secondaryHeaderColor: accent,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade400),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MaterialStateColor.resolveWith(
+            (s) {
+              if (s.contains(MaterialState.selected)) {
+                return accent.shade200;
+              }
+              return Colors.black;
+            },
+          ),
+        ),
+      );
+    else
+      td = ThemeData(
+        brightness: primaryBrightness,
+        primarySwatch: primary,
+        secondaryHeaderColor: accent,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade100),
+        checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateColor.resolveWith((states) {
+            return Colors.black;
+          }),
+          fillColor: MaterialStateColor.resolveWith(
+            (s) {
+              if (s.contains(MaterialState.selected)) {
+                return accent.shade200;
+              }
+              return Colors.black;
+            },
+          ),
+        ),
+      );
+
+    AdaptiveTheme.of(context).setTheme(light: td!, dark: td);
   }
 
   void primaryBrightnessChange(bool? value) {
@@ -233,35 +258,35 @@ class CustomThemePageState extends State<CustomThemePage> {
     setColors();
   }
 
-  buildBody() {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Theme"),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => {},
-          child: IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ),
-        body: ListView(
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("Theme"),
-            ),
-            Divider(),
-            TextButton(
-              onPressed: () {},
-              child: const Text("Theme"),
-            ),
-            Divider(),
-            TextField(
-              controller: tec,
-            ),
-          ],
-        ),
-        persistentFooterButtons: [TextButton(child: const Text("Theme"), onPressed: () {})]);
-  }
+  // buildBody() {
+  //   return Scaffold(
+  //       appBar: AppBar(
+  //         title: const Text("Theme"),
+  //       ),
+  //       floatingActionButton: FloatingActionButton(
+  //         onPressed: () => {},
+  //         child: IconButton(
+  //           icon: Icon(Icons.search),
+  //           onPressed: () {},
+  //         ),
+  //       ),
+  //       body: ListView(
+  //         children: <Widget>[
+  //           ElevatedButton(
+  //             onPressed: () {},
+  //             child: const Text("Theme"),
+  //           ),
+  //           Divider(),
+  //           TextButton(
+  //             onPressed: () {},
+  //             child: const Text("Theme"),
+  //           ),
+  //           Divider(),
+  //           TextField(
+  //             controller: tec,
+  //           ),
+  //         ],
+  //       ),
+  //       persistentFooterButtons: [TextButton(child: const Text("Theme"), onPressed: () {})]);
+  // }
 }
