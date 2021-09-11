@@ -111,6 +111,8 @@ jobs:
     # Checkout NSSL code, recreate missing files, and get packages.
     - name: Checkout NSSL code
       uses: actions/checkout@v2
+    - run: |
+        echo "$SCANDIT_LICENSE_FILE" > lib/.license.dart
     - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
 
