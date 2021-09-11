@@ -111,7 +111,7 @@ jobs:
     # Checkout NSSL code, recreate missing files, and get packages.
     - name: Checkout NSSL code
       uses: actions/checkout@v2
-    - run: flutter create . --project-name nssl
+    - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
 
     - name: Configure Keystore for Android
