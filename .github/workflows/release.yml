@@ -134,6 +134,8 @@ jobs:
       run: |
         [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("$SCANDIT_LICENSE_FILE") > .license.dart
       working-directory: lib
+      env:
+        SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
       
     - name: Create License File Bash
       if: matrix.target != 'Windows'
@@ -141,6 +143,8 @@ jobs:
         echo "$SCANDIT_LICENSE_FILE" | base64 --decode > .license.dart
         head -c 50 .license.dart
       working-directory: lib
+      env:
+        SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
         
     # Build the application
     - name: Build Flutter Application
