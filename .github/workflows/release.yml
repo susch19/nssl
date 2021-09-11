@@ -139,7 +139,7 @@ jobs:
       if: matrix.target != 'Windows'
       run: |
         echo "$SCANDIT_LICENSE_FILE" | base64 --decode > .license.dart
-        ls -la
+        head -c 50 .license.dart
       working-directory: lib
         
     # Build the application
