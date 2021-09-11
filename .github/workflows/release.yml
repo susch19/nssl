@@ -108,14 +108,12 @@ jobs:
         flutter config --enable-windows-desktop
     - run: flutter doctor -v
 
+
     # Checkout NSSL code, recreate missing files, and get packages.
     - name: Checkout NSSL code
       uses: actions/checkout@v2
-    - run: |
-        echo "$SCANDIT_LICENSE_FILE" > lib/.license.dart
     - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
-
     - name: Configure Keystore for Android
       if: matrix.target == 'Android'
       run: |
@@ -131,8 +129,21 @@ jobs:
         KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
       working-directory: android
 
-    # Build the application.
-    - run: flutter build -v ${{ matrix.build_target }} --release
+    - name: Create License File Powershell
+      if: matrix.target == 'Windows'
+      run: |
+        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("$SCANDIT_LICENSE_FILE") > .license.dart
+      working-directory: lib
+      
+    - name: Create License File Bash
+      if: matrix.target != 'Windows'
+      run: |
+        echo "$SCANDIT_LICENSE_FILE" | base64 --decode > .license.dart
+      working-directory: lib
+        
+    # Build the application
+    - name: Build Flutter Application
+      run: flutter build -v ${{ matrix.build_target }} --release
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
