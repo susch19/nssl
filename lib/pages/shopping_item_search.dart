@@ -63,11 +63,11 @@ class _ProductAddPageState extends State<ProductAddPage> {
 
       showInSnackBar(
           item == null
-              ? NSSLStrings.of(context)!.addedProduct() + "$name"
-              : "$name" + NSSLStrings.of(context)!.productWasAlreadyInList(),
+              ? NSSLStrings.of(context).addedProduct() + "$name"
+              : "$name" + NSSLStrings.of(context).productWasAlreadyInList(),
           duration: Duration(seconds: item == null ? 2 : 4),
           action: SnackBarAction(
-              label: NSSLStrings.of(context)!.undo(),
+              label: NSSLStrings.of(context).undo(),
               onPressed: () async {
                 var res = item == null
                     ? await ShoppingListSync.deleteProduct(

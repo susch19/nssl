@@ -137,5 +137,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "requestPasswordResetButton": MessageLookupByLibrary.simpleMessage("REQUEST PASSWORD RESET"),
         "requestPasswordResetTitle": MessageLookupByLibrary.simpleMessage("Password Reset"),
         "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage('If the email exists, the password request was successfully requested. Further instructions can be found in the email, that was send to the address.'),
+        "settings": MessageLookupByLibrary.simpleMessage('Settings'),
       };
 }

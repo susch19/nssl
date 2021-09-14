@@ -73,7 +73,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
   Future<bool> _handleSubmitted() async {
     if (_isSendToServer) {
-      showInSnackBar(NSSLStrings.of(context)!.bePatient());
+      showInSnackBar(NSSLStrings.of(context).bePatient());
       return false;
     }
     final FormState form = _formKey.currentState!;
@@ -107,7 +107,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
       if (!res.success!)
         showInSnackBar(res.error!);
       else {
-        showInSnackBar(NSSLStrings.of(context)!.successful());
+        showInSnackBar(NSSLStrings.of(context).successful());
         if (putInList) {
           var list = User.currentList!;
           var pres = AddListItemResult.fromJson(
@@ -139,7 +139,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-          title: Text(NSSLStrings.of(context)!.newProductTitle()),
+          title: Text(NSSLStrings.of(context).newProductTitle()),
           actions: <Widget>[
             TextButton(
                 child: Text(NSSLStrings.of(context)!.saveButton(),
@@ -156,8 +156,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             Container(
                 child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: NSSLStrings.of(context)!.newProductName(),
-                      hintText: NSSLStrings.of(context)!.newProductNameHint(),
+                      labelText: NSSLStrings.of(context).newProductName(),
+                      hintText: NSSLStrings.of(context).newProductNameHint(),
                     ),
                     autofocus: true,
                     controller: tecProductName,
@@ -167,9 +167,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 child: TextFormField(
                     decoration: InputDecoration(
                         labelText:
-                            NSSLStrings.of(context)!.newProductBrandName(),
+                            NSSLStrings.of(context).newProductBrandName(),
                         hintText:
-                            NSSLStrings.of(context)!.newProductBrandNameHint()),
+                            NSSLStrings.of(context).newProductBrandNameHint()),
                     autofocus: false,
                     controller: tecBrandName,
                     onSaved: (s) => brandName = s,
@@ -177,9 +177,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             Container(
                 child: TextFormField(
                     decoration: InputDecoration(
-                        labelText: NSSLStrings.of(context)!.newProductWeight(),
+                        labelText: NSSLStrings.of(context).newProductWeight(),
                         hintText:
-                            NSSLStrings.of(context)!.newProductWeightHint()),
+                            NSSLStrings.of(context).newProductWeightHint()),
                     autofocus: false,
                     onSaved: (s) => weight = s,
                     controller: tecPackagingSize)),
@@ -189,12 +189,12 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                     border:
                         Border(bottom: BorderSide(color: theme.dividerColor))),
                 alignment: FractionalOffset.bottomLeft,
-                child: Text(NSSLStrings.of(context)!.codeText() + gtin!)),
+                child: Text(NSSLStrings.of(context).codeText() + gtin!)),
             Container(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 alignment: FractionalOffset.bottomLeft,
                 child: Row(children: [
-                  Text(NSSLStrings.of(context)!.newProductAddToList()),
+                  Text(NSSLStrings.of(context).newProductAddToList()),
                   Checkbox(
                       value: putInList,
                       onChanged: (b) => setState(() => putInList = !putInList))
@@ -210,9 +210,9 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
 
   String? _validateName(String? value) {
     _saveNeeded = true;
-    if (value!.isEmpty) return NSSLStrings.of(context)!.fieldRequiredError();
+    if (value!.isEmpty) return NSSLStrings.of(context).fieldRequiredError();
     if (value.length < 3)
-      return NSSLStrings.of(context)!.newProductNameToShort();
+      return NSSLStrings.of(context).newProductNameToShort();
     return null;
   }
 

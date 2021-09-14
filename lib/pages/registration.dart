@@ -107,7 +107,7 @@ class RegistrationState extends State<Registration> {
         showInSnackBar(response.error!);
         return;
       }
-      showInSnackBar(NSSLStrings.of(context)!.registrationSuccessfulMessage());
+      showInSnackBar(NSSLStrings.of(context).registrationSuccessfulMessage());
       var x = await UserSync.login(name, password, context);
 
       if (x.statusCode != 200) {
@@ -127,32 +127,32 @@ class RegistrationState extends State<Registration> {
 
   String? _validateName(String? value) {
     if (value!.isEmpty)
-      return NSSLStrings.of(context)!.usernameEmptyError();
+      return NSSLStrings.of(context).usernameEmptyError();
     else if (value.length < 4)
-      return NSSLStrings.of(context)!.usernameToShortError();
+      return NSSLStrings.of(context).usernameToShortError();
     return null;
   }
 
   String? _validateEmail(String? value) {
-    if (value!.isEmpty) return NSSLStrings.of(context)!.emailEmptyError();
+    if (value!.isEmpty) return NSSLStrings.of(context).emailEmptyError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value))
-      return NSSLStrings.of(context)!.emailIncorrectFormatError();
+      return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (pwInput.textEditingController.text.isEmpty)
-      return NSSLStrings.of(context)!.chooseAPasswordPrompt();
+      return NSSLStrings.of(context).chooseAPasswordPrompt();
     return null;
   }
 
   String? _validatePassword2(String? value) {
     if (pwInput.textEditingController.text.isEmpty)
-      return NSSLStrings.of(context)!.reenterPasswordPrompt();
+      return NSSLStrings.of(context).reenterPasswordPrompt();
     if (pwInput.textEditingController.text != value)
-      return NSSLStrings.of(context)!.passwordsDontMatchError();
+      return NSSLStrings.of(context).passwordsDontMatchError();
     return null;
   }
 
@@ -162,7 +162,7 @@ class RegistrationState extends State<Registration> {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-            title: Text(NSSLStrings.of(context)!.registrationTitle())),
+            title: Text(NSSLStrings.of(context).registrationTitle())),
         body: Form(
             key: _formKey,
         autovalidateMode: validateMode,
@@ -231,7 +231,7 @@ class RegistrationState extends State<Registration> {
                       child: ElevatedButton(
                         child: Center(
                           child: Text(
-                              NSSLStrings.of(context)!.registerButton()),
+                              NSSLStrings.of(context).registerButton()),
                         ),
                         onPressed: _handleSubmitted,
                       ),
@@ -258,20 +258,20 @@ class RegistrationState extends State<Registration> {
 
   _resetInput() {
     nameInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.usernameRegisterHint(),
-        labelText: NSSLStrings.of(context)!.username());
+        helperText: NSSLStrings.of(context).usernameRegisterHint(),
+        labelText: NSSLStrings.of(context).username());
 
     emailInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.emailRegisterHint(),
-        labelText: NSSLStrings.of(context)!.emailTitle());
+        helperText: NSSLStrings.of(context).emailRegisterHint(),
+        labelText: NSSLStrings.of(context).emailTitle());
 
     pwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.passwordRegisterHint(),
-        labelText: NSSLStrings.of(context)!.password());
+        helperText: NSSLStrings.of(context).passwordRegisterHint(),
+        labelText: NSSLStrings.of(context).password());
 
     pw2Input.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.retypePasswordHint(),
-        labelText: NSSLStrings.of(context)!.retypePasswordTitle());
+        helperText: NSSLStrings.of(context).retypePasswordHint(),
+        labelText: NSSLStrings.of(context).retypePasswordTitle());
   }
 
   @override

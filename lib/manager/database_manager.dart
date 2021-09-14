@@ -17,6 +17,7 @@ class DatabaseManager {
     sqfliteFfiInit();
    
     var dbPath =  path.join((await getApplicationDocumentsDirectory()).path, "db.db");
+    print(dbPath);
     database = await databaseFactoryFfi.openDatabase(dbPath, options:  OpenDatabaseOptions(version: _version, onCreate: (Database db, int version) async {
       await db
           .execute("CREATE TABLE ShoppingItems (id INTEGER PRIMARY KEY, name TEXT, amount INTEGER, crossed INTEGER, res_list_id INTEGER, sortorder INTEGER)");

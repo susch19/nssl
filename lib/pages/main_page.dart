@@ -77,23 +77,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     return Scaffold(
         appBar: AppBar(
             title: Text(
-              User.currentList?.name ?? NSSLStrings.of(context)!.noListLoaded(),
+              User.currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
             ),
-            actions: isReorderingItems
-                ? <Widget>[]
-                : <Widget>[
-                    PopupMenuButton<String>(
-                        onSelected: selectedOption,
-                        itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                              PopupMenuItem<String>(
-                                  value: 'Options', child: Text(NSSLStrings.of(context)!.changeTheme())),
-                              PopupMenuItem<String>(
-                                  value: 'deleteCrossedOut',
-                                  child: Text(NSSLStrings.of(context)!.deleteCrossedOutPB())),
-                              PopupMenuItem<String>(
-                                  value: 'reorderItems', child: Text(NSSLStrings.of(context)!.reorderItems())),
-                            ])
-                  ]),
+            actions: _getMainDropdownActions(context)),
         body: buildBody(context),
         floatingActionButton: isReorderingItems ? acceptReordingFAB() : null,
         drawer: _buildDrawer(context),
@@ -101,12 +87,12 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
             ? <Widget>[]
             : <Widget>[
                   TextButton(
-                      child: Text(NSSLStrings.of(context)!.addPB()), onPressed: () => _addWithoutSearchDialog(context))
+                      child: Text(NSSLStrings.of(context).addPB()), onPressed: () => _addWithoutSearchDialog(context))
                 ] +
                 (Platform.isAndroid
-                    ? [TextButton(child: Text(NSSLStrings.of(context)!.scanPB()), onPressed: _getEAN)]
+                    ? [TextButton(child: Text(NSSLStrings.of(context).scanPB()), onPressed: _getEAN)]
                     : []) +
-                [TextButton(child: Text(NSSLStrings.of(context)!.searchPB()), onPressed: search)]);
+                [TextButton(child: Text(NSSLStrings.of(context).searchPB()), onPressed: search)]);
   }
 
   Widget buildBody(BuildContext context) {
@@ -130,7 +116,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                 x.name ?? "",
                 maxLines: 2,
                 softWrap: true,
-                style: TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
+                style: TextStyle(
+                    decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none,
+                    decorationThickness: 4),
               ),
             ],
           ),
@@ -269,15 +257,15 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
   void handleDismissMain(DismissDirection dir, ShoppingItem s) async {
     var list = User.currentList;
     final String action =
-        (dir == DismissDirection.endToStart) ? NSSLStrings.of(context)!.archived() : NSSLStrings.of(context)!.deleted();
+        (dir == DismissDirection.endToStart) ? NSSLStrings.of(context).archived() : NSSLStrings.of(context).deleted();
     var index = list!.shoppingItems!.indexOf(s);
     await list.deleteSingleItem(s);
     setState(() {});
     ShoppingListSync.deleteProduct(list.id, s.id, context);
     updateOrderIndiciesAndSave();
-    showInSnackBar(NSSLStrings.of(context)!.youHaveActionItemMessage() + "${s.name} $action",
+    showInSnackBar(NSSLStrings.of(context).youHaveActionItemMessage() + "${s.name} $action",
         action: SnackBarAction(
-            label: NSSLStrings.of(context)!.undo(),
+            label: NSSLStrings.of(context).undo(),
             onPressed: () {
               setState(() {
                 list.addSingleItem(s, index: index);
@@ -294,15 +282,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
       case "Login/Register":
         login();
         break;
-      case "Options":
-        await Navigator.push(
-                cont!,
-                MaterialPageRoute<DismissDialogAction>(
-                  builder: (BuildContext context) => CustomThemePage(),
-                  fullscreenDialog: true,
-                ))
-            .whenComplete(() => AdaptiveTheme.of(context)
-                .setTheme(light: Themes.lightTheme.theme!, dark: Themes.darkTheme.theme, notify: true));
+      case "options":
+        Navigator.push(context, MaterialPageRoute(builder: (c) => SettingsPage(), fullscreenDialog: true));
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -312,6 +293,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         break;
       case "materialGrid":
         setState(() => materialGrid = !materialGrid);
+        break;
+      case "logout":
+        _logout();
         break;
       case "ChangePassword":
         Navigator.push(
@@ -382,11 +366,11 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
 
   void addListDialog() {
     var sd = SimpleDialogSingleInput.create(
-        hintText: NSSLStrings.of(context)!.newNameOfListHint(),
-        labelText: NSSLStrings.of(context)!.listName(),
+        hintText: NSSLStrings.of(context).newNameOfListHint(),
+        labelText: NSSLStrings.of(context).listName(),
         onSubmitted: createNewList,
-        title: NSSLStrings.of(context)!.addNewListTitle(),
-        context: cont);
+        title: NSSLStrings.of(context).addNewListTitle(),
+        context: context);
 
     showDialog(builder: (BuildContext context) => sd, context: cont!, barrierDismissible: false);
   }
@@ -396,11 +380,11 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         context: cont!,
         barrierDismissible: false,
         builder: (BuildContext context) => SimpleDialogSingleInput.create(
-            hintText: NSSLStrings.of(context)!.renameListHint(),
-            labelText: NSSLStrings.of(context)!.listName(),
+            hintText: NSSLStrings.of(context).renameListHint(),
+            labelText: NSSLStrings.of(context).listName(),
             onSubmitted: (s) => renameList(listId, s),
-            title: NSSLStrings.of(context)!.renameListTitle(),
-            context: cont));
+            title: NSSLStrings.of(context).renameListTitle(),
+            context: context));
   }
 
   Future createNewList(String listName) async {
@@ -416,8 +400,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
   Widget _buildDrawer(BuildContext context) {
     var isDarkTheme = AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark;
     var userheader = UserAccountsDrawerHeader(
-      accountName: Text(User.username ?? NSSLStrings.of(context)!.notLoggedInYet()),
-      accountEmail: Text(User.eMail ?? NSSLStrings.of(context)!.notLoggedInYet()),
+      accountName: Text(User.username ?? NSSLStrings.of(context).notLoggedInYet()),
+      accountEmail: Text(User.eMail ?? NSSLStrings.of(context).notLoggedInYet()),
       currentAccountPicture: CircleAvatar(
           child: Text(
             User.username?.substring(0, 2).toUpperCase() ?? "",
@@ -446,14 +430,14 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                               value: x.id.toString() + "\u{1E}" + "Contributors",
                               child: ListTile(
                                 leading: const Icon(Icons.person_add),
-                                title: Text(NSSLStrings.of(context)!.contributors()),
+                                title: Text(NSSLStrings.of(context).contributors()),
                               ),
                             ),
                             PopupMenuItem<String>(
                               value: x.id.toString() + "\u{1E}" + "BoughtList",
                               child: ListTile(
                                 leading: const Icon(Icons.history),
-                                title: Text(NSSLStrings.of(context)!.boughtProducts()),
+                                title: Text(NSSLStrings.of(context).boughtProducts()),
                                 // NSSLStrings.of(context)!.contributors()),
                               ),
                             ),
@@ -468,22 +452,22 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                                 value: x.id.toString() + "\u{1E}" + 'Rename',
                                 child: ListTile(
                                     leading: const Icon(Icons.mode_edit),
-                                    title: Text(NSSLStrings.of(context)!.rename()))),
+                                    title: Text(NSSLStrings.of(context).rename()))),
                             PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Auto-Sync',
                                 child: ListTile(
                                     leading: Icon(x.messagingEnabled ? Icons.check_box : Icons.check_box_outline_blank),
-                                    title: Text(NSSLStrings.of(context)!.autoSync()))),
+                                    title: Text(NSSLStrings.of(context).autoSync()))),
                             const PopupMenuDivider(),
                             PopupMenuItem<String>(
                                 value: x.id.toString() + "\u{1E}" + 'Remove',
                                 child: ListTile(
-                                    leading: const Icon(Icons.delete), title: Text(NSSLStrings.of(context)!.remove())))
+                                    leading: const Icon(Icons.delete), title: Text(NSSLStrings.of(context).remove())))
                           ]),
                 ))
             .toList()
         : [
-            ListTile(title: Text(NSSLStrings.of(context)!.noListsInDrawerMessage())),
+            ListTile(title: Text(NSSLStrings.of(context).noListsInDrawerMessage())),
           ];
     var emptyListTiles = <ListTile>[];
     for (int i = 0; i < list.length - 2; i++)
@@ -512,25 +496,21 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                           children: <Widget>[
                             ListTile(
                               leading: const Icon(Icons.sync),
-                              title: Text(NSSLStrings.of(context)!.refresh()),
+                              title: Text(NSSLStrings.of(context).refresh()),
                               onTap: () => _handleDrawerRefresh(),
                             ),
                             ListTile(
                               leading: const Icon(Icons.restore_page_outlined),
                               title: Text(
-                                NSSLStrings.of(context)!.changePasswordPD(),
+                                NSSLStrings.of(context).changePasswordPD(),
                               ),
                               onTap: () => selectedOption("ChangePassword"),
                             ),
                             ListTile(
                               leading: const Icon(Icons.exit_to_app),
-                              title: Text(NSSLStrings.of(context)!.logout()),
+                              title: Text(NSSLStrings.of(context).logout()),
                               onTap: () async {
-                                await User.delete();
-                                User.username = null;
-                                User.eMail = null;
-                                User.token = null;
-                                runApp(NSSL());
+                                await _logout();
                               },
                             ),
                             Column(children: emptyListTiles)
@@ -546,12 +526,20 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
         persistentFooterButtons: [
-          TextButton(child: Text(NSSLStrings.of(context)!.addListPB()), onPressed: addListDialog)
+          TextButton(child: Text(NSSLStrings.of(context).addListPB()), onPressed: addListDialog)
         ]);
 
     return Drawer(child: d);
   }
 
+  Future<void> _logout() async {
+    await User.delete();
+    User.username = null;
+    User.eMail = null;
+    User.token = null;
+    runApp(NSSL());
+  }
+  
   Future drawerListItemMenuClicked(String value) async {
     var splitted = value.split('\u{1E}');
     int id = int.parse(splitted[0]);
@@ -580,21 +568,21 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
             context: cont!,
             barrierDismissible: false,
             builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
-                title: NSSLStrings.of(cont)?.deleteListTitle() ?? "" + deleteList.name!,
-                text: NSSLStrings.of(cont)?.deleteListText() ?? "",
+                title: NSSLStrings.of(context).deleteListTitle() + deleteList.name!,
+                text: NSSLStrings.of(context).deleteListText(),
                 onSubmitted: (s) async {
                   var res = Result.fromJson((await ShoppingListSync.deleteList(id, cont)).body);
                   if (!(res.success ?? false))
                     showInDrawerSnackBar(res.error!);
                   else {
-                    showInDrawerSnackBar(deleteList.name! + " " + NSSLStrings.of(cont)!.removed());
+                    showInDrawerSnackBar(deleteList.name! + " " + NSSLStrings.of(context).removed());
                     if (User.currentList!.id! == id) {
                       changeCurrentList(User.shoppingLists.indexOf(User.shoppingLists.firstWhere((l) => l.id != id)));
                     }
                     setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
                   }
                 },
-                context: cont));
+                context: context));
         break;
       case "Auto-Sync":
         var list = User.shoppingLists.firstWhere((x) => x.id == id);
@@ -654,9 +642,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         barrierDismissible: false,
         builder: (BuildContext context) => SimpleDialogSingleInput.create(
             context: context,
-            title: NSSLStrings.of(context)!.addProduct(),
-            hintText: NSSLStrings.of(context)!.addProductWithoutSearch(),
-            labelText: NSSLStrings.of(context)!.productName(),
+            title: NSSLStrings.of(context).addProduct(),
+            hintText: NSSLStrings.of(context).addProductWithoutSearch(),
+            labelText: NSSLStrings.of(context).productName(),
             onSubmitted: _addWithoutSearch));
   }
 
@@ -702,10 +690,10 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
       for (var item in sublist) list.shoppingItems?.remove(item);
     });
     updateOrderIndiciesAndSave();
-    showInSnackBar(NSSLStrings.of(context)!.messageDeleteAllCrossedOut(),
+    showInSnackBar(NSSLStrings.of(context).messageDeleteAllCrossedOut(),
         duration: Duration(seconds: 10),
         action: SnackBarAction(
-            label: NSSLStrings.of(context)!.undo(),
+            label: NSSLStrings.of(context).undo(),
             onPressed: () async {
               var res = await ShoppingListSync.changeProducts(
                   list.id, sublist.map((s) => s!.id).toList(), sublist.map((s) => s!.amount).toList(), cont);
@@ -726,10 +714,10 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
         context: cont!,
         barrierDismissible: false,
         builder: (BuildContext context) => SimpleDialogSingleInput.create(
-            context: cont,
-            title: NSSLStrings.of(context)!.renameListItem(),
-            hintText: NSSLStrings.of(context)!.renameListHint(),
-            labelText: NSSLStrings.of(context)!.renameListItemLabel(),
+            context: context,
+            title: NSSLStrings.of(context).renameListItem(),
+            hintText: NSSLStrings.of(context).renameListHint(),
+            labelText: NSSLStrings.of(context).renameListItemLabel(),
             defaultText: x?.name ?? "",
             maxLines: 2,
             onSubmitted: (s) async {
@@ -761,4 +749,49 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
           });
         },
       );
+
+  List<Widget> _getMainDropdownActions(BuildContext context) {
+    if (isReorderingItems) return <Widget>[];
+
+    return <Widget>[
+      // IconButton(
+      //     onPressed: () {
+      //       Navigator.push(
+      //           context,
+      //           MaterialPageRoute<DismissDialogAction>(
+      //             builder: (BuildContext context) => SettingsPage(),
+      //             fullscreenDialog: true,
+      //           ));
+      //     },
+      //     icon: Icon(Icons.settings)),
+      PopupMenuButton<String>(
+          onSelected: selectedOption,
+          itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                PopupMenuItem<String>(
+                  value: 'deleteCrossedOut',
+                  child: Text(
+                    NSSLStrings.of(context).deleteCrossedOutPB(),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'reorderItems',
+                  child: Text(
+                    NSSLStrings.of(context).reorderItems(),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'options',
+                  child: Text(
+                    NSSLStrings.of(context).options(),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Text(
+                    NSSLStrings.of(context).logout(),
+                  ),
+                ),
+              ])
+    ];
+  }
 }

@@ -11,15 +11,13 @@ class NSSLStrings {
 
   static Future<NSSLStrings> load(Locale locale) {
     return initializeMessages(locale.toString()).then((dynamic _) {
-      // ignore: strong_mode_uses_dynamic_as_bottom
       return NSSLStrings(locale);
+      // ignore: strong_mode_uses_dynamic_as_bottom
     });
   }
 
-  static NSSLStrings? of(BuildContext? context) {
-    if (context == null) return null;
-
-    return Localizations.of<NSSLStrings>(context, NSSLStrings);
+  static NSSLStrings of(BuildContext context) {
+    return Localizations.of<NSSLStrings>(context, NSSLStrings)!;
   }
   // static final NSSLStrings instance = NSSLStrings();
 
@@ -302,8 +300,16 @@ class NSSLStrings {
       Intl.message('Reorder', name: 'reorderItems', locale: _localeName);
 
   String refresh() => Intl.message('Refresh', name: "refresh", locale: _localeName);
+  String settings() => Intl.message('Settings', name: "settings", locale: _localeName);
+  String about() => Intl.message('About', name: "about", locale: _localeName);
+  String codeOnGithub() => Intl.message('View Source Code on GitHub', name: "codeOnGithub", locale: _localeName);
+  String playstoreEntry() => Intl.message('Entry on Play Store', name: "playstoreEntry", locale: _localeName);
+  String iconSource() => Intl.message('Source of the App Icon', name: "iconSource", locale: _localeName);
+  String scanditCredit() => Intl.message('has provided the Scanner for this App', name: "scanditCredit", locale: _localeName);
+  String aboutText() => Intl.message('Forged over many years with the only intention to make it easier for multiple people to plan their shopping and add their favorite products via camera in an unmatched speed.', name: "aboutText", locale: _localeName);
+  String freeText() => Intl.message('Free of charge, no Advertisments, forever!', name: "freeText", locale: _localeName);
+  String questionsErrors() => Intl.message('Questions, Errors or everything else can be send by a GitHub issue.', name: "questionsErrors", locale: _localeName);
   String okayButton() => Intl.message('OKAY', name: "okayButton", locale: _localeName);
-
   String requestPasswordResetButton() => Intl.message('REQUEST PASSWORD RESET', name: 'requestPasswordResetButton', locale: _localeName);
   String requestPasswordResetTitle() => Intl.message('Password Reset', name: "requestPasswordResetTitle", locale: _localeName);
   String requestPasswordResetSuccess() => Intl.message('If the email exists, the password request was successfully requested. Further instructions can be found in the email, that was send to the address.', name: "requestPasswordResetSuccess", locale: _localeName);
