@@ -37,7 +37,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
 // iWonderHowLongThisTakes();
-
   runApp(FutureBuilder(
     builder: (c, t) {
       if (t.connectionState == ConnectionState.done)
@@ -127,15 +126,14 @@ class _NSSLState extends State<NSSLPage> {
       builder: (theme, darkTheme) => MaterialApp(
         scrollBehavior: CustomScrollBehavior(),
         title: 'NSSL',
-        color: Colors.grey[500],
         localizationsDelegates: <LocalizationsDelegate<dynamic>>[
           new _NSSLLocalizationsDelegate(),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: const <Locale>[
-          const Locale('en', 'US'),
-          const Locale('de', 'DE'),
+          const Locale('en', ''),
+          const Locale('de', ''),
         ],
         theme: theme,
         darkTheme: darkTheme,

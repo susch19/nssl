@@ -33,21 +33,21 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       oldPwInput.decoration = InputDecoration(
           labelText: oldPwInput.decoration!.labelText,
           helperText: oldPwInput.decoration!.helperText,
-          errorText: NSSLStrings.of(context)!.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPwInput.textEditingController)) {
       newPwInput.decoration = InputDecoration(
           labelText: newPwInput.decoration!.labelText,
           helperText: newPwInput.decoration!.helperText,
-          errorText: NSSLStrings.of(context)!.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     if (_validateEmpty(newPw2Input.textEditingController)) {
       newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration!.labelText,
           helperText: newPw2Input.decoration!.helperText,
-          errorText: NSSLStrings.of(context)!.passwordEmptyError());
+          errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
     setState(() => {});
@@ -57,7 +57,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration!.labelText,
           helperText: newPw2Input.decoration!.helperText,
-          errorText: NSSLStrings.of(context)!.passwordsDontMatchError());
+          errorText: NSSLStrings.of(context).passwordsDontMatchError());
       setState(() => {});
       return;
     }
@@ -84,10 +84,10 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
     var dialog = AlertDialog(
-        title: Text(NSSLStrings.of(context)!.successful()),
+        title: Text(NSSLStrings.of(context).successful()),
         content: SingleChildScrollView(
           child: ListBody(
-            children: <Widget>[Text(NSSLStrings.of(context)!.passwordSet())],
+            children: <Widget>[Text(NSSLStrings.of(context).passwordSet())],
           ),
         ),
         actions: <Widget>[
@@ -100,14 +100,14 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
 
   _resetInput() {
     oldPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.oldPasswordHint(),
-        labelText: NSSLStrings.of(context)!.oldPassword());
+        helperText: NSSLStrings.of(context).oldPasswordHint(),
+        labelText: NSSLStrings.of(context).oldPassword());
     newPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.newPasswordHint(),
-        labelText: NSSLStrings.of(context)!.newPassword());
+        helperText: NSSLStrings.of(context).newPasswordHint(),
+        labelText: NSSLStrings.of(context).newPassword());
     newPw2Input.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context)!.new2PasswordHint(),
-        labelText: NSSLStrings.of(context)!.new2Password());
+        helperText: NSSLStrings.of(context).new2PasswordHint(),
+        labelText: NSSLStrings.of(context).new2Password());
   }
 
   @override

@@ -6,7 +6,7 @@ class SimpleDialogAcceptDeny {
       {String title = "",
       String text = "",
       ValueChanged<String>? onSubmitted,
-      BuildContext? context}) {
+      required BuildContext context}) {
     return AlertDialog(
             title: title == "" ? null : Text(title),
             content: SingleChildScrollView(
@@ -16,12 +16,12 @@ class SimpleDialogAcceptDeny {
             ),
             actions: <Widget>[
           TextButton(
-              child: Text(NSSLStrings.of(context)!.cancelButton()),
-              onPressed: () => Navigator.pop(context!, "")),
+              child: Text(NSSLStrings.of(context).cancelButton()),
+              onPressed: () => Navigator.pop(context, "")),
           TextButton(
-              child: Text(NSSLStrings.of(context)!.acceptButton()),
+              child: Text(NSSLStrings.of(context).acceptButton()),
               onPressed: () {
-                Navigator.pop(context!, "");
+                Navigator.pop(context, "");
                 onSubmitted!("");
               })
         ]);

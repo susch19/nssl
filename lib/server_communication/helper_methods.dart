@@ -64,8 +64,8 @@ class HelperMethods {
       showDialog(
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(NSSLStrings.of(context)!.tokenExpired()),
-              content: Text(NSSLStrings.of(context)!.tokenExpiredExplanation()),
+              title: Text(NSSLStrings.of(context).tokenExpired()),
+              content: Text(NSSLStrings.of(context).tokenExpiredExplanation()),
               actions: [
                 MaterialButton(
                   onPressed: () async {

@@ -8,7 +8,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final Map<String, dynamic> messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => {
         "options": MessageLookupByLibrary.simpleMessage("Optionen"),
-        "changeTheme": MessageLookupByLibrary.simpleMessage("Theme ändern"),
+        "changeTheme": MessageLookupByLibrary.simpleMessage("Design ändern"),
         "scanPB": MessageLookupByLibrary.simpleMessage("SCANNEN"),
         "addPB": MessageLookupByLibrary.simpleMessage("ADD"), //TODO find good german word
         "searchPB": MessageLookupByLibrary.simpleMessage("SUCHEN"),
@@ -138,6 +138,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "requestPasswordResetButton": MessageLookupByLibrary.simpleMessage("PASSWORT ZURÜCKSETZUNG BEANTRAGEN"),
         "requestPasswordResetTitle": MessageLookupByLibrary.simpleMessage("Passwort zurücksetzen"),
         "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage('Die Passwort zurücksetzen Email wurde erfolgreich an die Adresse gesendet, sollte diese existieren. Weitere Schritte für das abschließen des Resets sind in der Email enthalten.'),
+        "settings": MessageLookupByLibrary.simpleMessage('Einstellungen'),
+        "about": MessageLookupByLibrary.simpleMessage('Über'),
+        "codeOnGithub": MessageLookupByLibrary.simpleMessage('Schau doch mal in den Code auf GitHub rein'),
+        "playstoreEntry": MessageLookupByLibrary.simpleMessage('Play Store Eintrag'),
+        "iconSource": MessageLookupByLibrary.simpleMessage('Wer hat dieses schicke Icon gemacht? Finde es heraus!'),
+        "scanditCredit":MessageLookupByLibrary.simpleMessage('hat diesen super Scanner in der App zur Verfügung gestellt'),
+        "aboutText": MessageLookupByLibrary.simpleMessage('In jahrelanger Handarbeit geschmiedet mit dem einzigen Ziel, die Einkaufsplanung mit anderen zu vereinfachen und dabei seine Lieblingsprodukte blitzschnell per Kamera zu erfassen.'),
+        "freeText": MessageLookupByLibrary.simpleMessage('Kostenlos, Werbefrei, für immer!'),
+        "questionsErrors": MessageLookupByLibrary.simpleMessage('Bei Fragen, Anregungen, Fehlern oder sonstigen Belangen kann jederzeit auf GitHub vorbeigeschaut werden, um ein Issue zu eröffnen.'),
+        
+        
 
       };
 }

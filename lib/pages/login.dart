@@ -96,7 +96,7 @@ class LoginPageState extends State<LoginPage> {
       showInSnackBar(res.error!);
       return;
     }
-    showInSnackBar(NSSLStrings.of(context)!.loginSuccessfulMessage());
+    showInSnackBar(NSSLStrings.of(context).loginSuccessfulMessage());
     bool firstBoot = User.username == null;
     User.token = res.token;
     User.username = res.username;
@@ -131,7 +131,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   String? _validateEmail(String value) {
-    if (value.isEmpty) return NSSLStrings.of(context)!.emailRequiredError();
+    if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
     if (!email.hasMatch(value))
@@ -168,7 +168,7 @@ class LoginPageState extends State<LoginPage> {
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: Text(NSSLStrings.of(context)!.login())),
+      appBar: AppBar(title: Text(NSSLStrings.of(context).login())),
       body: Form(
         key: _formKey,
         autovalidateMode: validateMode,
@@ -225,7 +225,7 @@ class LoginPageState extends State<LoginPage> {
                           ? Navigator.pushNamed(context, "/registration")
                           : Navigator.popAndPushNamed(context, "/registration");
                     },
-                    child: Text(NSSLStrings.of(context)!.registerTextOnLogin()),
+                    child: Text(NSSLStrings.of(context).registerTextOnLogin()),
                   ),
                 ),
               ),
