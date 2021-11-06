@@ -132,7 +132,7 @@ jobs:
     - name: Create License File Powershell
       if: matrix.target == 'Windows'
       run: |
-        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("$SCANDIT_LICENSE_FILE")) > .license.dart
+        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("$Env:SCANDIT_LICENSE_FILE")) > .license.dart
       working-directory: lib
       env:
         SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
