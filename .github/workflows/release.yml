@@ -128,7 +128,7 @@ jobs:
         KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
       working-directory: android
-
+        
     - name: Create License File Powershell
       if: matrix.target == 'Windows'
       run: |
@@ -144,6 +144,15 @@ jobs:
       working-directory: lib
       env:
         SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
+        
+    - name: Create Google Services Json File Bash
+      if: matrix.target != 'Windows'
+      run: |
+        echo "$GOOGLE_SERVICES_JSON" | base64 --decode > google-services.json
+      working-directory: android/app
+      env:
+        SCANDIT_LICENSE_FILE: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        
         
     # Build the application
     - name: Build Flutter Application
