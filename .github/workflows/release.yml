@@ -12,18 +12,18 @@ jobs:
     name: Generate changelog
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest published release tag
-        id: get_latest_release
-        uses: pozetroninc/github-action-get-latest-release@v0.5.0
-        with:
-          repository: ${{ github.repository }}
-          excludes: prerelease, draft
+      #- name: Get latest published release tag
+      #  id: get_latest_release
+      #  uses: pozetroninc/github-action-get-latest-release@v0.5.0
+      #  with:
+      #    repository: ${{ github.repository }}
+      #    excludes: prerelease, draft
       - name: Generate changelog since last published release
         uses: charmixer/auto-changelog-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           future_release: ${{ github.ref }}
-          since_tag: ${{ steps.get_latest_release.outputs.release }}
+          #since_tag: ${{ steps.get_latest_release.outputs.release }}
       - name: Upload changelog
         uses: actions/upload-artifact@v2
         with:
@@ -108,29 +108,59 @@ jobs:
         flutter config --enable-windows-desktop
     - run: flutter doctor -v
 
+
     # Checkout NSSL code, recreate missing files, and get packages.
     - name: Checkout NSSL code
       uses: actions/checkout@v2
-    - run: flutter create . --project-name nssl
+    - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
-
     - name: Configure Keystore for Android
       if: matrix.target == 'Android'
       run: |
-        echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/nssl-keystore.jks
+        echo "$KEY_STORE_FILE" | base64 --decode > app/nssl-keystore.jks
         echo "storeFile=nssl-keystore.jks" >> key.properties
         echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
         echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
         echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
       env:
-        PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+        KEY_STORE_FILE: ${{ secrets.KEY_STORE_FILE }}
         KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
         KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
         KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
       working-directory: android
-
-    # Build the application.
-    - run: flutter build -v ${{ matrix.build_target }} --release
+        
+    - name: Create License File Powershell
+      if: matrix.target == 'Windows'
+      run: |
+        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("$Env:SCANDIT_LICENSE_FILE")) > .license.dart
+      working-directory: lib
+      env:
+        SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
+      
+    - name: Create License File Bash
+      if: matrix.target != 'Windows'
+      run: |
+        echo "$SCANDIT_LICENSE_FILE" | base64 --decode > .license.dart
+      working-directory: lib
+      env:
+        SCANDIT_LICENSE_FILE: ${{ secrets.SCANDIT_LICENSE_FILE }}
+        
+    - name: Create Google Services Json File Bash
+      if: matrix.target != 'Windows'
+      run: |
+        echo "$GOOGLE_SERVICES_JSON" | base64 --decode > google-services.json
+      working-directory: android/app
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        
+        
+    # Build the application
+    - name: Build Flutter Application
+      run: flutter build -v ${{ matrix.build_target }} --release
+      
+    - name: Copy SQLite3 Dependency
+      if: matrix.target == 'Windows'
+      run: cp .\windows\libs\* ${{ matrix.build_path }}
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
