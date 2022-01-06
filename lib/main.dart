@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
@@ -30,7 +29,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Startup.initializeMinFunction();
   //Startup.remoteMessages.add(message);
-  var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
+  var dir =
+      await Startup.fs.systemTempDirectory.childDirectory("message").create();
   var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
   await file.writeAsString(jsonEncode(message.data));
 }
@@ -45,8 +45,9 @@ Future<void> main() async {
       else
         return Container(color: Colors.green);
     },
-    future: Startup.initialize()
-        .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
+    future: Startup.initialize().then((value) =>
+        FirebaseMessaging.onBackgroundMessage(
+            _firebaseMessagingBackgroundHandler)),
   ));
 }
 
@@ -95,7 +96,8 @@ class _NSSLState extends State<NSSLPage> {
     // FirebaseMessaging.onBackgroundMessage((message) => CloudMessaging.onMessage(message, setState));
     // firebaseMessaging.configure(
     //     onMessage: (x) => CloudMessaging.onMessage(x, setState), onLaunch: (x) => Startup.initialize());
-    for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
+    for (var list in User.shoppingLists)
+      if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
   Future subscribeFirebase(BuildContext context) async {
@@ -145,7 +147,9 @@ class _NSSLState extends State<NSSLPage> {
   }
 
   Scaffold mainAppHome() => Scaffold(
-      key: _mainScaffoldKey, resizeToAvoidBottomInset: false, body: MainPage() //CustomThemePage()//LoginPage(),
+      key: _mainScaffoldKey,
+      resizeToAvoidBottomInset: false,
+      body: MainPage() //CustomThemePage()//LoginPage(),
       );
 
   Scaffold mainAppLoginRegister() => Scaffold(

@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_import
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nssl/localization/nssl_strings.dart';
@@ -17,8 +19,7 @@ class AddProductToDatabase extends StatefulWidget {
   final String? gtin;
 
   @override
-  AddProductToDatabaseState createState() =>
-      AddProductToDatabaseState(gtin);
+  AddProductToDatabaseState createState() => AddProductToDatabaseState(gtin);
 }
 
 class AddProductToDatabaseState extends State<AddProductToDatabase> {
@@ -43,32 +44,31 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     if (!_saveNeeded) return true;
 
     final ThemeData theme = Theme.of(context);
-    final TextStyle dialogTextStyle =
-        theme.textTheme.subtitle1!.copyWith(color: theme.textTheme.caption!.color);
+    final TextStyle dialogTextStyle = theme.textTheme.subtitle1!
+        .copyWith(color: theme.textTheme.caption!.color);
 
     return await (showDialog<bool>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-                content: Text(NSSLStrings.of(context)!.discardNewProduct(),
-                    style: dialogTextStyle),
-                actions: <Widget>[
-                  TextButton(
-                      child: Text(NSSLStrings.of(context)!.cancelButton()),
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      }),
-                  TextButton(
-                      child: Text(NSSLStrings.of(context)!.discardButton()),
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                      })
-                ])) as FutureOr<bool>?) ??
+                    content: Text(NSSLStrings.of(context)!.discardNewProduct(),
+                        style: dialogTextStyle),
+                    actions: <Widget>[
+                      TextButton(
+                          child: Text(NSSLStrings.of(context)!.cancelButton()),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          }),
+                      TextButton(
+                          child: Text(NSSLStrings.of(context)!.discardButton()),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          })
+                    ])) as FutureOr<bool>?) ??
         false;
   }
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
   }
 
   Future<bool> _handleSubmitted() async {
@@ -78,7 +78,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
     }
     final FormState form = _formKey.currentState!;
     if (!form.validate()) {
-      showInSnackBar(NSSLStrings.of(context)!.fixErrorsBeforeSubmittingPrompt());
+      showInSnackBar(
+          NSSLStrings.of(context)!.fixErrorsBeforeSubmittingPrompt());
       validateMode = AutovalidateMode.onUserInteraction;
       return false;
     } else {
@@ -142,15 +143,16 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
           actions: <Widget>[
             TextButton(
                 child: Text(NSSLStrings.of(context)!.saveButton(),
-                    style: theme.textTheme.bodyText2!.copyWith(color: Colors.white)),
+                    style: theme.textTheme.bodyText2!
+                        .copyWith(color: Colors.white)),
                 onPressed: () => _handleSubmitted())
           ]),
       body: Form(
           key: _formKey,
           onWillPop: _onWillPop,
-        autovalidateMode: validateMode,
-          child: ListView(padding: const EdgeInsets.all(16.0), children: <
-              Widget>[
+          autovalidateMode: validateMode,
+          child:
+              ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
             Container(
                 child: TextFormField(
                     decoration: InputDecoration(
@@ -184,8 +186,8 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
             Container(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: theme.dividerColor))),
+                    border:
+                        Border(bottom: BorderSide(color: theme.dividerColor))),
                 alignment: FractionalOffset.bottomLeft,
                 child: Text(NSSLStrings.of(context)!.codeText() + gtin!)),
             Container(
@@ -199,8 +201,7 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
                 ])),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                  NSSLStrings.of(context)!.newProductStarExplanation(),
+              child: Text(NSSLStrings.of(context)!.newProductStarExplanation(),
                   style: Theme.of(context).textTheme.caption),
             ),
           ])),

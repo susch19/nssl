@@ -90,6 +90,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "newProductWeight": MessageLookupByLibrary.simpleMessage("Amount with Unit"),
         "newProductWeightHint": MessageLookupByLibrary.simpleMessage("Example: 1.5l or 100g"),
         "newProductAddToList": MessageLookupByLibrary.simpleMessage("Add to current list"),
+        "newProductAddedToList": MessageLookupByLibrary.simpleMessage(" was added to list "),
         "newProductStarExplanation": MessageLookupByLibrary.simpleMessage('* indicates required field'),
         "fieldRequiredError": MessageLookupByLibrary.simpleMessage("This field is required!"),
         "newProductNameToShort": MessageLookupByLibrary.simpleMessage("This name seems to be to short"),
