@@ -91,6 +91,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "newProductWeight": MessageLookupByLibrary.simpleMessage("Menge mit Einheit"),
         "newProductWeightHint": MessageLookupByLibrary.simpleMessage("Zum Beispiel: 1,5l oder 100g"),
         "newProductAddToList": MessageLookupByLibrary.simpleMessage("Füge es der aktuellen Liste hinzu"),
+        "newProductAddedToList": MessageLookupByLibrary.simpleMessage(" wurde hinzugefügt zur Liste "),
         "newProductStarExplanation": MessageLookupByLibrary.simpleMessage("* kennzeichnet die benötigten Felder"),
         "fieldRequiredError": MessageLookupByLibrary.simpleMessage("Dieses Feld wird benötigt!"),
         "newProductNameToShort": MessageLookupByLibrary.simpleMessage("Dieser Name scheint zu kurz zu sein"),
