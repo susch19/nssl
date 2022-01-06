@@ -13,6 +13,12 @@ class ChangePasswordArgs {
   toJson() => {"oldPWHash": "$oldPWHash", "newPWHash": "$newPWHash"};
 }
 
+class ResetPasswordArgs {
+  ResetPasswordArgs(this.email);
+  String email;
+  toJson() => {"email": "$email"};
+}
+
 class AddContributorArgs {
   AddContributorArgs(this.name);
   String name;
@@ -29,7 +35,7 @@ class ChangeProductArgs {
   ChangeProductArgs({this.change, this.newName});
   int? change;
   String? newName;
-  toJson() => {"change": "$change", "newName" : "$newName"};
+  toJson() => {"change": "$change", "newName": "$newName"};
 }
 
 class ChangeProductsArgs {

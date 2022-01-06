@@ -132,6 +132,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "boughtProducts": MessageLookupByLibrary.simpleMessage('Eingekauft'),
         "nothingBoughtYet": MessageLookupByLibrary.simpleMessage('Noch nichts eingekauft'),
         "reorderItems": MessageLookupByLibrary.simpleMessage('Reihenfolge'),
-        "refresh": MessageLookupByLibrary.simpleMessage('Aktualisieren')
+        "refresh": MessageLookupByLibrary.simpleMessage('Aktualisieren'),
+        "okayButton": MessageLookupByLibrary.simpleMessage('OKAY'),
+        "requestPasswordResetButton": MessageLookupByLibrary.simpleMessage("PASSWORT ZURÜCKSETZUNG BEANTRAGEN"),
+        "requestPasswordResetTitle": MessageLookupByLibrary.simpleMessage("Passwort zurücksetzen"),
+        "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage('Die Passwort zurücksetzen Email wurde erfolgreich an die Adresse gesendet, sollte diese existieren. Weitere Schritte für das abschließen des Resets sind in der Email enthalten.'),
+
       };
 }

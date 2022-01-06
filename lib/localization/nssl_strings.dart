@@ -194,6 +194,12 @@ class NSSLStrings {
   String reorderItems() => Intl.message('Reorder', name: 'reorderItems', locale: _localeName);
 
   String refresh() => Intl.message('Refresh', name: "refresh", locale: _localeName);
+  String okayButton() => Intl.message('OKAY', name: "okayButton", locale: _localeName);
+
+  String requestPasswordResetButton() => Intl.message('REQUEST PASSWORD RESET', name: 'requestPasswordResetButton', locale: _localeName);
+  String requestPasswordResetTitle() => Intl.message('Password Reset', name: "requestPasswordResetTitle", locale: _localeName);
+  String requestPasswordResetSuccess() => Intl.message('If the email exists, the password request was successfully requested. Further instructions can be found in the email, that was send to the address.', name: "requestPasswordResetSuccess", locale: _localeName);
+
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 
 }
