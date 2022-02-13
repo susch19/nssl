@@ -24,10 +24,6 @@ dependencies:
   process_run: 
   permission_handler: 
   scandit_flutter_datacapture_barcode: 6.13.0
-  # scandit_flutter_datacapture_barcode: ^6.7.0
-  # scandit_flutter_datacapture_core: ^6.7.0
-  # flutter_scandit: ^0.1.0
-
   pdf: 
   flutter_colorpicker: 
   adaptive_theme: 
