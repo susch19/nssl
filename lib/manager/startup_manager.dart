@@ -55,12 +55,10 @@ class Startup {
   }
 
   static Future<bool> initialize() async {
-    // var t = SharedPreferences.getInstance();
     WidgetsFlutterBinding.ensureInitialized();
     var f1 = initializeMinFunction();
     await DatabaseManager.initialize();
     await User.load();
-    // sharedPreferences = await t;
 
     if (User.username == null || User.username == "" || User.eMail == null || User.eMail == "") return false;
     await Themes.loadTheme();
@@ -71,41 +69,6 @@ class Startup {
         User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
     await f1;
     return true;
-
-    // FileManager.createFolder("ShoppingListsCo");
-    // FileManager.createFile("token.txt");
-    // FileManager.createFile("User.txt");
-    // FileManager.createFile("listList.txt");
-
-    // User.token = await FileManager.readAsString("token.txt");
-
-    // var userData = await FileManager.readAsLines("User.txt");
-    // if(userData.where((s)=> s.isNotEmpty).length == 2) {
-    //   User.username = userData[0];
-    //   User.eMail = userData[1];
-    // }
-    // else {
-    //   User.username = null;
-    //   User.eMail = null;
-    // }
-    // for (var list in dir.listSync())
-    //   if (list != null)
-    //     User.shoppingLists.add(await ShoppingList
-    //         .load(int.parse(list.path.split('/').last.split('.')[0])));
-
-    // await Themes.loadTheme();
-
-    // if (User.shoppingLists.length > 0) {
-    //   var listId = int.parse(await FileManager.readAsString("lastList.txt"));
-    //   User.currentList = User.shoppingLists.firstWhere((x) => x.id == listId);
-    // } else {
-    //   User.currentList = ShoppingList()
-    //     ..name = "No List yet"
-    //     ..id = 1
-    //     ..shoppingItems = <ShoppingItem>[];
-    // }
-    // User.currentListIndex = User.currentList.id;
-    // await User.save();
   }
 
   static Future initializeNewListsFromServer() async {
