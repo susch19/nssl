@@ -17,6 +17,7 @@ import 'package:nssl/firebase/cloud_messsaging.dart';
 
 import '../main.dart';
 import 'barcode_scanner_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -80,7 +81,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
               User.currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
             ),
             actions: _getMainDropdownActions(context)),
-        body: buildBody(context),
+        body: ShoppingListWidget(this),
         floatingActionButton: isReorderingItems ? acceptReordingFAB() : null,
         drawer: _buildDrawer(context),
         persistentFooterButtons: isReorderingItems
@@ -93,99 +94,6 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                     ? [TextButton(child: Text(NSSLStrings.of(context).scanPB()), onPressed: _getEAN)]
                     : []) +
                 [TextButton(child: Text(NSSLStrings.of(context).searchPB()), onPressed: search)]);
-  }
-
-  Widget buildBody(BuildContext context) {
-    cont = context;
-
-    if (User.currentList == null || User.currentList!.shoppingItems == null) return const Text("");
-    if (User.currentList!.shoppingItems!.any((item) => item?.sortOrder == null)) updateOrderIndiciesAndSave();
-
-    User.currentList!.shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
-    var lv;
-    if (User.currentList!.shoppingItems!.length > 0) {
-      var mainList = User.currentList!.shoppingItems!.map((x) {
-        if (x == null || x.name == null) return Text("Null");
-        // return Text(x.name!);
-
-        var lt = ListTile(
-          key: ValueKey(x),
-          title: Wrap(
-            children: [
-              Text(
-                x.name ?? "",
-                maxLines: 2,
-                softWrap: true,
-                style: TextStyle(
-                    decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none,
-                    decorationThickness: 4),
-              ),
-            ],
-          ),
-          leading: PopupMenuButton<String>(
-            child: FittedBox(
-              child: Row(children: [
-                Text(x.amount.toString() + "x"),
-                const Icon(Icons.expand_more, size: 16.0),
-                SizedBox(height: 38.0), //for larger clickable size (2 Lines)
-              ]),
-            ),
-            initialValue: x.amount.toString(),
-            onSelected: (y) => shoppingItemChange(x, int.parse(y) - x.amount),
-            itemBuilder: buildChangeMenuItems,
-          ),
-          trailing: isReorderingItems ? Icon(Icons.reorder) : null,
-          onTap: isReorderingItems ? null : (() => crossOutMainListItem(x)),
-          onLongPress: isReorderingItems ? null : (() => renameListItem(x)),
-        );
-
-        if (isReorderingItems) {
-          return lt;
-        } else {
-          return Dismissible(
-            key: ValueKey(x),
-            child: lt,
-            onDismissed: (DismissDirection d) => handleDismissMain(d, x),
-            direction: DismissDirection.startToEnd,
-            background: Container(
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              child: ListTile(
-                leading: Icon(Icons.delete,
-                    //  color: Theme.of(context).accentIconTheme.color,
-                    size: 36.0),
-              ),
-            ),
-          );
-        }
-      }).toList(growable: true);
-
-      if (isReorderingItems) {
-        lv = ReorderableListView(onReorder: _onReorderItems, scrollDirection: Axis.vertical, children: mainList);
-      } else {
-        lv = CustomScrollView(
-          controller: _mainController,
-          slivers: [
-            SliverFixedExtentList(
-                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                  return Container(
-                    alignment: FractionalOffset.center,
-                    child: mainList[index],
-                  );
-                }, childCount: mainList.length),
-                itemExtent: 50.0)
-          ],
-          physics: AlwaysScrollableScrollPhysics(),
-        );
-      }
-    } else
-      lv = ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: <Widget>[ListTile(title: const Text(""))],
-      );
-    return RefreshIndicator(
-      child: lv,
-      onRefresh: _handleMainListRefresh,
-    );
   }
 
   void _onReorderItems(int oldIndex, int newIndex) {
@@ -212,18 +120,18 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
 
   void sortAndOrderCrossedOut() {
     final crossedOffset = 0xFFFFFFFF;
-    setState(() {
-      for (var crossedOut
-          in User.currentList?.shoppingItems?.where((x) => x!.crossedOut && x.sortOrder! < crossedOffset) ??
-              <ShoppingItem>[]) {
-        crossedOut?.sortOrder = crossedOut.sortOrder! + crossedOffset;
-      }
-      for (var notCrossedOut
-          in User.currentList?.shoppingItems?.where((x) => !x!.crossedOut && x.sortOrder! > crossedOffset) ??
-              <ShoppingItem>[]) {
-        notCrossedOut!.sortOrder = notCrossedOut.sortOrder! - crossedOffset;
-      }
-    });
+    // setState(() {
+    for (var crossedOut
+        in User.currentList?.shoppingItems?.where((x) => x!.crossedOut && x.sortOrder! < crossedOffset) ??
+            <ShoppingItem>[]) {
+      crossedOut?.sortOrder = crossedOut.sortOrder! + crossedOffset;
+    }
+    for (var notCrossedOut
+        in User.currentList?.shoppingItems?.where((x) => !x!.crossedOut && x.sortOrder! > crossedOffset) ??
+            <ShoppingItem>[]) {
+      notCrossedOut!.sortOrder = notCrossedOut.sortOrder! - crossedOffset;
+    }
+    // });
   }
 
   void updateOrderIndiciesAndSave({bool syncToServer = false}) async {
@@ -282,8 +190,15 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
       case "Login/Register":
         login();
         break;
-      case "options":
-        Navigator.push(context, MaterialPageRoute(builder: (c) => SettingsPage(), fullscreenDialog: true));
+      case "Options":
+        await Navigator.push(
+                cont!,
+                MaterialPageRoute<DismissDialogAction>(
+                  builder: (BuildContext context) => CustomThemePage(),
+                  fullscreenDialog: true,
+                ))
+            .whenComplete(() => AdaptiveTheme.of(context)
+                .setTheme(light: Themes.lightTheme.theme!, dark: Themes.darkTheme.theme, notify: true));
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -793,5 +708,111 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                 ),
               ])
     ];
+  }
+}
+
+final _isReorderingProvider = StateProvider<bool>((final _) {
+  return false;
+});
+
+class ShoppingListWidget extends ConsumerWidget {
+  final MainPageState mainPageState;
+  const ShoppingListWidget(this.mainPageState, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (User.currentList == null || User.currentList!.shoppingItems == null) return const Text("");
+    if (User.currentList!.shoppingItems!.any((item) => item?.sortOrder == null))
+      mainPageState.updateOrderIndiciesAndSave();
+
+    User.currentList!.shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
+    var lv;
+    if (User.currentList!.shoppingItems!.length > 0) {
+      final isReorderingItems = ref.watch(_isReorderingProvider);
+      var mainList = User.currentList!.shoppingItems!.map((x) {
+        return getListTileForShoppingItem(x, isReorderingItems, context);
+      }).toList(growable: true);
+
+      if (isReorderingItems) {
+        lv = ReorderableListView(
+            onReorder: mainPageState._onReorderItems, scrollDirection: Axis.vertical, children: mainList);
+      } else {
+        lv = CustomScrollView(
+          controller: mainPageState._mainController,
+          slivers: [
+            SliverFixedExtentList(
+                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                  return Container(
+                    alignment: FractionalOffset.center,
+                    child: mainList[index],
+                  );
+                }, childCount: mainList.length),
+                itemExtent: 50.0)
+          ],
+          physics: AlwaysScrollableScrollPhysics(),
+        );
+      }
+    } else
+      lv = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: <Widget>[ListTile(title: const Text(""))],
+      );
+    return RefreshIndicator(
+      child: lv,
+      onRefresh: mainPageState._handleMainListRefresh,
+    );
+  }
+
+  Widget getListTileForShoppingItem(ShoppingItem? x, bool isReorderingItems, BuildContext context) {
+    if (x == null || x.name == null) return Text("Null");
+    // return Text(x.name!);
+
+    var lt = ListTile(
+      key: ValueKey(x),
+      title: Wrap(
+        children: [
+          Text(
+            x.name ?? "",
+            maxLines: 2,
+            softWrap: true,
+            style: TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
+          ),
+        ],
+      ),
+      leading: PopupMenuButton<String>(
+        child: FittedBox(
+          child: Row(children: [
+            Text(x.amount.toString() + "x"),
+            const Icon(Icons.expand_more, size: 16.0),
+            SizedBox(height: 38.0), //for larger clickable size (2 Lines)
+          ]),
+        ),
+        initialValue: x.amount.toString(),
+        onSelected: (y) => mainPageState.shoppingItemChange(x, int.parse(y) - x.amount),
+        itemBuilder: mainPageState.buildChangeMenuItems,
+      ),
+      trailing: isReorderingItems ? Icon(Icons.reorder) : null,
+      onTap: isReorderingItems ? null : (() => mainPageState.crossOutMainListItem(x)),
+      onLongPress: isReorderingItems ? null : (() => mainPageState.renameListItem(x)),
+    );
+
+    if (isReorderingItems) {
+      return lt;
+    } else {
+      return Dismissible(
+        key: ValueKey(x),
+        child: lt,
+        onDismissed: (DismissDirection d) => mainPageState.handleDismissMain(d, x),
+        direction: DismissDirection.startToEnd,
+        background: Container(
+          decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+          child: ListTile(
+            leading: Icon(Icons.delete,
+                //  color: Theme.of(context).accentIconTheme.color,
+                size: 36.0),
+          ),
+        ),
+      );
+    }
   }
 }

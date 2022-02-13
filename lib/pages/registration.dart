@@ -29,8 +29,7 @@ class RegistrationState extends State<Registration> {
   var validateMode = AutovalidateMode.disabled;
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value), duration: Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
   }
 
   Future _handleSubmitted() async {
@@ -40,59 +39,6 @@ class RegistrationState extends State<Registration> {
       return;
     }
 
-    /*ool error = false;
-    _resetInput();
-
-    String ni = _validateName(nameInput.textEditingController.text);
-    String ei = _validateEmail(emailInput.textEditingController.text);
-    String pi = _validatePassword(pwInput.textEditingController.text);
-    String p2i = _validatePassword2(pw2Input.textEditingController.text);
-
-    if (ni != null) {
-      nameInput.decoration = InputDecoration(
-          labelText: nameInput.decoration.labelText,
-          helperText: nameInput.decoration.helperText,
-          errorText: ni);
-      nameInput.errorText = nameInput.decoration.errorText;
-      error = true;
-    }
-    if (ei != null) {
-      emailInput.decoration = InputDecoration(
-          labelText: emailInput.decoration.labelText,
-          helperText: emailInput.decoration.helperText,
-          errorText: ei);
-      emailInput.errorText = emailInput.decoration.errorText;
-      error = true;
-    }
-    if (pi != null) {
-      pwInput.decoration = InputDecoration(
-          labelText: pwInput.decoration.labelText,
-          helperText: pwInput.decoration.helperText,
-          errorText: pi);
-      pwInput.errorText = pwInput.decoration.errorText;
-      error = true;
-    }
-    if (p2i != null) {
-      pw2Input.decoration = InputDecoration(
-          labelText: pw2Input.decoration.labelText,
-          helperText: pw2Input.decoration.helperText,
-          errorText: p2i);
-      pw2Input.errorText = pw2Input.decoration.errorText;
-      error = true;
-    }
-    if (pwInput.textEditingController.text !=
-        pw2Input.textEditingController.text) {
-      pw2Input.decoration = InputDecoration(
-          labelText: pw2Input.decoration.labelText,
-          helperText: pw2Input.decoration.helperText,
-          errorText: NSSLStrings.of(context).passwordsDontMatchError());
-      pw2Input.errorText = pw2Input.decoration.errorText;
-      error = true;
-    }
-
-    setState(() => {});
-
-    if (error == true) return;*/
     String name = nameInput.textEditingController.text;
     String email = emailInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
@@ -165,7 +111,7 @@ class RegistrationState extends State<Registration> {
             title: Text(NSSLStrings.of(context).registrationTitle())),
         body: Form(
             key: _formKey,
-        autovalidateMode: validateMode,
+            autovalidateMode: validateMode,
             child: ListView(
 //              physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -177,9 +123,7 @@ class RegistrationState extends State<Registration> {
                       autocorrect: false,
                       validator: _validateName,
                       onSaved: (s) {
-                        FocusScope
-                            .of(context)
-                            .requestFocus(emailInput.focusNode);
+                        FocusScope.of(context).requestFocus(emailInput.focusNode);
                       }),
                   TextFormField(
                       key: emailInput.key,
@@ -192,37 +136,33 @@ class RegistrationState extends State<Registration> {
                       onSaved: (s) {
                         FocusScope.of(context).requestFocus(pwInput.focusNode);
                       }),
-                  Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Flexible(
-                            child: TextFormField(
-                                key: pwInput.key,
-                                decoration: pwInput.decoration,
-                                controller: pwInput.textEditingController,
-                                focusNode: pwInput.focusNode,
-                                autocorrect: false,
-                                obscureText: true,
-                                validator: _validatePassword,
-                                onSaved: (s) {
-                                  FocusScope
-                                      .of(context)
-                                      .requestFocus(pw2Input.focusNode);
-                                })),
-                        SizedBox(width: 16.0),
-                        Flexible(
-                            child: TextFormField(
-                                key: pw2Input.key,
-                                decoration: pw2Input.decoration,
-                                controller: pw2Input.textEditingController,
-                                focusNode: pw2Input.focusNode,
-                                autocorrect: false,
-                                obscureText: true,
-                                validator: _validatePassword2,
-                                onSaved: (s) {
-                                  _handleSubmitted();
-                                })),
-                      ]),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Flexible(
+                        child: TextFormField(
+                            key: pwInput.key,
+                            decoration: pwInput.decoration,
+                            controller: pwInput.textEditingController,
+                            focusNode: pwInput.focusNode,
+                            autocorrect: false,
+                            obscureText: true,
+                            validator: _validatePassword,
+                            onSaved: (s) {
+                              FocusScope.of(context).requestFocus(pw2Input.focusNode);
+                            })),
+                    SizedBox(width: 16.0),
+                    Flexible(
+                        child: TextFormField(
+                            key: pw2Input.key,
+                            decoration: pw2Input.decoration,
+                            controller: pw2Input.textEditingController,
+                            focusNode: pw2Input.focusNode,
+                            autocorrect: false,
+                            obscureText: true,
+                            validator: _validatePassword2,
+                            onSaved: (s) {
+                              _handleSubmitted();
+                            })),
+                  ]),
                   Row(children: [
                     Flexible(
                         child: Container(

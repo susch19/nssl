@@ -51,24 +51,6 @@ class LoginPageState extends State<LoginPage> {
       validateMode = AutovalidateMode.onUserInteraction;
       return;
     }
-    //form.save();
-    /*  var validate = _validateName(nameInput.textEditingController.text);
-    if (validate != null) {
-      nameInput.decoration = InputDecoration(
-          labelText: nameInput.decoration.labelText,
-          helperText: nameInput.decoration.helperText,
-          errorText: validate);
-      error = true;
-    }
-    if (_validatePassword(pwInput.textEditingController.text) != null) {
-      pwInput.decoration = InputDecoration(
-          labelText: pwInput.decoration.labelText,
-          helperText: pwInput.decoration.helperText,
-          errorText: _validatePassword(pwInput.textEditingController.text));
-      error = true;
-    }
-    setState(() => {});*/
-//    if (error == true) return;
 
     String name = nameInput.textEditingController.text;
     String password = pwInput.textEditingController.text;
@@ -129,6 +111,7 @@ class LoginPageState extends State<LoginPage> {
     if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
+
     if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }

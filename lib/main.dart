@@ -15,6 +15,8 @@ import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -40,7 +42,9 @@ Future<void> main() async {
   runApp(FutureBuilder(
     builder: (c, t) {
       if (t.connectionState == ConnectionState.done)
-        return NSSLPage();
+        return ProviderScope(
+          child: NSSLPage(),
+        );
       else
         return MaterialApp(
           builder: (context, child) {
@@ -69,13 +73,8 @@ class NSSL extends StatelessWidget {
 class NSSLPage extends StatefulWidget {
   NSSLPage({Key? key}) : super(key: key);
 
-  static _NSSLState? state;
   @override
-  _NSSLState createState() {
-    var localState = new _NSSLState();
-    state = localState;
-    return localState;
-  }
+  _NSSLState createState() => _NSSLState();
 }
 
 class _NSSLState extends State<NSSLPage> {
@@ -98,12 +97,6 @@ class _NSSLState extends State<NSSLPage> {
     FirebaseMessaging.onMessage.listen((event) {
       CloudMessaging.onMessage(event, setState);
     });
-    // FirebaseMessaging.onBackgroundMessage((message) async {
-    //   return;
-    // });
-    // FirebaseMessaging.onBackgroundMessage((message) => CloudMessaging.onMessage(message, setState));
-    // firebaseMessaging.configure(
-    //     onMessage: (x) => CloudMessaging.onMessage(x, setState), onLaunch: (x) => Startup.initialize());
     for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
