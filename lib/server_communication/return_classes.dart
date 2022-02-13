@@ -138,7 +138,7 @@ class AddListItemResult extends BaseResult {
 class ChangeListItemResult extends BaseResult {
   String? name;
   int? id;
-  int? amount;
+  late int amount;
   int? listId;
   DateTime? changed;
   static ChangeListItemResult fromJson(String dataString) =>

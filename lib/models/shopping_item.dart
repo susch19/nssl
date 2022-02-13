@@ -1,4 +1,4 @@
-class TestClass{
+class TestClass {
   int test;
   String? o;
 
@@ -9,13 +9,13 @@ class TestClass{
 
 class ShoppingItem {
   //extends JsonDecoder{
-  int? amount;
+  int amount = 1;
   String? name;
   int? id;
-  DateTime?  created;
-  DateTime?  changed;
+  DateTime? created;
+  DateTime? changed;
   bool crossedOut = false;
-  int?  sortOrder;
+  int? sortOrder;
 
   ShoppingItem(this.name);
 
@@ -24,14 +24,21 @@ class ShoppingItem {
     return name! + "\u{1F}" + amount.toString() + "\u{1F}" + id.toString();
   }
 
-  ShoppingItem clone(){
+  /// Creates a copy, with only including [amount] and [name]
+  ShoppingItem copy() {
+    return ShoppingItem(name)..amount = amount;
+  }
+
+  /// Creates an identical clone, where all fields are the same as
+  /// the parent item
+  ShoppingItem clone() {
     return ShoppingItem(name)
-    ..amount=amount
-    ..id=id
-    ..created=created
-    ..changed=changed
-    ..crossedOut=crossedOut
-    ..sortOrder=sortOrder;
+      ..amount = amount
+      ..id = id
+      ..created = created
+      ..changed = changed
+      ..crossedOut = crossedOut
+      ..sortOrder = sortOrder;
   }
 
   ShoppingItem.fromJson(String s) : name = s;

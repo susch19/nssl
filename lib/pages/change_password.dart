@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/models/user.dart';
 import 'package:nssl/pages/login.dart';
@@ -22,8 +21,8 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   var newPw2Input = ForInput();
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value), duration: Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(value), duration: Duration(seconds: 3)));
   }
 
   void _handleSubmitted() {
@@ -65,8 +64,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     _changePassword();
   }
 
-  bool _validateEmpty(TextEditingController value) =>
-      (value.text.isEmpty);
+  bool _validateEmpty(TextEditingController value) => (value.text.isEmpty);
 
   _changePassword() async {
     var res = await UserSync.changePassword(
@@ -76,14 +74,13 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
         context);
     if (res.statusCode != 200) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(res.reasonPhrase!),
-          duration: Duration(seconds: 3)));
+          content: Text(res.reasonPhrase!), duration: Duration(seconds: 3)));
       return;
     }
     var obj = Result.fromJson(res.body);
     if (!obj.success!) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(obj.error!), duration: Duration(seconds: 3)));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(obj.error!), duration: Duration(seconds: 3)));
       return;
     }
     var dialog = AlertDialog(
@@ -124,13 +121,12 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-          title: Text(NSSLStrings.of(context)!.changePasswordPD())),
+      appBar: AppBar(title: Text(NSSLStrings.of(context)!.changePasswordPD())),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Flexible(child: TextField(
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Flexible(
+            child: TextField(
               key: oldPwInput.key,
               decoration: oldPwInput.decoration,
               focusNode: oldPwInput.focusNode,
@@ -141,7 +137,8 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               },
             ),
           ),
-          Flexible(child:  TextField(
+          Flexible(
+            child: TextField(
               key: newPwInput.key,
               decoration: newPwInput.decoration,
               focusNode: newPwInput.focusNode,
@@ -153,7 +150,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
           ),
           Flexible(
-           child: TextField(
+            child: TextField(
               key: newPw2Input.key,
               decoration: newPw2Input.decoration,
               focusNode: newPw2Input.focusNode,
@@ -165,16 +162,16 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
           ),
           Flexible(
-           child: Container(
+            child: Container(
               padding: const EdgeInsets.only(top: 32.0),
               child: ElevatedButton(
 //                child: Center(
-                  child: Text(
-                    NSSLStrings.of(context)!.changePasswordButton(),
-                  ),
+                child: Text(
+                  NSSLStrings.of(context)!.changePasswordButton(),
+                ),
 //                ),
                 onPressed: _handleSubmitted,
-            ),
+              ),
               /*
               TextButton(
                 onPressed: () {

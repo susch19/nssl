@@ -4,7 +4,6 @@
  * Copyright (C) 2020- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -93,13 +92,16 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
 
     // Add a barcode capture overlay to the data capture view to render the location of captured barcodes on top of
     // the video preview. This is optional, but recommended for better visual feedback.
-    var overlay = BarcodeCaptureOverlay.withBarcodeCaptureForView(_barcodeCapture, _captureView)
+    var overlay = BarcodeCaptureOverlay.withBarcodeCaptureForView(
+        _barcodeCapture, _captureView)
       ..viewfinder = RectangularViewfinder.withStyleAndLineStyle(
-          RectangularViewfinderStyle.square, RectangularViewfinderLineStyle.light);
+          RectangularViewfinderStyle.square,
+          RectangularViewfinderLineStyle.light);
 
     // Adjust the overlay's barcode highlighting to match the new viewfinder styles and improve the visibility of feedback.
     // With 6.10 we will introduce this visual treatment as a new style for the overlay.
-    overlay.brush = Brush(Color.fromARGB(0, 0, 0, 0), Color.fromARGB(255, 255, 255, 255), 3);
+    overlay.brush = Brush(
+        Color.fromARGB(0, 0, 0, 0), Color.fromARGB(255, 255, 255, 255), 3);
 
     _captureView.addOverlay(overlay);
 
@@ -117,7 +119,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
     Widget child;
     if (_isPermissionMessageVisible) {
       child = PlatformText('No permission to access the camera!',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black));
+          style: TextStyle(
+              fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black));
     } else {
       child = _captureView;
     }
@@ -134,15 +137,19 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
   }
 
   @override
-  void didScan(BarcodeCapture barcodeCapture, BarcodeCaptureSession session) async {
+  void didScan(
+      BarcodeCapture barcodeCapture, BarcodeCaptureSession session) async {
     _barcodeCapture.isEnabled = false;
     var code = session.newlyRecognizedBarcodes.first;
-    var data = (code.data == null || code.data?.isEmpty == true) ? code.rawData : code.data;
+    var data = (code.data == null || code.data?.isEmpty == true)
+        ? code.rawData
+        : code.data;
     Navigator.pop(context, data);
   }
 
   @override
-  void didUpdateSession(BarcodeCapture barcodeCapture, BarcodeCaptureSession session) {}
+  void didUpdateSession(
+      BarcodeCapture barcodeCapture, BarcodeCaptureSession session) {}
 
   @override
   void dispose() {

@@ -13,7 +13,7 @@ class User {
 class Product {
   String? gtin;
   String? name;
-  int?  quantity;
+  int? quantity;
   String? unit;
 
   toJson() => {"gtin": gtin, "name": name, "quantity": quantity, "unit": unit};
@@ -26,27 +26,40 @@ class Product {
 }
 
 class ShoppingItem {
-  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created, this.sortOrder) : super();
+  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created,
+      this.sortOrder)
+      : super();
   int? id;
-  int? amount;
+  int amount;
   String? name;
-  DateTime?  changed;
-  DateTime?  created;
+  DateTime? changed;
+  DateTime? created;
   int? sortOrder;
 
-  toJson() => {"id": id, "amount": amount, "name": name, "changed" :changed, "created" :created, "sortOrder" : sortOrder};
+  toJson() => {
+        "id": id,
+        "amount": amount,
+        "name": name,
+        "changed": changed,
+        "created": created,
+        "sortOrder": sortOrder
+      };
 
-  static ShoppingItem fromJson(Map data) =>
-      ShoppingItem(data["id"], data["amount"], data["name"], data["changed"], data["created"], data["sortOrder"]);
+  static ShoppingItem fromJson(Map data) => ShoppingItem(
+      data["id"],
+      data["amount"],
+      data["name"],
+      data["changed"],
+      data["created"],
+      data["sortOrder"]);
 }
 
 class ShoppingList {
   List<ShoppingItem>? products;
-  int?  id;
+  int? id;
   String? name;
 
   toJson() => {
-
         "products": products?.map((p) => p.toJson()).toList(growable: false),
         "id": id,
         "name": name

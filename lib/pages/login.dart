@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/main.dart';
 import 'package:nssl/models/model_export.dart';
-import 'package:nssl/models/user.dart';
-import 'package:nssl/server_communication/helper_methods.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
-import 'package:nssl/server_communication/user_sync.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key, this.scaffoldKey}) : super(key: key);

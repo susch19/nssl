@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/forgot_password.dart';
 import 'package:nssl/pages/pages.dart';

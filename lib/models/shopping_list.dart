@@ -22,14 +22,24 @@ class ShoppingList {
 
   Future save() async {
     await DatabaseManager.database.transaction((z) async {
-      await z.execute('INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
+      await z.execute(
+          'INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
           [id, name, messagingEnabled ? 1 : 0, User.ownId]);
 
-      await z.rawDelete("DELETE FROM ShoppingItems WHERE res_list_id = ? and id not in (?)", [id, shoppingItems!.map((e) => e!.id).join(",")]);
+      await z.rawDelete(
+          "DELETE FROM ShoppingItems WHERE res_list_id = ? and id not in (?)",
+          [id, shoppingItems!.map((e) => e!.id).join(",")]);
       for (var item in shoppingItems!) {
         await z.execute(
             "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
-            [item!.id, item.name, item.amount, item.crossedOut ? 1 : 0, id, item.sortOrder]);
+            [
+              item!.id,
+              item.name,
+              item.amount,
+              item.crossedOut ? 1 : 0,
+              id,
+              item.sortOrder
+            ]);
       }
     });
   }
@@ -39,18 +49,28 @@ class ShoppingList {
     shoppingItems!.insert(index, item);
     await DatabaseManager.database.execute(
         "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
-        [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, id, item.sortOrder]);
+        [
+          item.id,
+          item.name,
+          item.amount,
+          item.crossedOut ? 1 : 0,
+          id,
+          item.sortOrder
+        ]);
   }
 
   Future deleteSingleItem(ShoppingItem item) async {
     shoppingItems!.remove(item);
-    await DatabaseManager.database.rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
+    await DatabaseManager.database
+        .rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
   }
 
   static Future<List<ShoppingList>> load() async {
-    var lists = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingLists WHERE user_id = ?", [User.ownId]);
+    var lists = await DatabaseManager.database.rawQuery(
+        "SELECT * FROM ShoppingLists WHERE user_id = ?", [User.ownId]);
 
-    var items = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingItems ORDER BY res_list_id, sortorder");
+    var items = await DatabaseManager.database.rawQuery(
+        "SELECT * FROM ShoppingItems ORDER BY res_list_id, sortorder");
 
     // TODO: if db ordering enough for us, or do we want to order by ourself in code?
     // return lists
@@ -75,7 +95,7 @@ class ShoppingList {
           ..shoppingItems = items
               .where((y) => y["res_list_id"] == x["id"])
               .map((y) => ShoppingItem(y["name"] as String?)
-                ..amount = y["amount"] as int?
+                ..amount = y["amount"] as int
                 ..crossedOut = y["crossed"] == 0 ? false : true
                 ..id = y["id"] as int?
                 ..sortOrder = y["sortorder"] as int?)
@@ -95,8 +115,9 @@ class ShoppingList {
 //    }
     var newList = GetListResult.fromJson(res.body);
     List<Map<String, dynamic>> items;
-    items = (await DatabaseManager.database
-        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?", [id]));
+    items = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?",
+        [id]));
 
     shoppingItems!.clear();
     for (var item in newList.products!)
@@ -105,8 +126,11 @@ class ShoppingList {
         ..amount = item.amount
         ..changed = item.changed
         ..created = item.created
-        ..crossedOut =
-            (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true)
+        ..crossedOut = (items.firstWhere((x) => x["id"] == item.id,
+                    orElse: () => {"crossed": 0})["crossed"] ==
+                0
+            ? false
+            : true)
         ..sortOrder = item.sortOrder);
 
     shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
@@ -114,14 +138,17 @@ class ShoppingList {
   }
 
   static Future<Null> reloadAllLists([BuildContext? cont]) async {
-    var result = GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
+    var result =
+        GetListsResult.fromJson((await ShoppingListSync.getLists(cont)).body);
     User.shoppingLists.clear();
 
-    await DatabaseManager.database.delete("ShoppingLists", where: "user_id = ?", whereArgs: [User.ownId]);
+    await DatabaseManager.database
+        .delete("ShoppingLists", where: "user_id = ?", whereArgs: [User.ownId]);
     //await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
 
     List<Map<String, dynamic>> items;
-    items = (await DatabaseManager.database.rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems"));
+    items = (await DatabaseManager.database
+        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems"));
 
     for (var res in result.shoppingLists) {
       var list = ShoppingList(res.id, res.name);
@@ -130,14 +157,20 @@ class ShoppingList {
         list.shoppingItems!.add(ShoppingItem(item.name)
           ..id = item.id
           ..amount = item.amount
-          ..crossedOut =
-              (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true)
-          ..sortOrder = (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"sortorder": 0})["sortorder"]));
+          ..crossedOut = (items.firstWhere((x) => x["id"] == item.id,
+                      orElse: () => {"crossed": 0})["crossed"] ==
+                  0
+              ? false
+              : true)
+          ..sortOrder = (items.firstWhere((x) => x["id"] == item.id,
+              orElse: () => {"sortorder": 0})["sortorder"]));
 
       if (list.shoppingItems!.any((element) => element!.sortOrder == null))
-        for (int i = 0; i < list.shoppingItems!.length; i++) list.shoppingItems![i]!.sortOrder = i;
+        for (int i = 0; i < list.shoppingItems!.length; i++)
+          list.shoppingItems![i]!.sortOrder = i;
 
-      list.shoppingItems!.sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
+      list.shoppingItems!
+          .sort((a, b) => a!.sortOrder!.compareTo(b!.sortOrder!));
       User.shoppingLists.add(list);
 
       list.subscribeForFirebaseMessaging();
@@ -150,6 +183,7 @@ class ShoppingList {
   }
 
   void unsubscribeFromFirebaseMessaging() {
-    firebaseMessaging?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
+    firebaseMessaging
+        ?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
   }
 }
