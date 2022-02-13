@@ -133,5 +133,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "nothingBoughtYet": MessageLookupByLibrary.simpleMessage('Nothing bought yet'),
         "reorderItems": MessageLookupByLibrary.simpleMessage('Reorder'),
         "refresh": MessageLookupByLibrary.simpleMessage('Refresh'),
+        "okayButton": MessageLookupByLibrary.simpleMessage('OKAY'),
+        "requestPasswordResetButton": MessageLookupByLibrary.simpleMessage("REQUEST PASSWORD RESET"),
+        "requestPasswordResetTitle": MessageLookupByLibrary.simpleMessage("Password Reset"),
+        "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage('If the email exists, the password request was successfully requested. Further instructions can be found in the email, that was send to the address.'),
       };
 }

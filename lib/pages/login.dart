@@ -229,17 +229,17 @@ class LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-//              ListTile(
-//                title: Container(
-//                  child: TextButton(
-//                    onPressed: () {
-//                      Navigator.pushNamed(context, "/forgot_password");
-//                    },
-//                    child:
-//                        Text(NSSLStrings.of(context).forgotPassword()),
-//                  ),
-//                ),
-//              ),
+              ListTile(
+                title: Container(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/forgot_password");
+                    },
+                    child:
+                        Text(NSSLStrings.of(context)?.forgotPassword() ?? ""),
+                  ),
+                ),
+              ),
               //padding: EdgeInsets.only(
               //    top: MediaQuery.of(context).size.height / 5),
             ]

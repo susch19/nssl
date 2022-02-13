@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:nssl/options/themes.dart';
+import 'package:nssl/pages/forgot_password.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
 import 'package:nssl/models/model_export.dart';
@@ -13,6 +14,7 @@ import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:nssl/server_communication/request_classes.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -137,7 +139,7 @@ class _NSSLState extends State<NSSLPage> {
           '/login': (BuildContext context) => LoginPage(),
           '/registration': (BuildContext context) => Registration(),
           '/search': (BuildContext context) => ProductAddPage(),
-          '/forgot_password': (BuildContext context) => CustomThemePage(),
+          '/forgot_password': (BuildContext context) => ForgotPasswordPage(),
         },
         showPerformanceOverlay: performanceOverlay,
         showSemanticsDebugger: false,

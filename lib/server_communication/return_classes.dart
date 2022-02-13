@@ -5,6 +5,15 @@ import 'package:nssl/models_json.dart';
 class BaseResult {
   bool? success;
   String? error;
+  static BaseResult fromJson(String dataString) =>
+      _fromJson(jsonDecode(dataString));
+
+  static BaseResult _fromJson(Map data) {
+    var r = BaseResult();
+    r.success = data["success"];
+    r.error = data["error"];
+    return r;
+  }
 }
 
 class CreateResult extends BaseResult {
