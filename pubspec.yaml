@@ -12,11 +12,7 @@ dependencies:
   path_provider:
   intl: 
   file: 
-  # intl_translation:
   shared_preferences: 
- # jwt:
- #   git: git://github.com/susch19/dart-json_web_token.git
-  #jaguar_jwt: "^1.1.5"
   crypto: 
   firebase_core:
   firebase_messaging:
@@ -29,12 +25,17 @@ dependencies:
   permission_handler: 
   scandit_flutter_datacapture_barcode:
   flutter_platform_widgets: 
-  # scandit_flutter_datacapture_barcode: ^6.7.0
-  # scandit_flutter_datacapture_core: ^6.7.0
-  # flutter_scandit: ^0.1.0
   pdf: 
   flutter_colorpicker: 
   adaptive_theme: 
+  flutter_svg:
+  # scandit_flutter_datacapture_barcode: ^6.7.0
+  # scandit_flutter_datacapture_core: ^6.7.0
+  # flutter_scandit: ^0.1.0
+  # intl_translation:
+ # jwt:
+ #   git: git://github.com/susch19/dart-json_web_token.git
+  #jaguar_jwt: "^1.1.5"
 
     #git: https://github.com/tekartik/sqflite.git
 
@@ -48,6 +49,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the Icons class.
   uses-material-design: true
+  assets:
+    - assets/vectors/
 
   # To add assets to your application, add an assets section here, in
   # this "flutter" section, as in:
