@@ -53,7 +53,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     Startup.deleteMessagesFromFolder();
-    Startup.initializeNewListsFromServer(setState);
+    Startup.initializeNewListsFromServer().then((value) => {if (value) setState(() {})});
 
     _controller = AnimationController(
       vsync: this,

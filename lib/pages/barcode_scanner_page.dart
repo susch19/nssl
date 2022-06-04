@@ -5,7 +5,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scandit_flutter_datacapture_barcode/scandit_flutter_datacapture_barcode.dart';
 import 'package:scandit_flutter_datacapture_barcode/scandit_flutter_datacapture_barcode_capture.dart';
@@ -115,7 +114,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
   Widget build(BuildContext context) {
     Widget child;
     if (_isPermissionMessageVisible) {
-      child = PlatformText('No permission to access the camera!',
+      child = Text('No permission to access the camera!',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black));
     } else {
       child = _captureView;
