@@ -21,8 +21,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
   var newPw2Input = ForInput();
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(value), duration: Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
   }
 
   void _handleSubmitted() {
@@ -52,8 +51,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     }
     setState(() => {});
     if (error == true) return;
-    if (newPwInput.textEditingController.text !=
-        newPw2Input.textEditingController.text) {
+    if (newPwInput.textEditingController.text != newPw2Input.textEditingController.text) {
       newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration!.labelText,
           helperText: newPw2Input.decoration!.helperText,
@@ -68,19 +66,15 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
 
   _changePassword() async {
     var res = await UserSync.changePassword(
-        oldPwInput.textEditingController.text,
-        newPwInput.textEditingController.text,
-        User.token,
-        context);
+        oldPwInput.textEditingController.text, newPwInput.textEditingController.text, User.token, context);
     if (res.statusCode != 200) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(res.reasonPhrase!), duration: Duration(seconds: 3)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(res.reasonPhrase!), duration: Duration(seconds: 3)));
       return;
     }
     var obj = Result.fromJson(res.body);
     if (!obj.success!) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(obj.error!), duration: Duration(seconds: 3)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(obj.error!), duration: Duration(seconds: 3)));
       return;
     }
     var dialog = AlertDialog(
@@ -91,23 +85,18 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
           ),
         ),
         actions: <Widget>[
-          TextButton(
-              child: const Text("OK"),
-              onPressed: () => Navigator.popUntil(context, (r) => r.isFirst)),
+          TextButton(child: const Text("OK"), onPressed: () => Navigator.popUntil(context, (r) => r.isFirst)),
         ]);
     showDialog(context: context, builder: (BuildContext context) => dialog);
   }
 
   _resetInput() {
     oldPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).oldPasswordHint(),
-        labelText: NSSLStrings.of(context).oldPassword());
+        helperText: NSSLStrings.of(context).oldPasswordHint(), labelText: NSSLStrings.of(context).oldPassword());
     newPwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).newPasswordHint(),
-        labelText: NSSLStrings.of(context).newPassword());
+        helperText: NSSLStrings.of(context).newPasswordHint(), labelText: NSSLStrings.of(context).newPassword());
     newPw2Input.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).new2PasswordHint(),
-        labelText: NSSLStrings.of(context).new2Password());
+        helperText: NSSLStrings.of(context).new2PasswordHint(), labelText: NSSLStrings.of(context).new2Password());
   }
 
   @override
@@ -121,7 +110,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: Text(NSSLStrings.of(context)!.changePasswordPD())),
+      appBar: AppBar(title: Text(NSSLStrings.of(context).changePasswordPD())),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -167,7 +156,7 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
               child: ElevatedButton(
 //                child: Center(
                 child: Text(
-                  NSSLStrings.of(context)!.changePasswordButton(),
+                  NSSLStrings.of(context).changePasswordButton(),
                 ),
 //                ),
                 onPressed: _handleSubmitted,

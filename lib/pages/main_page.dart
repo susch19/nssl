@@ -539,7 +539,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
     User.token = null;
     runApp(NSSL());
   }
-  
+
   Future drawerListItemMenuClicked(String value) async {
     var splitted = value.split('\u{1E}');
     int id = int.parse(splitted[0]);
@@ -575,11 +575,11 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin, Widge
                   if (!(res.success ?? false))
                     showInDrawerSnackBar(res.error!);
                   else {
-                    showInDrawerSnackBar(deleteList.name! + " " + NSSLStrings.of(context).removed());
                     if (User.currentList!.id! == id) {
                       changeCurrentList(User.shoppingLists.indexOf(User.shoppingLists.firstWhere((l) => l.id != id)));
                     }
                     setState(() => User.shoppingLists.removeWhere((x) => x.id == id));
+                    showInDrawerSnackBar(deleteList.name! + " " + NSSLStrings.of(cont!).removed());
                   }
                 },
                 context: context));

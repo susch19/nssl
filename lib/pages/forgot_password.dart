@@ -35,8 +35,7 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
   var validateMode = AutovalidateMode.disabled;
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(value), duration: Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
   }
 
   Future _handleSubmitted() async {
@@ -51,31 +50,27 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (emailInput.textEditingController.text.length > 0 &&
         _validateEmail(emailInput.textEditingController.text) == null) {
       var res = await UserSync.resetPassword(email, context);
-      if (!HelperMethods.reactToRespone(res, context,
-          scaffoldState: _scaffoldKey.currentState)) return;
+      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey.currentState)) return;
       await showDialog<bool>(
           context: context,
-          builder: (BuildContext context) => AlertDialog(
-                  content: Text(
-                      NSSLStrings.of(context)!.requestPasswordResetSuccess()),
-                  actions: <Widget>[
-                    TextButton(
-                        child: Text(NSSLStrings.of(context)!.okayButton()),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        })
-                  ]));
+          builder: (BuildContext context) =>
+              AlertDialog(content: Text(NSSLStrings.of(context).requestPasswordResetSuccess()), actions: <Widget>[
+                TextButton(
+                    child: Text(NSSLStrings.of(context).okayButton()),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    })
+              ]));
       Navigator.pop(context);
     }
   }
 
   String? _validateEmail(String? value) {
     if (value == null) return value;
-    if (value.isEmpty) return NSSLStrings.of(context)!.emailRequiredError();
+    if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value))
-      return NSSLStrings.of(context)!.emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
@@ -89,39 +84,34 @@ class ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-          title: Text(NSSLStrings.of(context)!.requestPasswordResetTitle())),
+      appBar: AppBar(title: Text(NSSLStrings.of(context).requestPasswordResetTitle())),
       body: Form(
         key: _formKey,
         autovalidateMode: validateMode,
-        child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            children: [
-              ListTile(
-                title: TextFormField(
-                  key: emailInput.key,
-                  decoration: emailInput.decoration,
-                  controller: emailInput.textEditingController,
-                  keyboardType: TextInputType.emailAddress,
-                  autofillHints: [AutofillHints.username, AutofillHints.email],
-                  autocorrect: false,
-                  autofocus: true,
-                  validator: _validateEmail,
-                  onSaved: (s) => _handleSubmitted(),
+        child: ListView(padding: const EdgeInsets.symmetric(horizontal: 32.0), children: [
+          ListTile(
+            title: TextFormField(
+              key: emailInput.key,
+              decoration: emailInput.decoration,
+              controller: emailInput.textEditingController,
+              keyboardType: TextInputType.emailAddress,
+              autofillHints: [AutofillHints.username, AutofillHints.email],
+              autocorrect: false,
+              autofocus: true,
+              validator: _validateEmail,
+              onSaved: (s) => _handleSubmitted(),
+            ),
+          ),
+          ListTile(
+            title: Container(
+                child: ElevatedButton(
+                  key: submit.key,
+                  child: Center(child: Text(NSSLStrings.of(context).requestPasswordResetButton())),
+                  onPressed: _handleSubmitted,
                 ),
-              ),
-              ListTile(
-                title: Container(
-                    child: ElevatedButton(
-                      key: submit.key,
-                      child: Center(
-                          child: Text(NSSLStrings.of(context)!
-                              .requestPasswordResetButton())),
-                      onPressed: _handleSubmitted,
-                    ),
-                    padding: const EdgeInsets.only(top: 16.0)),
-              ),
-            ]),
+                padding: const EdgeInsets.only(top: 16.0)),
+          ),
+        ]),
       ),
     );
   }
