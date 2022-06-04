@@ -21,7 +21,9 @@ class Startup {
 
   static Future<bool> initializeMinFunction() async {
     if (!Platform.isAndroid) return true;
-    return Firebase.initializeApp().then((value) async => await ScanditFlutterDataCaptureBarcode.initialize()).then((value) => true);
+    return Firebase.initializeApp()
+        .then((value) async => await ScanditFlutterDataCaptureBarcode.initialize())
+        .then((value) => true);
   }
 
   static Future<void> loadMessagesFromFolder(Function setState) async {
@@ -106,7 +108,7 @@ class Startup {
     // await User.save();
   }
 
-  static Future initializeNewListsFromServer(Function setState) async {
+  static Future initializeNewListsFromServer() async {
     var res = await ShoppingListSync.getLists(null);
 
     if (res.statusCode == 200) {
@@ -135,9 +137,6 @@ class Startup {
     User.currentList =
         User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
 
-    var args = [];
-    args.add(() {});
-    Function.apply(setState, args);
     return true;
   }
 }
