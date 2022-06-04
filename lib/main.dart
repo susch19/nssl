@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/forgot_password.dart';
 import 'package:nssl/pages/pages.dart';
@@ -14,8 +15,6 @@ import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:nssl/server_communication/request_classes.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -31,8 +30,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Startup.initializeMinFunction();
   //Startup.remoteMessages.add(message);
-  var dir =
-      await Startup.fs.systemTempDirectory.childDirectory("message").create();
+  var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
   var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
   await file.writeAsString(jsonEncode(message.data));
 }
@@ -45,11 +43,20 @@ Future<void> main() async {
       if (t.connectionState == ConnectionState.done)
         return NSSLPage();
       else
-        return Container(color: Colors.green);
+        return MaterialApp(
+          builder: (context, child) {
+            return Center(
+              child: SizedBox(
+                height: 200,
+                width: 200,
+                child: SvgPicture.asset("assets/vectors/app_icon.svg"),
+              ),
+            );
+          },
+        );
     },
-    future: Startup.initialize().then((value) =>
-        FirebaseMessaging.onBackgroundMessage(
-            _firebaseMessagingBackgroundHandler)),
+    future: Startup.initialize()
+        .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
   ));
 }
 
@@ -98,8 +105,7 @@ class _NSSLState extends State<NSSLPage> {
     // FirebaseMessaging.onBackgroundMessage((message) => CloudMessaging.onMessage(message, setState));
     // firebaseMessaging.configure(
     //     onMessage: (x) => CloudMessaging.onMessage(x, setState), onLaunch: (x) => Startup.initialize());
-    for (var list in User.shoppingLists)
-      if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
+    for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
   Future subscribeFirebase(BuildContext context) async {
@@ -149,9 +155,7 @@ class _NSSLState extends State<NSSLPage> {
   }
 
   Scaffold mainAppHome() => Scaffold(
-      key: _mainScaffoldKey,
-      resizeToAvoidBottomInset: false,
-      body: MainPage() //CustomThemePage()//LoginPage(),
+      key: _mainScaffoldKey, resizeToAvoidBottomInset: false, body: MainPage() //CustomThemePage()//LoginPage(),
       );
 
   Scaffold mainAppLoginRegister() => Scaffold(

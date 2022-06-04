@@ -93,11 +93,11 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen>
     // the video preview. This is optional, but recommended for better visual feedback.
     var overlay = BarcodeCaptureOverlay.withBarcodeCaptureForView(_barcodeCapture, _captureView)
       ..viewfinder = RectangularViewfinder.withStyleAndLineStyle(
-          RectangularViewfinderStyle.square, RectangularViewfinderLineStyle.bold);
+          RectangularViewfinderStyle.square, RectangularViewfinderLineStyle.light);
 
     // Adjust the overlay's barcode highlighting to match the new viewfinder styles and improve the visibility of feedback.
     // With 6.10 we will introduce this visual treatment as a new style for the overlay.
-    overlay.brush = Brush(Color.fromARGB(0, 0, 0, 0), Color.fromARGB(0, 0, 0, 0), 3);
+    overlay.brush = Brush(Color.fromARGB(0, 0, 0, 0), Color.fromARGB(255, 255, 255, 255), 3);
 
     _captureView.addOverlay(overlay);
 
