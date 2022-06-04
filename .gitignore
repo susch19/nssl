@@ -21,3 +21,7 @@ ios/Flutter/flutter_export_environment.sh
 .dart_tool/*
 android/app/src/main/java/io/flutter/plugins/*
 lib/.license.dart
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
