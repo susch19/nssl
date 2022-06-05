@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nssl/localization/nssl_strings.dart';
+import 'package:nssl/manager/database_manager.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:nssl/models/model_export.dart';
@@ -19,7 +20,7 @@ class HelperMethods {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
     var res = await http.post(Uri(host: host, scheme: scheme, path: path /*, port: 4344*/),
         body: jsonEncode(body),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
+        headers: {"Content-Type": "application/json", User.token == "" ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
@@ -27,7 +28,7 @@ class HelperMethods {
   static Future<http.Response> get(String path, BuildContext? context, [String query = ""]) async {
     await handleTokenRefresh(context);
     var res = await http.get(Uri(host: host, scheme: scheme, path: path, query: query /*, port: 4344*/),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
+        headers: {"Content-Type": "application/json", User.token == "" ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
@@ -37,7 +38,7 @@ class HelperMethods {
     if (!skipTokenRefresh) await handleTokenRefresh(context);
     var res = await http.put(Uri(host: host, scheme: scheme, path: path /*, port: 4344*/),
         body: jsonEncode(body),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
+        headers: {"Content-Type": "application/json", User.token == "" ? "X-foo" : "X-Token": User.token});
     reactToRespone(res, context);
     return res;
   }
@@ -45,7 +46,7 @@ class HelperMethods {
   static Future<http.Response> delete(String path, BuildContext? context) async {
     await handleTokenRefresh(context);
     var res = await http.delete(Uri(host: host, scheme: scheme, path: path /*, port: 4344*/),
-        headers: {"Content-Type": "application/json", User.token == null ? "X-foo" : "X-Token": User.token ?? ""});
+        headers: {"Content-Type": "application/json", User.token == "" ? "X-foo" : "X-Token": User.token});
 
     reactToRespone(res, context);
     return res;
@@ -88,7 +89,7 @@ class HelperMethods {
       var m = jsonDecode(t.body);
       var to = m["token"];
       User.token = to;
-      User.save();
+      DatabaseManager.database.execute("Update User set token = ?", [to]);
     }
   }
 }

@@ -37,30 +37,37 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await file.writeAsString(jsonEncode(message.data));
 }
 
+final appRestartProvider = StateProvider<int>(
+  (ref) => 0,
+);
+
 Future<void> main() async {
 // iWonderHowLongThisTakes();
-  runApp(FutureBuilder(
-    builder: (c, t) {
-      if (t.connectionState == ConnectionState.done)
-        return ProviderScope(
-          child: NSSLPage(),
-        );
-      else
-        return MaterialApp(
-          builder: (context, child) {
-            return Center(
-              child: SizedBox(
-                height: 200,
-                width: 200,
-                child: SvgPicture.asset("assets/vectors/app_icon.svg"),
-              ),
+  runApp(ProviderScope(child: Consumer(
+    builder: (context, ref, child) {
+      return FutureBuilder(
+        builder: (c, t) {
+          if (t.connectionState == ConnectionState.done) {
+            ref.watch(appRestartProvider);
+            return NSSLPage();
+          } else
+            return MaterialApp(
+              builder: (context, child) {
+                return Center(
+                  child: SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: SvgPicture.asset("assets/vectors/app_icon.svg"),
+                  ),
+                );
+              },
             );
-          },
-        );
+        },
+        future: Startup.initialize(ref)
+            .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
+      );
     },
-    future: Startup.initialize()
-        .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
-  ));
+  )));
 }
 
 class NSSL extends StatelessWidget {
@@ -70,14 +77,14 @@ class NSSL extends StatelessWidget {
   }
 }
 
-class NSSLPage extends StatefulWidget {
+class NSSLPage extends ConsumerStatefulWidget {
   NSSLPage({Key? key}) : super(key: key);
 
   @override
   _NSSLState createState() => _NSSLState();
 }
 
-class _NSSLState extends State<NSSLPage> {
+class _NSSLState extends ConsumerState<NSSLPage> {
   _NSSLState() : super();
   final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -88,16 +95,18 @@ class _NSSLState extends State<NSSLPage> {
   @override
   void initState() {
     super.initState();
-
+    ref.read(cloudMessagingProvider); //Neded for ref on onMessage
     subscribeFirebase(context);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      CloudMessaging.onMessage(message, setState);
+      CloudMessaging.onMessage(message);
     });
 
     FirebaseMessaging.onMessage.listen((event) {
-      CloudMessaging.onMessage(event, setState);
+      CloudMessaging.onMessage(event);
     });
-    for (var list in User.shoppingLists) if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
+
+    for (var list in ref.read(shoppingListsProvider).shoppingLists)
+      if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
   Future subscribeFirebase(BuildContext context) async {
@@ -106,12 +115,14 @@ class _NSSLState extends State<NSSLPage> {
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initMessage != null) {
-      CloudMessaging.onMessage(initMessage, setState);
+      CloudMessaging.onMessage(initMessage);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var user = ref.watch(userProvider);
+
     return AdaptiveTheme(
       light: Themes.lightTheme.theme!,
       dark: Themes.darkTheme.theme,
@@ -131,7 +142,7 @@ class _NSSLState extends State<NSSLPage> {
         theme: theme,
         darkTheme: darkTheme,
         debugShowMaterialGrid: materialGrid,
-        home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
+        home: user.ownId >= 0 ? mainAppHome() : mainAppLoginRegister(),
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => LoginPage(),
           '/registration': (BuildContext context) => Registration(),

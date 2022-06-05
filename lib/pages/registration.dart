@@ -7,8 +7,9 @@ import 'package:nssl/server_communication/s_c.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/models/model_export.dart';
 import 'login.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Registration extends StatefulWidget {
+class Registration extends ConsumerStatefulWidget {
   Registration({Key? key}) : super(key: key);
 
   static const String routeName = '/Registration';
@@ -17,7 +18,7 @@ class Registration extends StatefulWidget {
   RegistrationState createState() => RegistrationState();
 }
 
-class RegistrationState extends State<Registration> {
+class RegistrationState extends ConsumerState<Registration> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -49,8 +50,8 @@ class RegistrationState extends State<Registration> {
       return;
     else {
       var response = LoginResult.fromJson(res.body);
-      if (!response.success!) {
-        showInSnackBar(response.error!);
+      if (!response.success) {
+        showInSnackBar(response.error);
         return;
       }
       showInSnackBar(NSSLStrings.of(context).registrationSuccessfulMessage());
@@ -61,21 +62,22 @@ class RegistrationState extends State<Registration> {
         return;
       }
       var loginRes = LoginResult.fromJson(x.body);
+      var userState = ref.watch(userStateProvider.notifier);
       User.token = loginRes.token;
-      User.username = response.username;
-      User.eMail = response.eMail;
+      var user = User(loginRes.id, loginRes.username, loginRes.eMail);
+      userState.state = user;
+      await user.save(0);
 
-      await User.save();
-      Navigator.pop(context);
-      runApp(NSSL());
+      // Navigator.pop(context);
+      var restartState = ref.watch(appRestartProvider.notifier);
+      restartState.state = restartState.state + 1;
     }
   }
 
   String? _validateName(String? value) {
     if (value!.isEmpty)
       return NSSLStrings.of(context).usernameEmptyError();
-    else if (value.length < 4)
-      return NSSLStrings.of(context).usernameToShortError();
+    else if (value.length < 4) return NSSLStrings.of(context).usernameToShortError();
     return null;
   }
 
@@ -83,22 +85,18 @@ class RegistrationState extends State<Registration> {
     if (value!.isEmpty) return NSSLStrings.of(context).emailEmptyError();
     RegExp email = RegExp(
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-    if (!email.hasMatch(value))
-      return NSSLStrings.of(context).emailIncorrectFormatError();
+    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (pwInput.textEditingController.text.isEmpty)
-      return NSSLStrings.of(context).chooseAPasswordPrompt();
+    if (pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).chooseAPasswordPrompt();
     return null;
   }
 
   String? _validatePassword2(String? value) {
-    if (pwInput.textEditingController.text.isEmpty)
-      return NSSLStrings.of(context).reenterPasswordPrompt();
-    if (pwInput.textEditingController.text != value)
-      return NSSLStrings.of(context).passwordsDontMatchError();
+    if (pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).reenterPasswordPrompt();
+    if (pwInput.textEditingController.text != value) return NSSLStrings.of(context).passwordsDontMatchError();
     return null;
   }
 
@@ -107,8 +105,7 @@ class RegistrationState extends State<Registration> {
     _resetInput();
     return Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(
-            title: Text(NSSLStrings.of(context).registrationTitle())),
+        appBar: AppBar(title: Text(NSSLStrings.of(context).registrationTitle())),
         body: Form(
             key: _formKey,
             autovalidateMode: validateMode,
@@ -170,8 +167,7 @@ class RegistrationState extends State<Registration> {
                       alignment: const FractionalOffset(0.5, 0.5),
                       child: ElevatedButton(
                         child: Center(
-                          child: Text(
-                              NSSLStrings.of(context).registerButton()),
+                          child: Text(NSSLStrings.of(context).registerButton()),
                         ),
                         onPressed: _handleSubmitted,
                       ),
@@ -198,16 +194,13 @@ class RegistrationState extends State<Registration> {
 
   _resetInput() {
     nameInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).usernameRegisterHint(),
-        labelText: NSSLStrings.of(context).username());
+        helperText: NSSLStrings.of(context).usernameRegisterHint(), labelText: NSSLStrings.of(context).username());
 
     emailInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).emailRegisterHint(),
-        labelText: NSSLStrings.of(context).emailTitle());
+        helperText: NSSLStrings.of(context).emailRegisterHint(), labelText: NSSLStrings.of(context).emailTitle());
 
     pwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).passwordRegisterHint(),
-        labelText: NSSLStrings.of(context).password());
+        helperText: NSSLStrings.of(context).passwordRegisterHint(), labelText: NSSLStrings.of(context).password());
 
     pw2Input.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).retypePasswordHint(),

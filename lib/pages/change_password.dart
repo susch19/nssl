@@ -49,14 +49,12 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
           errorText: NSSLStrings.of(context).passwordEmptyError());
       error = true;
     }
-    setState(() => {});
     if (error == true) return;
     if (newPwInput.textEditingController.text != newPw2Input.textEditingController.text) {
       newPw2Input.decoration = InputDecoration(
           labelText: newPw2Input.decoration!.labelText,
           helperText: newPw2Input.decoration!.helperText,
           errorText: NSSLStrings.of(context).passwordsDontMatchError());
-      setState(() => {});
       return;
     }
     _changePassword();
@@ -73,8 +71,8 @@ class ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
     var obj = Result.fromJson(res.body);
-    if (!obj.success!) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(obj.error!), duration: Duration(seconds: 3)));
+    if (!obj.success) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(obj.error), duration: Duration(seconds: 3)));
       return;
     }
     var dialog = AlertDialog(

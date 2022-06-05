@@ -4,8 +4,9 @@ import 'package:nssl/models/model_export.dart';
 import 'package:nssl/server_communication//s_c.dart';
 import 'dart:async';
 import 'package:nssl/server_communication/return_classes.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ContributorsPage extends StatefulWidget {
+class ContributorsPage extends ConsumerStatefulWidget {
   ContributorsPage(this.listId, {Key? key, this.title}) : super(key: key);
   final String? title;
   final int listId;
@@ -13,7 +14,7 @@ class ContributorsPage extends StatefulWidget {
   _ContributorsPagePageState createState() => new _ContributorsPagePageState(listId);
 }
 
-class _ContributorsPagePageState extends State<ContributorsPage> {
+class _ContributorsPagePageState extends ConsumerState<ContributorsPage> {
   final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey _iff = GlobalKey();
   GlobalKey _ib = GlobalKey();
@@ -35,7 +36,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
         return;
       }
       GetContributorsResult z = GetContributorsResult.fromJson(o.body);
-      if (!z.success! || z.contributors.length <= 0)
+      if (!z.success || z.contributors.length <= 0)
         showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + o.reasonPhrase!,
             duration: Duration(seconds: 10));
       else
@@ -69,8 +70,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   Future _addContributor(String value) async {
     var o = await ShoppingListSync.addContributor(listId, value, context);
     AddContributorResult z = AddContributorResult.fromJson(o.body);
-    if (!z.success!)
-      showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error!, duration: Duration(seconds: 10));
+    if (!z.success)
+      showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error, duration: Duration(seconds: 10));
     else
       setState(() => conList.add(ContributorResult()
         ..name = z.name
@@ -81,7 +82,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
   Widget buildBody() {
     bool? isAdmin = false;
     if (conList.length > 0) {
-      isAdmin = conList.firstWhere((x) => x.name!.toLowerCase() == User.username!.toLowerCase()).isAdmin;
+      var user = ref.watch(userProvider);
+      isAdmin = conList.firstWhere((x) => x.name!.toLowerCase() == user.username.toLowerCase()).isAdmin;
       var listView = ListView.builder(
           itemBuilder: (c, i) {
             return ListTile(
@@ -89,7 +91,7 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
                     (conList[i].isAdmin!
                         ? NSSLStrings.of(context).contributorAdmin()
                         : NSSLStrings.of(context).contributorUser())),
-                trailing: isAdmin! && conList[i].name!.toLowerCase() != User.username!.toLowerCase()
+                trailing: isAdmin! && conList[i].name!.toLowerCase() != user.username.toLowerCase()
                     ? PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
                         onSelected: popupMenuClicked,
@@ -142,8 +144,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
         var userId = int.parse(splitted[0]);
         var res = await ShoppingListSync.deleteContributor(listId, userId, context);
         var enres = Result.fromJson(res.body);
-        if (!enres.success!)
-          showInSnackBar(enres.error!);
+        if (!enres.success)
+          showInSnackBar(enres.error);
         else {
           showInSnackBar(conList.firstWhere((x) => x.userId == userId).name! + " was removed successfully");
           setState(() => conList.removeWhere((x) => x.userId == userId));
@@ -153,8 +155,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
         var userId = int.parse(splitted[0]);
         var res = await ShoppingListSync.changeRight(listId, userId, context);
         var enres = Result.fromJson(res.body);
-        if (!enres.success!)
-          showInSnackBar(enres.error!);
+        if (!enres.success)
+          showInSnackBar(enres.error);
         else {
           ShoppingListSync.getContributors(listId, context).then((o) {
             if (o.statusCode == 500) {
@@ -162,8 +164,8 @@ class _ContributorsPagePageState extends State<ContributorsPage> {
               return;
             }
             GetContributorsResult z = GetContributorsResult.fromJson(o.body);
-            if (!z.success! || z.contributors.length <= 0)
-              showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error!,
+            if (!z.success || z.contributors.length <= 0)
+              showInSnackBar(NSSLStrings.of(context).genericErrorMessageSnackbar() + z.error,
                   duration: Duration(seconds: 10));
             else
               conList.clear();
