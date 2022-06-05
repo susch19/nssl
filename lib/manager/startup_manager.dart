@@ -8,11 +8,10 @@ import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/manager/database_manager.dart';
 import 'package:nssl/models/model_export.dart';
 import 'package:nssl/options/themes.dart';
-import 'package:nssl/server_communication/return_classes.dart';
-import 'package:nssl/server_communication/s_c.dart';
 import 'package:scandit_flutter_datacapture_barcode/scandit_flutter_datacapture_barcode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file/local.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Startup {
   static SharedPreferences? sharedPreferences;
@@ -26,7 +25,7 @@ class Startup {
         .then((value) => true);
   }
 
-  static Future<void> loadMessagesFromFolder(Function setState) async {
+  static Future<void> loadMessagesFromFolder(WidgetRef ref) async {
     var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
     var subFiles = dir.listSync();
     if (subFiles.length == 0) return;
@@ -37,7 +36,8 @@ class Startup {
         .forEach((subFile) {
       var str = subFile.readAsStringSync();
       var remoteMessage = RemoteMessage(data: jsonDecode(str));
-      CloudMessaging.onMessage(remoteMessage, setState);
+      ref.read(cloudMessagingProvider);
+      CloudMessaging.onMessage(remoteMessage);
       subFile.delete();
     });
   }
@@ -54,51 +54,26 @@ class Startup {
     });
   }
 
-  static Future<bool> initialize() async {
+  static Future<bool> initialize(WidgetRef ref) async {
     WidgetsFlutterBinding.ensureInitialized();
     var f1 = initializeMinFunction();
     await DatabaseManager.initialize();
-    await User.load();
+    var user = await ref.read(userFromDbProvider.future);
 
-    if (User.username == null || User.username == "" || User.eMail == null || User.eMail == "") return false;
+    if (user == null || user.username == "" || user.eMail == "") return false;
+    ref.read(themeProvider);
     await Themes.loadTheme();
 
-    User.shoppingLists = await ShoppingList.load();
-    if (User.shoppingLists.length == 0) return true;
-    User.currentList =
-        User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
+    var provider = ref.read(shoppingListsProvider);
+    await provider.load();
+
     await f1;
     return true;
   }
 
-  static Future initializeNewListsFromServer() async {
-    var res = await ShoppingListSync.getLists(null);
-
-    if (res.statusCode == 200) {
-      var result = GetListsResult.fromJson(res.body);
-
-      User.shoppingLists.clear();
-      await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [User.ownId]);
-
-      var crossedOut =
-          (await DatabaseManager.database.rawQuery("SELECT id, crossed FROM ShoppingItems WHERE crossed = 1"));
-      result.shoppingLists.forEach((resu) {
-        var list = ShoppingList(resu.id, resu.name)..shoppingItems = <ShoppingItem?>[];
-
-        for (var item in resu.products!)
-          list.shoppingItems!.add(ShoppingItem(item.name)
-            ..id = item.id
-            ..amount = item.amount
-            ..crossedOut =
-                (crossedOut.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0
-                    ? false
-                    : true));
-        User.shoppingLists.add(list);
-        list.save();
-      });
-    }
-    User.currentList =
-        User.shoppingLists.firstWhere((x) => x.id == User.currentListIndex, orElse: () => User.shoppingLists.first);
+  static Future initializeNewListsFromServer(WidgetRef ref) async {
+    var provider = ref.read(shoppingListsProvider);
+    await provider.reloadAllLists();
 
     return true;
   }

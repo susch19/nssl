@@ -2,79 +2,108 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:nssl/helper/iterable_extensions.dart';
 import 'package:nssl/models/model_export.dart';
+import 'package:riverpod/riverpod.dart';
 
 FirebaseMessaging? get firebaseMessaging => Platform.isAndroid ? FirebaseMessaging.instance : null;
 
+final cloudMessagingProvider = Provider<CloudMessaging>((ref) {
+  return CloudMessaging(ref);
+});
+
 class CloudMessaging {
-  static Future onMessage(RemoteMessage message, Function setState) async {
-   
+  static late Ref _ref;
+
+  CloudMessaging(Ref ref) {
+    _ref = ref;
+  }
+
+  static Future onMessage(RemoteMessage message) async {
     final dynamic data = message.data;
 
     int listId = int.parse(data["listId"]);
-    if (User.ownId == int.parse(data["userId"])) {
+    var ownId = _ref.read(userIdProvider);
+    if (ownId == int.parse(data["userId"])) {
       return null;
     }
+    var listController = _ref.read(shoppingListsProvider);
 
-    if (User.shoppingLists.firstWhere((x) => x.id == listId, orElse: () => ShoppingList.empty) == ShoppingList.empty) {
+    var list = listController.shoppingLists.firstOrNull((element) => element.id == listId);
+
+    if (list == null) {
       var mapp = jsonDecode(data["items"]);
       //User was added to new list
-      User.shoppingLists.add(ShoppingList(listId, data["name"])
-        ..shoppingItems = mapp
-            .map((x) => ShoppingItem(x["name"])
-              ..id = x["id"]
-              ..amount = x["amount"]
-              ..sortOrder = x["sortOrder"])
-            .toList());
-      firebaseMessaging!.subscribeToTopic(listId.toString() + "shoppingListTopic");
+      var items = _ref.watch(shoppingItemsProvider.notifier);
+      var newState = items.state.toList();
+      newState
+          .addAll(mapp.map((x) => ShoppingItem(x["name"], listId, x["sortOrder"], id: x["id"], amount: x["amount"])));
+      items.state = newState;
+      listController.addList(ShoppingList(listId, data["name"]));
     } else if (data.length == 1) {
       //List deleted
-      User.shoppingLists.removeWhere((x) => x.id == listId);
-      firebaseMessaging!.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
+      listController.removeList(listId);
     } else {
       var action = data["action"];
-      var list = User.shoppingLists.firstWhere((x) => x.id == listId);
+      var list = listController.shoppingLists.firstWhere((x) => x.id == listId);
       switch (action) {
         case "ItemChanged": //Id, Amount, action
           var id = int.parse(data["id"]);
-          list.shoppingItems!.firstWhere((x) => x!.id == id)!.amount = int.parse(data["amount"]);
-          list.save();
+          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var newState = items.state.toList();
+          var item = newState.firstWhere((x) => x.id == id);
+          newState.remove(item);
+          newState.add(item.cloneWith(newAmount: int.parse(data["amount"])));
+          items.state = newState;
+          listController.save(list);
           break;
         case "ItemDeleted": //Id, action
           var id = int.parse(data["id"]);
-          list.shoppingItems!.removeWhere((x) => x!.id == id);
-          list.save();
+          listController.deleteSingleItemById(list, id);
           break;
         case "NewItemAdded": //Id, Name, Gtin, Amount, action
-          if (list.shoppingItems!.firstWhere((x) => x!.id == int.parse(data["id"]), orElse: () => null) != null) break;
-          list.shoppingItems!.add(ShoppingItem(data["name"])
-            ..id = int.parse(data["id"])
-            ..amount = int.parse(data["amount"])
-            ..crossedOut = false
-            ..sortOrder = int.parse(data["sortOrder"]));
-          list.save();
+          var newItemId = int.parse(data["id"]);
+          var existing = _ref.read(shoppingItemProvider.create(newItemId));
+          if (existing != null) break;
+
+          listController.addSingleItem(
+              list,
+              ShoppingItem(data["name"], list.id, int.parse(data["sortOrder"]),
+                  id: int.parse(data["id"]), amount: int.parse(data["amount"]), crossedOut: false));
           break;
         case "ListRename": //Name, action
-          list.name = data["name"];
-          list.save();
+          listController.rename(list.id, data["name"] as String);
           break;
         case "Refresh": //action
-          await list.refresh();
+          listController.refresh(list);
           break;
         case "ItemRenamed": //product.Id, product.Name
-          list.shoppingItems!.firstWhere((x) => x!.id == int.parse(data["id"]))!.name = data["name"];
-          list.save();
+          var itemId = int.parse(data["id"]);
+          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var newState = items.state.toList();
+          var item = newState.firstWhere((x) => x.id == itemId);
+          newState.remove(item);
+          newState.add(
+            item.cloneWith(newName: data["name"]),
+          );
+          items.state = newState;
+          listController.save(list);
           break;
         case "OrderChanged":
-          var id = int.parse(data["id"]);
-          list.shoppingItems!.firstWhere((x) => x!.id == id)!.sortOrder = int.parse(data["sortOrder"]);
-          list.save();
+          var itemId = int.parse(data["id"]);
+          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var newState = items.state.toList();
+          var item = newState.firstWhere((x) => x.id == itemId);
+          newState.remove(item);
+          newState.add(item.cloneWith(
+            newAmount: int.parse(data["amount"]),
+            newSortOrder: int.parse(data["sortOrder"]),
+          ));
+          items.state = newState;
+          listController.save(list);
           break;
       }
     }
-    var args = [];
-    args.add(() {});
-    Function.apply(setState, args);
 
     return null;
   }

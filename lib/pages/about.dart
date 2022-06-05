@@ -82,9 +82,9 @@ class AboutPage extends StatelessWidget {
           ),
           title: Text(NSSLStrings.of(context).codeOnGithub()),
           onTap: () {
-            var urlString = "https://github.com/susch19/nssl";
-            canLaunch(urlString).then((value) {
-              if (value) launch(urlString);
+            var urlString = Uri.parse("https://github.com/susch19/nssl");
+            canLaunchUrl(urlString).then((value) {
+              if (value) launchUrl(urlString);
             });
           },
         ),
@@ -93,9 +93,9 @@ class AboutPage extends StatelessWidget {
           leading: SvgPicture.asset("assets/vectors/nssl_icon.svg", alignment: Alignment.center, width: 32),
           title: Text(NSSLStrings.of(context).iconSource()),
           onTap: () {
-            var urlString = "https://www.flaticon.com/free-icon/check-list_306470";
-            canLaunch(urlString).then((value) {
-              if (value) launch(urlString);
+            var urlString = Uri.parse("https://www.flaticon.com/free-icon/check-list_306470");
+            canLaunchUrl(urlString).then((value) {
+              if (value) launchUrl(urlString);
             });
           },
         ),
@@ -104,9 +104,9 @@ class AboutPage extends StatelessWidget {
           leading: SvgPicture.asset("assets/vectors/google_play.svg", alignment: Alignment.center, width: 32),
           title: Text(NSSLStrings.of(context).playstoreEntry()),
           onTap: () {
-            var urlString = "https://play.google.com/store/apps/details?id=de.susch19.nssl";
-            canLaunch(urlString).then((value) {
-              if (value) launch(urlString);
+            var urlString = Uri.parse("https://play.google.com/store/apps/details?id=de.susch19.nssl");
+            canLaunchUrl(urlString).then((value) {
+              if (value) launchUrl(urlString);
             });
           },
         ),
@@ -115,9 +115,9 @@ class AboutPage extends StatelessWidget {
           leading: Image.asset("assets/images/scandit.png", alignment: Alignment.center, width: 128, color: iconColor),
           title: Text(NSSLStrings.of(context).scanditCredit()),
           onTap: () {
-            var urlString = "https://scandit.com";
-            canLaunch(urlString).then((value) {
-              if (value) launch(urlString);
+            var urlString = Uri.parse("https://scandit.com");
+            canLaunchUrl(urlString).then((value) {
+              if (value) launchUrl(urlString);
             });
           },
         ),

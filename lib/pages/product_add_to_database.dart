@@ -4,9 +4,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/models/model_export.dart';
-import 'package:nssl/models/user.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum DismissDialogAction {
   cancel,
@@ -14,7 +14,7 @@ enum DismissDialogAction {
   save,
 }
 
-class AddProductToDatabase extends StatefulWidget {
+class AddProductToDatabase extends ConsumerStatefulWidget {
   AddProductToDatabase(this.gtin);
   final String? gtin;
 
@@ -22,7 +22,7 @@ class AddProductToDatabase extends StatefulWidget {
   AddProductToDatabaseState createState() => AddProductToDatabaseState(gtin);
 }
 
-class AddProductToDatabaseState extends State<AddProductToDatabase> {
+class AddProductToDatabaseState extends ConsumerState<AddProductToDatabase> {
   AddProductToDatabaseState(this.gtin);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -100,28 +100,31 @@ class AddProductToDatabaseState extends State<AddProductToDatabase> {
         return false;
       }
       var res = ProductResult.fromJson(first.body);
-      if (!res.success!)
-        showInSnackBar(res.error!);
+      if (!res.success)
+        showInSnackBar(res.error);
       else {
         showInSnackBar(NSSLStrings.of(context).successful());
         if (putInList) {
-          var list = User.currentList!;
+          var list = ref.read(currentListProvider)!;
           var pres = AddListItemResult.fromJson(
               (await ShoppingListSync.addProduct(list.id, "$productName $brandName $weight", gtin, 1, context)).body);
-          if (!pres.success!)
-            showInSnackBar(pres.error!);
+          if (!pres.success)
+            showInSnackBar(pres.error);
           else {
-            setState(() {
-              list.shoppingItems!.add(ShoppingItem(pres.name)
-                ..amount = 1
-                ..id = pres.productId);
-            });
+            var listController = ref.read(shoppingListsProvider);
+            var shoppingItems = ref.read(currentShoppingItemsProvider);
+
+            int sortOrder = 0;
+            if (shoppingItems.length > 0) sortOrder = shoppingItems.last.sortOrder + 1;
+
+            listController.addSingleItem(
+                list, ShoppingItem(pres.name, list.id, sortOrder, amount: 1, id: pres.productId));
           }
+          _isSendToServer = false;
+          Navigator.of(context).pop();
         }
         _isSendToServer = false;
-        Navigator.of(context).pop();
       }
-      _isSendToServer = false;
       return true;
     }
   }

@@ -2,12 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/localization/nssl_strings.dart';
-import 'package:nssl/main.dart';
 import 'package:nssl/models/model_export.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   LoginPage({Key? key, this.scaffoldKey}) : super(key: key);
 
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -29,7 +29,7 @@ class ForInput {
   FocusNode focusNode = FocusNode();
 }
 
-class LoginPageState extends State<LoginPage> {
+class LoginPageState extends ConsumerState<LoginPage> {
   LoginPageState() : super();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -71,33 +71,33 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _handleLoggedIn(LoginResult res) async {
-    if (!res.success!) {
-      showInSnackBar(res.error!);
+    if (!res.success) {
+      showInSnackBar(res.error);
       return;
     }
     showInSnackBar(NSSLStrings.of(context).loginSuccessfulMessage());
-    bool firstBoot = User.username == null;
-    User.token = res.token;
-    User.username = res.username;
-    User.eMail = res.eMail;
-    User.ownId = res.id;
-    await User.save();
-    firebaseMessaging?.subscribeToTopic(res.username! + "userTopic");
-    if (firstBoot) {
-      await _getAllListsInit();
-      if (User.shoppingLists.length > 0) {
-        User.currentList = User.shoppingLists.first;
-        User.currentListIndex = 1;
-        await User.save();
-      }
-      runApp(NSSL());
-    } else
-      Navigator.pop(context);
-  }
+    var curUser = ref.read(userProvider);
 
-  Future _getAllListsInit() async {
-    await ShoppingList.reloadAllLists(context);
-    setState(() => {});
+    var userState = ref.watch(userStateProvider.notifier);
+    // var
+    bool firstBoot = curUser.ownId >= 0;
+    User.token = res.token;
+    var user = User(res.id, res.username, res.eMail);
+
+    firebaseMessaging?.subscribeToTopic(res.username + "userTopic");
+
+    var listController = ref.read(shoppingListsProvider);
+    await listController.reloadAllLists(context);
+
+    if (firstBoot) {
+      if (listController.shoppingLists.length > 0) {
+        var curListState = ref.read(currentListIndexProvider.notifier);
+        curListState.state = 1;
+      }
+    }
+
+    user.save(1);
+    userState.state = user;
   }
 
   String? _validateName(String? value) {
@@ -192,7 +192,8 @@ class LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.only(top: 40.0),
                   child: TextButton(
                     onPressed: () {
-                      User.username == null
+                      var userId = ref.read(userIdProvider);
+                      userId == null || userId < 0
                           ? Navigator.pushNamed(context, "/registration")
                           : Navigator.popAndPushNamed(context, "/registration");
                     },

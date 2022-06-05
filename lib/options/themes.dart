@@ -3,8 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:nssl/manager/database_manager.dart';
 import 'package:nssl/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Themes {
+final themeProvider = ChangeNotifierProvider<Themes>((ref) {
+  return Themes(ref);
+});
+
+class Themes with ChangeNotifier {
+  static late Ref _ref;
+  Themes(Ref ref) {
+    _ref = ref;
+  }
+
   static NSSLThemeData lightTheme = NSSLThemeData(
       ThemeData(
         primarySwatch: Colors.blue,
@@ -47,27 +57,23 @@ class Themes {
 
   static Future saveTheme(ThemeData t, MaterialColor primary, MaterialAccentColor accent) async {
     // await DatabaseManager.database.rawDelete("DELETE FROM Themes");
-    var id = ((t.brightness == Brightness.light ? 1 : 2) << 32) + User.ownId!;
+    var userId = _ref.watch(userIdProvider);
+    if (userId == null) return;
+    var id = ((t.brightness == Brightness.light ? 1 : 2) << 32) + userId;
     (await SharedPreferences.getInstance()).setInt("lastTheme", id);
     tm = t.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
     await DatabaseManager.database.rawInsert(
         "INSERT OR REPLACE INTO Themes(id, primary_color, accent_color, brightness, accent_color_brightness, user_id) VALUES(?, ?, ?, ?, ?, ?)",
-        [
-          id,
-          Colors.primaries.indexOf(primary),
-          Colors.accents.indexOf(accent),
-          t.brightness.toString(),
-          "",
-          User.ownId
-        ]);
+        [id, Colors.primaries.indexOf(primary), Colors.accents.indexOf(accent), t.brightness.toString(), "", userId]);
   }
 
   static Future loadTheme() async {
     late var t;
     var lastId = (await SharedPreferences.getInstance()).getInt("lastTheme") ?? 0;
+    var userId = _ref.watch(userIdProvider);
     try {
-      if (User.ownId != null)
-        t = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes where user_id = ?", [User.ownId]));
+      if (userId != null)
+        t = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes where user_id = ?", [userId]));
     } catch (e) {
       var temp = (await DatabaseManager.database.rawQuery("SELECT * FROM Themes")).first;
 

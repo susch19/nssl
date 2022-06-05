@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
-import 'package:nssl/pages/product_add_to_database.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage();
