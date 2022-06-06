@@ -20,7 +20,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "addProduct": MessageLookupByLibrary.simpleMessage("Artikel hinzufügen"),
         "addProductWithoutSearch": MessageLookupByLibrary.simpleMessage("Name des Artikels"),
         "productName": MessageLookupByLibrary.simpleMessage("Artikelname"),
-        "messageDeleteAllCrossedOut": MessageLookupByLibrary.simpleMessage("Alle durchgestrichenen Artikel wurden gelöscht"),
+        "messageDeleteAllCrossedOut":
+            MessageLookupByLibrary.simpleMessage("Alle durchgestrichenen Artikel wurden gelöscht"),
         "undo": MessageLookupByLibrary.simpleMessage("RÜCKG."),
         "removedShoppingListMessage": MessageLookupByLibrary.simpleMessage(" entfernt "), //\${User.shoppingLists}
         "noListsInDrawerMessage": MessageLookupByLibrary.simpleMessage(" Hier werden deine Listen angezeigt"),
@@ -39,49 +40,60 @@ class MessageLookup extends MessageLookupByLibrary {
         "promoteMenu": MessageLookupByLibrary.simpleMessage("Befördern"),
         "contributorUser": MessageLookupByLibrary.simpleMessage(" - User"),
         "contributorAdmin": MessageLookupByLibrary.simpleMessage(" - Admin"),
-        "genericErrorMessageSnackbar": MessageLookupByLibrary.simpleMessage("Etwas Unerwartetes ist passiert!\n "), //\${z.error}
+        "genericErrorMessageSnackbar":
+            MessageLookupByLibrary.simpleMessage("Etwas Unerwartetes ist passiert!\n "), //\${z.error}
         "nameOfNewContributorHint": MessageLookupByLibrary.simpleMessage("Name des neuen Teilnehmers"),
         "wasRemovedSuccessfullyMessage": MessageLookupByLibrary.simpleMessage(" wurde erfolgreich gelöscht"),
-        "loginSuccessfulMessage": MessageLookupByLibrary.simpleMessage("Login erfolgreich"),
+        "loginSuccessfullMessage": MessageLookupByLibrary.simpleMessage("Login erfolgreich, die Listen werden geladen"),
         "nameEmailRequiredError": MessageLookupByLibrary.simpleMessage("Name oder EMail wird benötigt."),
-        "usernameToShortError": MessageLookupByLibrary.simpleMessage("Der Benutzername muss aus mindestens 4 Zeichen bestehen"),
+        "usernameToShortError":
+            MessageLookupByLibrary.simpleMessage("Der Benutzername muss aus mindestens 4 Zeichen bestehen"),
         "emailRequiredError": MessageLookupByLibrary.simpleMessage("EMail ist erforderlich"),
-        "emailIncorrectFormatError": MessageLookupByLibrary.simpleMessage("Die EMail-Adresse scheint ein falsches Format zu haben"),
+        "emailIncorrectFormatError":
+            MessageLookupByLibrary.simpleMessage("Die EMail-Adresse scheint ein falsches Format zu haben"),
         "chooseAPassword": MessageLookupByLibrary.simpleMessage("Bitte ein Passwort eingeben"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
-        "usernameOrEmailForLoginHint": MessageLookupByLibrary.simpleMessage("Benutzername oder EMail kann für's einloggen genutzt werden"),
+        "usernameOrEmailForLoginHint":
+            MessageLookupByLibrary.simpleMessage("Benutzername oder EMail kann für's einloggen genutzt werden"),
         "usernameOrEmailTitle": MessageLookupByLibrary.simpleMessage("Benutzername oder EMail"),
         "emailTitle": MessageLookupByLibrary.simpleMessage('EMail'),
         "choosenPasswordHint": MessageLookupByLibrary.simpleMessage("Dein gewähltes Passwort"),
         "password": MessageLookupByLibrary.simpleMessage("Passwort"),
         "loginButton": MessageLookupByLibrary.simpleMessage("LOGIN"),
-        "registerTextOnLogin": MessageLookupByLibrary.simpleMessage("Du hast noch keinen Account? Erstelle jetzt einen."),
+        "registerTextOnLogin":
+            MessageLookupByLibrary.simpleMessage("Du hast noch keinen Account? Erstelle jetzt einen."),
         "usernameEmptyError": MessageLookupByLibrary.simpleMessage("Benutzername muss ausgefüllt sein"),
         "passwordEmptyError": MessageLookupByLibrary.simpleMessage("Passwort muss ausgefüllt sein"),
         "emailEmptyError": MessageLookupByLibrary.simpleMessage("EMail muss ausgefüllt sein"),
-        "reenterPasswordError": MessageLookupByLibrary.simpleMessage("Die Passwörter stimmen nicht überein oder sind leer"),
+        "reenterPasswordError":
+            MessageLookupByLibrary.simpleMessage("Die Passwörter stimmen nicht überein oder sind leer"),
         "unknownUsernameError": MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit deinem Benutzername nicht"),
         "unknownEmailError": MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit deiner EMail nicht"),
         "unknownPasswordError": MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit deinem Passwort nicht"),
-        "unknownReenterPasswordError": MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit dem wiederholten Passwort nicht"),
+        "unknownReenterPasswordError":
+            MessageLookupByLibrary.simpleMessage("Es stimmt etwas mit dem wiederholten Passwort nicht"),
         "registrationSuccessfulMessage": MessageLookupByLibrary.simpleMessage("Registrierung erfolgreich"),
         "registrationTitle": MessageLookupByLibrary.simpleMessage("Registrierung"),
         "nameEmptyError": MessageLookupByLibrary.simpleMessage("Name ist erforderlich"),
         "chooseAPasswordPrompt": MessageLookupByLibrary.simpleMessage("Bitte gib ein Passwort ein"),
         "reenterPasswordPrompt": MessageLookupByLibrary.simpleMessage("Bitte gib dein Passwort erneut ein"),
         "passwordsDontMatchError": MessageLookupByLibrary.simpleMessage("Die Passwörter stimmen nicht überein"),
-        "usernameRegisterHint": MessageLookupByLibrary.simpleMessage("Kann zum einloggen und zum gefunden werden genutzt werden"),
+        "usernameRegisterHint":
+            MessageLookupByLibrary.simpleMessage("Kann zum einloggen und zum gefunden werden genutzt werden"),
         "username": MessageLookupByLibrary.simpleMessage("Benutzername"),
-        "emailRegisterHint": MessageLookupByLibrary.simpleMessage("Kann zum einloggen und zum gefunden werden genutzt werden"),
+        "emailRegisterHint":
+            MessageLookupByLibrary.simpleMessage("Kann zum einloggen und zum gefunden werden genutzt werden"),
         "passwordRegisterHint": MessageLookupByLibrary.simpleMessage("Das Passwort schützt deinen Account"),
-        "retypePasswordHint": MessageLookupByLibrary.simpleMessage("Bitte wiederhole dein Passwort um Fehler zu vermeiden"),
+        "retypePasswordHint":
+            MessageLookupByLibrary.simpleMessage("Bitte wiederhole dein Passwort um Fehler zu vermeiden"),
         "retypePasswordTitle": MessageLookupByLibrary.simpleMessage("Passwortwiederholung"),
         "registerButton": MessageLookupByLibrary.simpleMessage("REGISTRIEREN"),
         "discardNewProduct": MessageLookupByLibrary.simpleMessage("Änderungen verwerfen?"),
         "cancelButton": MessageLookupByLibrary.simpleMessage("ABBRECHEN"),
         "acceptButton": MessageLookupByLibrary.simpleMessage('ANNEHMEN'),
         "discardButton": MessageLookupByLibrary.simpleMessage("VERWERFEN"),
-        "fixErrorsBeforeSubmittingPrompt": MessageLookupByLibrary.simpleMessage("Bitte behebe die Fehler, gekennzeichnet in Rot"),
+        "fixErrorsBeforeSubmittingPrompt":
+            MessageLookupByLibrary.simpleMessage("Bitte behebe die Fehler, gekennzeichnet in Rot"),
         "newProductTitle": MessageLookupByLibrary.simpleMessage("Neues Produkt"),
         "saveButton": MessageLookupByLibrary.simpleMessage("SPEICHERN"),
         "newProductName": MessageLookupByLibrary.simpleMessage("Produktname *"),
@@ -96,9 +108,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "fieldRequiredError": MessageLookupByLibrary.simpleMessage("Dieses Feld wird benötigt!"),
         "newProductNameToShort": MessageLookupByLibrary.simpleMessage("Dieser Name scheint zu kurz zu sein"),
         "addedProduct": MessageLookupByLibrary.simpleMessage(' hinzugefügt'), //"\$name"
-        "productWasAlreadyInList": MessageLookupByLibrary.simpleMessage(' ist bereits in der Liste. Die Menge wurde um 1 erhöht'), //"\$name" ist
+        "productWasAlreadyInList": MessageLookupByLibrary.simpleMessage(
+            ' ist bereits in der Liste. Die Menge wurde um 1 erhöht'), //"\$name" ist
         "searchProductHint": MessageLookupByLibrary.simpleMessage("Produktsuche"),
-        "noMoreProductsMessage": MessageLookupByLibrary.simpleMessage("Es konnten keine weiteren Produkte mit dem Namen gefunden werden"),
+        "noMoreProductsMessage":
+            MessageLookupByLibrary.simpleMessage("Es konnten keine weiteren Produkte mit dem Namen gefunden werden"),
         "codeText": MessageLookupByLibrary.simpleMessage("Code: "),
         "removed": MessageLookupByLibrary.simpleMessage("entfernt"),
         "changePrimaryColor": MessageLookupByLibrary.simpleMessage("Hauptfarbe"),
@@ -128,7 +142,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "bePatient": MessageLookupByLibrary.simpleMessage('Der Server bearbeitet diese Anfrage bereits'),
         "logout": MessageLookupByLibrary.simpleMessage('Ausloggen'),
         "deleteListTitle": MessageLookupByLibrary.simpleMessage('Lösche Liste '),
-        "deleteListText": MessageLookupByLibrary.simpleMessage('Soll diese Liste wirklich gelöscht werden? Das kann NICHT rückgängig gemacht werden!'),
+        "deleteListText": MessageLookupByLibrary.simpleMessage(
+            'Soll diese Liste wirklich gelöscht werden? Das kann NICHT rückgängig gemacht werden!'),
         "exportAsPdf": MessageLookupByLibrary.simpleMessage('Als PDF exportieren'),
         "boughtProducts": MessageLookupByLibrary.simpleMessage('Eingekauft'),
         "nothingBoughtYet": MessageLookupByLibrary.simpleMessage('Noch nichts eingekauft'),
@@ -137,18 +152,19 @@ class MessageLookup extends MessageLookupByLibrary {
         "okayButton": MessageLookupByLibrary.simpleMessage('OKAY'),
         "requestPasswordResetButton": MessageLookupByLibrary.simpleMessage("PASSWORT ZURÜCKSETZUNG BEANTRAGEN"),
         "requestPasswordResetTitle": MessageLookupByLibrary.simpleMessage("Passwort zurücksetzen"),
-        "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage('Die Passwort zurücksetzen Email wurde erfolgreich an die Adresse gesendet, sollte diese existieren. Weitere Schritte für das abschließen des Resets sind in der Email enthalten.'),
+        "requestPasswordResetSuccess": MessageLookupByLibrary.simpleMessage(
+            'Die Passwort zurücksetzen Email wurde erfolgreich an die Adresse gesendet, sollte diese existieren. Weitere Schritte für das abschließen des Resets sind in der Email enthalten.'),
         "settings": MessageLookupByLibrary.simpleMessage('Einstellungen'),
         "about": MessageLookupByLibrary.simpleMessage('Über'),
         "codeOnGithub": MessageLookupByLibrary.simpleMessage('Schau doch mal in den Code auf GitHub rein'),
         "playstoreEntry": MessageLookupByLibrary.simpleMessage('Play Store Eintrag'),
         "iconSource": MessageLookupByLibrary.simpleMessage('Wer hat dieses schicke Icon gemacht? Finde es heraus!'),
-        "scanditCredit":MessageLookupByLibrary.simpleMessage('hat diesen super Scanner in der App zur Verfügung gestellt'),
-        "aboutText": MessageLookupByLibrary.simpleMessage('In jahrelanger Handarbeit geschmiedet mit dem einzigen Ziel, die Einkaufsplanung mit anderen zu vereinfachen und dabei seine Lieblingsprodukte blitzschnell per Kamera zu erfassen.'),
+        "scanditCredit":
+            MessageLookupByLibrary.simpleMessage('hat diesen super Scanner in der App zur Verfügung gestellt'),
+        "aboutText": MessageLookupByLibrary.simpleMessage(
+            'In jahrelanger Handarbeit geschmiedet mit dem einzigen Ziel, die Einkaufsplanung mit anderen zu vereinfachen und dabei seine Lieblingsprodukte blitzschnell per Kamera zu erfassen.'),
         "freeText": MessageLookupByLibrary.simpleMessage('Kostenlos, Werbefrei, für immer!'),
-        "questionsErrors": MessageLookupByLibrary.simpleMessage('Bei Fragen, Anregungen, Fehlern oder sonstigen Belangen kann jederzeit auf GitHub vorbeigeschaut werden, um ein Issue zu eröffnen.'),
-        
-        
-
+        "questionsErrors": MessageLookupByLibrary.simpleMessage(
+            'Bei Fragen, Anregungen, Fehlern oder sonstigen Belangen kann jederzeit auf GitHub vorbeigeschaut werden, um ein Issue zu eröffnen.'),
       };
 }

@@ -183,8 +183,7 @@ class GetListResult {
     r.userId = data["userId"];
     r.owner = data["owner"];
     var unMaped = data["products"] ?? <Map>[];
-    r.products = unMaped.map<ShoppingItem>((x) => ShoppingItem(x["id"], x["amount"], x["name"],
-        DateTime.tryParse(x["changed"]), DateTime.tryParse(x["created"]), x["sortOrder"]));
+    r.products = unMaped.map<ShoppingItem>((x) => ShoppingItem.fromJson(x));
 
     r.contributors = data["contributors"];
 
@@ -202,13 +201,7 @@ class GetListsResult {
 
     List<dynamic> unmappedShoppingLists = data["lists"];
     r.shoppingLists = unmappedShoppingLists.map((s) => ShoppingList(
-        s["id"],
-        s["name"],
-        s["products"]
-            .map((x) => ShoppingItem(x["id"], x["amount"], x["name"], DateTime.tryParse(x["changed"]),
-                DateTime.tryParse(x["created"]), x["sortOrder"] as int? ?? -1))
-            .toList()
-            .cast<ShoppingItem>()));
+        s["id"], s["name"], s["products"].map((x) => ShoppingItem.fromJson(x)).toList().cast<ShoppingItem>()));
 
     return r;
   }
@@ -226,8 +219,7 @@ class GetBoughtListResult {
     r.id = data["id"];
     r.name = data["name"];
     List<dynamic> unMaped = data["products"] ?? <Map>[];
-    r.products = unMaped.map((x) => ShoppingItem(x["id"], x["boughtAmount"], x["name"], DateTime.tryParse(x["changed"]),
-        DateTime.tryParse(x["created"]), x["sortOrder"]));
+    r.products = unMaped.map((x) => ShoppingItem.fromJson(x));
     return r;
   }
 }

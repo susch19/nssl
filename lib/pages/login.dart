@@ -76,11 +76,8 @@ class LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
     showInSnackBar(NSSLStrings.of(context).loginSuccessfulMessage());
-    var curUser = ref.read(userProvider);
 
     var userState = ref.watch(userStateProvider.notifier);
-    // var
-    bool firstBoot = curUser.ownId >= 0;
     User.token = res.token;
     var user = User(res.id, res.username, res.eMail);
 
@@ -89,14 +86,8 @@ class LoginPageState extends ConsumerState<LoginPage> {
     var listController = ref.read(shoppingListsProvider);
     await listController.reloadAllLists(context);
 
-    if (firstBoot) {
-      if (listController.shoppingLists.length > 0) {
-        var curListState = ref.read(currentListIndexProvider.notifier);
-        curListState.state = 1;
-      }
-    }
-
-    user.save(1);
+    user.save(0);
+    ref.watch(currentListIndexProvider.notifier).state = 0;
     userState.state = user;
   }
 
