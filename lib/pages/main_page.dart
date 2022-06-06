@@ -486,8 +486,8 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
                     var currentList = ref.read(currentListProvider)!;
                     var shoppingListController = ref.read(shoppingListsProvider);
                     if (currentList.id == id) {
-                      changeCurrentList(shoppingListController.shoppingLists
-                          .indexOf(shoppingListController.shoppingLists.firstWhere((l) => l.id != id)));
+                      var other = shoppingListController.shoppingLists.firstOrNull((l) => l.id != id);
+                      if (other != null) changeCurrentList(shoppingListController.shoppingLists.indexOf(other));
                     }
                     shoppingListController.removeList(deleteList.id);
                     showInDrawerSnackBar(deleteList.name + " " + NSSLStrings.of(cont).removed());

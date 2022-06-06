@@ -6,6 +6,7 @@ import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/models/model_export.dart';
+import '../helper/password_service.dart';
 import 'login.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,6 +29,7 @@ class RegistrationState extends ConsumerState<Registration> {
   var pw2Input = ForInput();
   var submit = ForInput();
   var validateMode = AutovalidateMode.disabled;
+  bool initialized = false;
 
   void showInSnackBar(String value) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
@@ -91,8 +93,21 @@ class RegistrationState extends ConsumerState<Registration> {
   }
 
   String? _validatePassword(String? value) {
-    if (pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).chooseAPasswordPrompt();
-    return null;
+    var errorCode = PasswordService.checkNewPassword(value ?? "");
+
+    if (errorCode != PasswordErrorCode.none) {
+      String errorText = "";
+      switch (errorCode) {
+        case PasswordErrorCode.empty:
+          return NSSLStrings.of(context).passwordEmptyError();
+        case PasswordErrorCode.none:
+          return null;
+        case PasswordErrorCode.tooShort:
+          return NSSLStrings.of(context).passwordTooShortError();
+        case PasswordErrorCode.missingCharacters:
+          return NSSLStrings.of(context).passwordMissingCharactersError();
+      }
+    }
   }
 
   String? _validatePassword2(String? value) {
@@ -103,7 +118,7 @@ class RegistrationState extends ConsumerState<Registration> {
 
   @override
   Widget build(BuildContext context) {
-    _resetInput();
+    if (!initialized) _resetInput();
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(title: Text(NSSLStrings.of(context).registrationTitle())),
@@ -134,33 +149,28 @@ class RegistrationState extends ConsumerState<Registration> {
                       onSaved: (s) {
                         FocusScope.of(context).requestFocus(pwInput.focusNode);
                       }),
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                    Flexible(
-                        child: TextFormField(
-                            key: pwInput.key,
-                            decoration: pwInput.decoration,
-                            controller: pwInput.textEditingController,
-                            focusNode: pwInput.focusNode,
-                            autocorrect: false,
-                            obscureText: true,
-                            validator: _validatePassword,
-                            onSaved: (s) {
-                              FocusScope.of(context).requestFocus(pw2Input.focusNode);
-                            })),
-                    SizedBox(width: 16.0),
-                    Flexible(
-                        child: TextFormField(
-                            key: pw2Input.key,
-                            decoration: pw2Input.decoration,
-                            controller: pw2Input.textEditingController,
-                            focusNode: pw2Input.focusNode,
-                            autocorrect: false,
-                            obscureText: true,
-                            validator: _validatePassword2,
-                            onSaved: (s) {
-                              _handleSubmitted();
-                            })),
-                  ]),
+                  TextFormField(
+                      key: pwInput.key,
+                      decoration: pwInput.decoration,
+                      controller: pwInput.textEditingController,
+                      focusNode: pwInput.focusNode,
+                      autocorrect: false,
+                      obscureText: true,
+                      validator: _validatePassword,
+                      onSaved: (s) {
+                        FocusScope.of(context).requestFocus(pw2Input.focusNode);
+                      }),
+                  TextFormField(
+                      key: pw2Input.key,
+                      decoration: pw2Input.decoration,
+                      controller: pw2Input.textEditingController,
+                      focusNode: pw2Input.focusNode,
+                      autocorrect: false,
+                      obscureText: true,
+                      validator: _validatePassword2,
+                      onSaved: (s) {
+                        _handleSubmitted();
+                      }),
                   Row(children: [
                     Flexible(
                         child: Container(
@@ -206,10 +216,6 @@ class RegistrationState extends ConsumerState<Registration> {
     pw2Input.decoration = InputDecoration(
         helperText: NSSLStrings.of(context).retypePasswordHint(),
         labelText: NSSLStrings.of(context).retypePasswordTitle());
-  }
-
-  @override
-  initState() {
-    super.initState();
+    initialized = true;
   }
 }

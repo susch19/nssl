@@ -64,6 +64,10 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Du hast noch keinen Account? Erstelle jetzt einen."),
         "usernameEmptyError": MessageLookupByLibrary.simpleMessage("Benutzername muss ausgefüllt sein"),
         "passwordEmptyError": MessageLookupByLibrary.simpleMessage("Passwort muss ausgefüllt sein"),
+        "passwordTooShortError": MessageLookupByLibrary.simpleMessage("Passwort muss mindestens 6 Zeichen lang sein"),
+        "passwordMissingCharactersError": MessageLookupByLibrary.simpleMessage(
+            "Passwort muss mindestens ein spezielles Zeichen (Kann jedes Symbol/Emoji sein) und Buchstabe oder Zahl enthalten"),
+
         "emailEmptyError": MessageLookupByLibrary.simpleMessage("EMail muss ausgefüllt sein"),
         "reenterPasswordError":
             MessageLookupByLibrary.simpleMessage("Die Passwörter stimmen nicht überein oder sind leer"),
