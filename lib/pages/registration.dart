@@ -66,6 +66,7 @@ class RegistrationState extends ConsumerState<Registration> {
       User.token = loginRes.token;
       var user = User(loginRes.id, loginRes.username, loginRes.eMail);
       userState.state = user;
+      ref.watch(currentListIndexProvider.notifier).state = 0;
       await user.save(0);
 
       // Navigator.pop(context);

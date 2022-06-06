@@ -25,19 +25,33 @@ class Product {
 }
 
 class ShoppingItem {
-  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created, this.sortOrder) : super();
+  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created, this.sortOrder, this.gtin) : super();
   int id;
   int amount;
   String name;
+  String? gtin;
   DateTime? changed;
   DateTime? created;
   int sortOrder;
 
-  toJson() =>
-      {"id": id, "amount": amount, "name": name, "changed": changed, "created": created, "sortOrder": sortOrder};
+  toJson() => {
+        "id": id,
+        "amount": amount,
+        "name": name,
+        "changed": changed,
+        "created": created,
+        "sortOrder": sortOrder,
+        "gtin": gtin
+      };
 
-  static ShoppingItem fromJson(Map data) =>
-      ShoppingItem(data["id"], data["amount"], data["name"], data["changed"], data["created"], data["sortOrder"]);
+  static ShoppingItem fromJson(Map data) => ShoppingItem(
+      data["id"],
+      data["amount"],
+      data["name"],
+      DateTime.tryParse(data["changed"]),
+      DateTime.tryParse(data["created"]),
+      data["order"] ?? data["sortOrder"],
+      data["gtin"]);
 }
 
 class ShoppingList {

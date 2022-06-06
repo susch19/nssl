@@ -206,15 +206,16 @@ class ShoppingListController with ChangeNotifier {
     await DatabaseManager.database.delete("ShoppingLists", where: "user_id = ?", whereArgs: [_userId]);
 
     List<Map<String, dynamic>> items;
-    items = (await DatabaseManager.database.rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems"));
+    items = (await DatabaseManager.database
+        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems where crossed = 1 or sortorder > 0"));
 
     var shoppintItemsState = _ref.watch(shoppingItemsProvider.notifier);
     var shoppingItems = <ShoppingItem>[];
-    int currentSortOrder = 0;
     for (var res in result.shoppingLists) {
+      int currentSortOrder = -1;
       for (var item in res.products) {
-        var order =
-            items.firstWhere((x) => x["id"] == item.id, orElse: () => {"sortorder": 0})["sortorder"] as int? ?? -1;
+        var order = items.firstWhere((x) => x["id"] == item.id,
+            orElse: () => {"sortorder": item.sortOrder})["sortorder"] as int;
         if (order == -1 || currentSortOrder == order)
           order = ++currentSortOrder;
         else
@@ -225,6 +226,8 @@ class ShoppingListController with ChangeNotifier {
           order,
           id: item.id,
           amount: item.amount,
+          changed: item.changed,
+          created: item.created,
           crossedOut: (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0
               ? false
               : true),

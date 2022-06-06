@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:nssl/main.dart';
 import 'package:nssl/manager/database_manager.dart';
 import 'package:nssl/server_communication/jwt.dart';
 import 'package:riverpod/riverpod.dart';
 
 final userFromDbProvider = FutureProvider<User?>((ref) async {
+  ref.watch(appRestartProvider);
   var list = (await DatabaseManager.database.rawQuery("SELECT * FROM User LIMIT 1"));
   if (list.length == 0) return null;
   var z = list.first;
@@ -33,12 +35,10 @@ final userStateProvider = StateProvider<User>((ref) {
 });
 
 final userProvider = Provider<User>((ref) {
+  var fromDb = ref.watch(userFromDbProvider);
   var fromState = ref.watch(userStateProvider);
-  if (fromState.ownId == -1) {
-    var fromDb = ref.watch(userFromDbProvider);
-    if (!fromDb.hasError && fromDb.hasValue) {
-      return fromDb.valueOrNull ?? fromState;
-    }
+  if (fromState.ownId == -1 && !fromDb.hasError && !fromDb.isLoading && fromDb.hasValue) {
+    return fromDb.valueOrNull ?? fromState;
   }
   return fromState;
 });
@@ -97,5 +97,8 @@ class User {
 
   Future delete() async {
     await DatabaseManager.database.rawDelete("DELETE FROM User where own_id = ?", [ownId]);
+    await DatabaseManager.database.rawDelete(
+        "DELETE FROM ShoppingItems where res_list_id in( SELECT id FROM ShoppingLists where user_id = ?)", [ownId]);
+    await DatabaseManager.database.rawDelete("DELETE FROM ShoppingLists where user_id = ?", [ownId]);
   }
 }

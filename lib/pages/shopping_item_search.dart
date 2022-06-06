@@ -19,7 +19,7 @@ class ProductAddPage extends ConsumerStatefulWidget {
   static ProductResult fromJson(Map data) {
     var r = ProductResult();
     r.success = data["success"];
-    r.error = data["error"];
+    r.error = data["error"] as String? ?? "";
     r.gtin = data["gtin"];
     r.quantity = data["quantity"];
     r.unit = data["unit"];
