@@ -86,6 +86,12 @@ class NSSLStrings {
       Intl.message('Username has to be filled in', name: 'usernameEmptyError', locale: _localeName);
   String passwordEmptyError() =>
       Intl.message('Password has to be filled in', name: 'passwordEmptyError', locale: _localeName);
+  String passwordTooShortError() =>
+      Intl.message('Password has to be at least 6 charactes long', name: 'passwordTooShortError', locale: _localeName);
+  String passwordMissingCharactersError() => Intl.message(
+      'Password has to contain a special character (Can be emoji or any other symbol) and a letter or number',
+      name: 'passwordMissingCharactersError',
+      locale: _localeName);
   String emailEmptyError() => Intl.message('Email has to be filled in', name: 'emailEmptyError', locale: _localeName);
   String reenterPasswordError() =>
       Intl.message('Passwords doesn\'t match or are empty', name: 'reenterPasswordError', locale: _localeName);

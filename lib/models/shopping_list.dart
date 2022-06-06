@@ -193,6 +193,7 @@ class ShoppingListController with ChangeNotifier {
     var index = shoppingLists.indexOf(list);
     shoppingLists.remove(list);
     shoppingLists.insert(index, newList);
+    notifyListeners();
   }
 
   Future<Null> reloadAllLists([BuildContext? cont]) async {
@@ -280,7 +281,7 @@ class ShoppingListController with ChangeNotifier {
   void toggleFirebaseMessaging(int listId) {
     var list = shoppingLists.firstWhere((element) => element.id == listId);
     var newList = ShoppingList(listId, list.name, messagingEnabled: !list.messagingEnabled);
-    newList.messagingEnabled ? list.unsubscribeFromFirebaseMessaging() : list.subscribeForFirebaseMessaging();
+    newList.messagingEnabled ? list.subscribeForFirebaseMessaging() : list.unsubscribeFromFirebaseMessaging();
     _exchangeLists(list, newList);
     save(newList);
   }

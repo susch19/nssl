@@ -44,9 +44,9 @@ class LoginResult extends BaseResult {
     r.success = data["success"];
     r.error = data["error"] as String? ?? "";
     r.id = data["id"];
-    r.username = data["username"];
-    r.eMail = data["eMail"];
-    r.token = data["token"];
+    r.username = data["username"] as String? ?? "";
+    r.eMail = data["eMail"] as String? ?? "";
+    r.token = data["token"] as String? ?? "";
     return r;
   }
 }
