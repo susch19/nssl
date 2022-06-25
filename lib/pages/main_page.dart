@@ -263,12 +263,48 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
             builder: (BuildContext context) => AddProductToDatabase(ean), fullscreenDialog: true));
   }
 
+  void chooseListToAddDialog() {
+    var dialog = AlertDialog(
+      title: Text("Was?"),
+      actions: [
+        TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
+        TextButton(
+          child: Text(NSSLStrings.of(context).chooseAddListDialog()),
+          onPressed: () {
+            Navigator.pop(context, "");
+            addListDialog();
+          },
+        ),
+        TextButton(
+          child: Text(NSSLStrings.of(context).chooseAddRecipeDialog()),
+          onPressed: () {
+            Navigator.pop(context, "");
+            addRecipeDialog();
+          },
+        ),
+      ],
+    );
+
+    showDialog(builder: (BuildContext context) => dialog, context: context, barrierDismissible: false);
+  }
+
   void addListDialog() {
     var sd = SimpleDialogSingleInput.create(
         hintText: NSSLStrings.of(context).newNameOfListHint(),
         labelText: NSSLStrings.of(context).listName(),
         onSubmitted: createNewList,
         title: NSSLStrings.of(context).addNewListTitle(),
+        context: context);
+
+    showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
+  }
+
+  void addRecipeDialog() {
+    var sd = SimpleDialogSingleInput.create(
+        hintText: NSSLStrings.of(context).recipeNameHint(),
+        labelText: NSSLStrings.of(context).recipeName(),
+        onSubmitted: createNewRecipe,
+        title: NSSLStrings.of(context).addNewRecipeTitle(),
         context: context);
 
     showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
@@ -284,6 +320,27 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
             onSubmitted: (s) => renameList(listId, s),
             title: NSSLStrings.of(context).renameListTitle(),
             context: context));
+  }
+
+  Future createNewRecipe(String idOrUrl) async {
+    var provider = ref.read(shoppingListsProvider);
+    var indexProvider = ref.watch(currentListIndexProvider.notifier);
+    var res = await ShoppingListSync.addRecipe(idOrUrl, context);
+    var newListRes = GetListResult.fromJson(res.body);
+    var newList = ShoppingList(newListRes.id!, newListRes.name!);
+
+    var items = ref.watch(shoppingItemsProvider.notifier);
+    var newState = items.state.toList();
+    if (newListRes.products != null)
+      newState.addAll(newListRes.products!.map((e) => ShoppingItem(e.name, newList.id, e.sortOrder,
+          amount: e.amount, id: e.id, created: e.created, changed: e.changed)));
+
+    items.state = newState;
+
+    provider.addList(newList);
+
+    indexProvider.state = provider.shoppingLists.indexOf(newList);
+    provider.save(newList);
   }
 
   Future createNewList(String listName) async {
@@ -430,7 +487,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
             onRefresh: _handleDrawerRefresh,
             displacement: 1.0),
         persistentFooterButtons: [
-          TextButton(child: Text(NSSLStrings.of(context).addListPB()), onPressed: addListDialog)
+          TextButton(child: Text(NSSLStrings.of(context).addListPB()), onPressed: chooseListToAddDialog)
         ]);
 
     return Drawer(child: d);
@@ -483,7 +540,8 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
                   if (!(res.success))
                     showInDrawerSnackBar(res.error);
                   else {
-                    var currentList = ref.read(currentListProvider)!;
+                    var currentList = ref.read(currentListProvider);
+                    if (currentList == null) return;
                     var shoppingListController = ref.read(shoppingListsProvider);
                     if (currentList.id == id) {
                       var other = shoppingListController.shoppingLists.firstOrNull((l) => l.id != id);

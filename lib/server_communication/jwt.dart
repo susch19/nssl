@@ -28,9 +28,8 @@ class JWT {
     //JsonWebToken jwt = JsonWebToken.decode(token);
     //var map = jwt.payload.toJson();
     //return int.parse(map["id"]);
-    String jwt = tokenToJson(token);
-    var exp = jwt.substring(jwt.indexOf("id"), jwt.indexOf(',\n', jwt.indexOf("id")));
-    return int.parse(exp.substring(5));
+    var jwt = jsonDecode(tokenToJson(token));
+    return jwt["id"];
 
 //    DateTime.parse("2018-07-07T10:49:56.9479953Z");
 //    var codec = Base64Codec.urlSafe();

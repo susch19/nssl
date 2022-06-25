@@ -32,6 +32,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "renameListTitle": MessageLookupByLibrary.simpleMessage("Rename List"),
         "renameListHint": MessageLookupByLibrary.simpleMessage('The name of the new list'),
         "addNewListTitle": MessageLookupByLibrary.simpleMessage("Add new List"),
+        "recipeName": MessageLookupByLibrary.simpleMessage("Recipe"),
+        "recipeNameHint": MessageLookupByLibrary.simpleMessage("Recipe ID or URL"),
+        "addNewRecipeTitle": MessageLookupByLibrary.simpleMessage("Add new recipe"),
+        "chooseAddListDialog": MessageLookupByLibrary.simpleMessage("Shopping"),
+        "chooseAddRecipeDialog": MessageLookupByLibrary.simpleMessage("Chefkoch"),
         "youHaveActionItemMessage": MessageLookupByLibrary.simpleMessage('You have '), //\$action \$item
         "archived": MessageLookupByLibrary.simpleMessage('archived'),
         "deleted": MessageLookupByLibrary.simpleMessage('deleted'),

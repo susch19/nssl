@@ -47,6 +47,11 @@ class NSSLStrings {
   String renameListTitle() => Intl.message('Rename List', name: 'renameListTitle', locale: _localeName);
   String renameListHint() => Intl.message('The name of the new list', name: 'renameListHint', locale: _localeName);
   String addNewListTitle() => Intl.message('Add new List', name: 'addNewListTitle', locale: _localeName);
+  String recipeName() => Intl.message('Recipe', name: 'recipeName', locale: _localeName);
+  String recipeNameHint() => Intl.message('Recipe ID or URL', name: 'recipeNameHint', locale: _localeName);
+  String addNewRecipeTitle() => Intl.message('Add new recipe', name: 'addNewRecipeTitle', locale: _localeName);
+  String chooseAddListDialog() => Intl.message('Shopping', name: 'chooseAddListDialog', locale: _localeName);
+  String chooseAddRecipeDialog() => Intl.message('Chefkoch', name: 'chooseAddRecipeDialog', locale: _localeName);
   String youHaveActionItemMessage() => Intl.message('You have ', name: 'youHaveActionItemMessage', locale: _localeName);
   String archived() => Intl.message('archived', name: 'archived', locale: _localeName);
   String deleted() => Intl.message('deleted', name: 'deleted', locale: _localeName);
