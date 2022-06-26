@@ -24,6 +24,13 @@ class ShoppingListSync {
   static Future<Response> addRecipe(String idOrUrl, BuildContext? context) =>
       HelperMethods.post("recipe/CreateShoppingListForRecipe", context, AddRecipeArgs(idOrUrl));
 
+  static Future<Response> importRecipe(String idOrUrl, int listId, BuildContext? context) => HelperMethods.post(
+      "recipe/AddRecipeToList",
+      context,
+      AddRecipeArgs(idOrUrl),
+      false,
+      {"amountOfPeople": "4", "listId": listId.toString()});
+
   static Future<Response> deleteProduct(int? listId, int? productId, BuildContext context) =>
       HelperMethods.delete("$listpath/$listId/products/$productId", context);
 

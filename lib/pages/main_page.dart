@@ -206,6 +206,9 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
         var reordering = ref.watch(_isReorderingProvider.notifier);
         reordering.state = !reordering.state;
         break;
+      case "recipeImport":
+        addRecipeDialog(true);
+        break;
     }
   }
 
@@ -283,7 +286,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
               title: Text(NSSLStrings.of(context).chooseAddRecipeDialog()),
               onTap: () {
                 Navigator.pop(context, "");
-                addRecipeDialog();
+                addRecipeDialog(false);
               },
             ),
           ],
@@ -308,12 +311,12 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
   }
 
-  void addRecipeDialog() {
+  void addRecipeDialog(bool import) {
     var sd = SimpleDialogSingleInput.create(
         hintText: NSSLStrings.of(context).recipeNameHint(),
         labelText: NSSLStrings.of(context).recipeName(),
-        onSubmitted: createNewRecipe,
-        title: NSSLStrings.of(context).addNewRecipeTitle(),
+        onSubmitted: import ? importNewRecipe : createNewRecipe,
+        title: import ? NSSLStrings.of(context).importNewRecipeTitle() : NSSLStrings.of(context).addNewRecipeTitle(),
         context: context);
 
     showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
@@ -335,6 +338,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var provider = ref.read(shoppingListsProvider);
     var indexProvider = ref.watch(currentListIndexProvider.notifier);
     var res = await ShoppingListSync.addRecipe(idOrUrl, context);
+    if (res.statusCode >= 400) return;
     var newListRes = GetListResult.fromJson(res.body);
     var newList = ShoppingList(newListRes.id!, newListRes.name!);
 
@@ -350,6 +354,18 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
     indexProvider.state = provider.shoppingLists.indexOf(newList);
     provider.save(newList);
+  }
+
+  Future importNewRecipe(String idOrUrl) async {
+    var list = ref.read(currentListProvider);
+    if (list == null) return;
+
+    var provider = ref.read(shoppingListsProvider);
+    var res = await ShoppingListSync.importRecipe(idOrUrl, list.id, context);
+
+    if (res.statusCode >= 400) return;
+
+    provider.refresh(list);
   }
 
   Future createNewList(String listName) async {
@@ -776,6 +792,10 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
                   child: Text(
                     NSSLStrings.of(context).reorderItems(),
                   ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'recipeImport',
+                  child: Text(NSSLStrings.of(context).importNewRecipe()),
                 ),
                 PopupMenuItem<String>(
                   value: 'options',

@@ -36,6 +36,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "recipeName": MessageLookupByLibrary.simpleMessage("Recipe"),
         "recipeNameHint": MessageLookupByLibrary.simpleMessage("Recipe ID or URL"),
         "addNewRecipeTitle": MessageLookupByLibrary.simpleMessage("Add new recipe"),
+        "importNewRecipe": MessageLookupByLibrary.simpleMessage("Import recipe"),
+        "importNewRecipeTitle": MessageLookupByLibrary.simpleMessage("Import new recipe"),
         "chooseAddListDialog": MessageLookupByLibrary.simpleMessage("Shopping"),
         "chooseAddRecipeDialog": MessageLookupByLibrary.simpleMessage("Chefkoch"),
         "youHaveActionItemMessage": MessageLookupByLibrary.simpleMessage('You have '), //\$action \$item

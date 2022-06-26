@@ -52,6 +52,8 @@ class NSSLStrings {
   String recipeName() => Intl.message('Recipe', name: 'recipeName', locale: _localeName);
   String recipeNameHint() => Intl.message('Recipe ID or URL', name: 'recipeNameHint', locale: _localeName);
   String addNewRecipeTitle() => Intl.message('Add new recipe', name: 'addNewRecipeTitle', locale: _localeName);
+  String importNewRecipe() => Intl.message('Import recipe', name: 'importNewRecipe', locale: _localeName);
+  String importNewRecipeTitle() => Intl.message('Import new recipe', name: 'importNewRecipeTitle', locale: _localeName);
   String chooseAddListDialog() => Intl.message('Shopping', name: 'chooseAddListDialog', locale: _localeName);
   String chooseAddRecipeDialog() => Intl.message('Chefkoch', name: 'chooseAddRecipeDialog', locale: _localeName);
   String youHaveActionItemMessage() => Intl.message('You have ', name: 'youHaveActionItemMessage', locale: _localeName);
