@@ -265,23 +265,32 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
   void chooseListToAddDialog() {
     var dialog = AlertDialog(
-      title: Text("Was?"),
+      title: Text(NSSLStrings.of(context).chooseListToAddTitle()),
+      content: Container(
+        width: 80,
+        child: ListView(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          children: [
+            ListTile(
+              title: Text(NSSLStrings.of(context).chooseAddListDialog()),
+              onTap: () {
+                Navigator.pop(context, "");
+                addListDialog();
+              },
+            ),
+            ListTile(
+              title: Text(NSSLStrings.of(context).chooseAddRecipeDialog()),
+              onTap: () {
+                Navigator.pop(context, "");
+                addRecipeDialog();
+              },
+            ),
+          ],
+        ),
+      ),
       actions: [
         TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
-        TextButton(
-          child: Text(NSSLStrings.of(context).chooseAddListDialog()),
-          onPressed: () {
-            Navigator.pop(context, "");
-            addListDialog();
-          },
-        ),
-        TextButton(
-          child: Text(NSSLStrings.of(context).chooseAddRecipeDialog()),
-          onPressed: () {
-            Navigator.pop(context, "");
-            addRecipeDialog();
-          },
-        ),
       ],
     );
 

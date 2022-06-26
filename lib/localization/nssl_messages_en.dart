@@ -31,6 +31,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "listName": MessageLookupByLibrary.simpleMessage('listname'),
         "renameListTitle": MessageLookupByLibrary.simpleMessage("Rename List"),
         "renameListHint": MessageLookupByLibrary.simpleMessage('The name of the new list'),
+        "chooseListToAddTitle": MessageLookupByLibrary.simpleMessage('Which list to add?'),
         "addNewListTitle": MessageLookupByLibrary.simpleMessage("Add new List"),
         "recipeName": MessageLookupByLibrary.simpleMessage("Recipe"),
         "recipeNameHint": MessageLookupByLibrary.simpleMessage("Recipe ID or URL"),
