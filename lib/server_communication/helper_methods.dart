@@ -11,7 +11,7 @@ import 'user_sync.dart';
 class HelperMethods {
   static const String scheme = "https";
   static const String host = "nssl.susch.eu";
-  static const int port = 80;
+  static const int port = 443;
   // static const String scheme = "http";
   // static const String host = "192.168.49.22";
   // static const String url = "http://192.168.49.22:4344";
