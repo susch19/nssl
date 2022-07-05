@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:nssl/helper/choose_dialog.dart';
 import 'package:nssl/helper/simple_dialog.dart';
 import 'package:nssl/manager/export_manager.dart';
 import 'package:nssl/options/themes.dart';
@@ -14,9 +15,11 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/helper/iterable_extensions.dart';
+import 'package:share_handler/share_handler.dart';
 import '../main.dart';
 import 'barcode_scanner_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 class MainPage extends ConsumerStatefulWidget {
   @override
@@ -37,6 +40,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
   bool _showDrawerContents = true;
   bool insideSortAndOrderCrossedOut = false;
   bool insideUpdateOrderIndicies = false;
+  SharedMedia? media;
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
@@ -48,6 +52,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    initPlatformState();
     WidgetsBinding.instance.addObserver(this);
     Startup.deleteMessagesFromFolder();
     Startup.initializeNewListsFromServer(ref);
@@ -267,36 +272,13 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
   }
 
   void chooseListToAddDialog() {
-    var dialog = AlertDialog(
-      title: Text(NSSLStrings.of(context).chooseListToAddTitle()),
-      content: Container(
-        width: 80,
-        child: ListView(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          children: [
-            ListTile(
-              title: Text(NSSLStrings.of(context).chooseAddListDialog()),
-              onTap: () {
-                Navigator.pop(context, "");
-                addListDialog();
-              },
-            ),
-            ListTile(
-              title: Text(NSSLStrings.of(context).chooseAddRecipeDialog()),
-              onTap: () {
-                Navigator.pop(context, "");
-                addRecipeDialog(false);
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
-      ],
-    );
-
+    var dialog = ChooseDialog.create(
+        context: context,
+        title: NSSLStrings.of(context).chooseListToAddTitle(),
+        titleOption1: NSSLStrings.of(context).chooseAddListDialog(),
+        onOption1: addListDialog,
+        titleOption2: NSSLStrings.of(context).chooseAddRecipeDialog(),
+        onOption2: () => addRecipeDialog(false));
     showDialog(builder: (BuildContext context) => dialog, context: context, barrierDismissible: false);
   }
 
@@ -338,7 +320,10 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var provider = ref.read(shoppingListsProvider);
     var indexProvider = ref.watch(currentListIndexProvider.notifier);
     var res = await ShoppingListSync.addRecipe(idOrUrl, context);
-    if (res.statusCode >= 400) return;
+    if (res.statusCode >= 400) {
+      showInSnackBar(NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""));
+      return;
+    }
     var newListRes = GetListResult.fromJson(res.body);
     var newList = ShoppingList(newListRes.id!, newListRes.name!);
 
@@ -360,10 +345,19 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var list = ref.read(currentListProvider);
     if (list == null) return;
 
+    importNewRecipeIntoList(list, idOrUrl);
+  }
+
+  Future importNewRecipeIntoList(ShoppingList? list, String idOrUrl) async {
+    if (list == null) return;
+
     var provider = ref.read(shoppingListsProvider);
     var res = await ShoppingListSync.importRecipe(idOrUrl, list.id, context);
 
-    if (res.statusCode >= 400) return;
+    if (res.statusCode >= 400) {
+      showInSnackBar(NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""));
+      return;
+    }
 
     provider.refresh(list);
   }
@@ -378,6 +372,92 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
     currentListProvider.state = provider.shoppingLists.indexOf(newList);
     provider.save(newList);
+  }
+
+  Future<void> initPlatformState() async {
+    final handler = ShareHandler.instance;
+    try {
+      media = await handler.getInitialSharedMedia();
+
+      handler.sharedMediaStream.listen((SharedMedia media) {
+        if (!mounted) return;
+        handleMediaFromShare(media);
+      });
+      if (!mounted) return;
+
+      handleMediaFromShare(media);
+    } on PlatformException {}
+  }
+
+  void handleMediaFromShare(SharedMedia? media) {
+    if (media == null || media.content == null) return;
+
+    var parsed = Uri.tryParse(media.content!);
+
+    if (parsed == null) return;
+
+    importRecipeFromSharedUri(parsed);
+  }
+
+  Future<void> importRecipeFromSharedUri(Uri uri) async {
+    var url = uri.toString();
+    var result = await ShoppingListSync.checkRecipeInput(url, context);
+
+    if (result.body != "true") {
+      showInSnackBar(NSSLStrings.of(context).recipeCreateError());
+      return;
+    }
+
+    var currList = ref.watch(currentListProvider);
+    var shoppingListsController = ref.watch(shoppingListsProvider);
+    var list = shoppingListsController.shoppingLists.copy();
+    list.sort(((a, b) {
+      if (a.id == currList?.id) return -1;
+      if (b.id == currList?.id) return 1;
+      return 0;
+    }));
+
+    var dialog = AlertDialog(
+      title: Text(NSSLStrings.of(context).recipeFromShareTitle()),
+      content: Container(
+        width: 80,
+        child: FractionallySizedBox(
+          heightFactor: 0.8,
+          child: ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                var currentSelected = list[index].id == currList?.id;
+                return Container(
+                  height: 50,
+                  child: ListTile(
+                    onTap: () {
+                      importNewRecipeIntoList(list[index], url);
+                      Navigator.pop(context, "");
+                    },
+                    title: Text(
+                      list[index].name,
+                      style: TextStyle(
+                        fontWeight: currentSelected ? FontWeight.bold : FontWeight.normal,
+                        fontStyle: currentSelected ? FontStyle.italic : FontStyle.normal,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+        ),
+      ),
+      actions: [
+        TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
+        TextButton(
+            child: Text(NSSLStrings.of(context).recipeFromShareNew()),
+            onPressed: () {
+              createNewRecipe(url);
+              Navigator.pop(context, "");
+            }),
+      ],
+    );
+    showDialog(builder: (BuildContext context) => dialog, context: context, barrierDismissible: false);
   }
 
   Widget _buildDrawer(BuildContext context) {

@@ -31,6 +31,9 @@ class ShoppingListSync {
       false,
       {"amountOfPeople": "4", "listId": listId.toString()});
 
+  static Future<Response> checkRecipeInput(String idOrUrl, BuildContext? context) =>
+      HelperMethods.post("recipe/IsValidIdOrUrl", context, AddRecipeArgs(idOrUrl));
+
   static Future<Response> deleteProduct(int? listId, int? productId, BuildContext context) =>
       HelperMethods.delete("$listpath/$listId/products/$productId", context);
 
