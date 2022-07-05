@@ -408,7 +408,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
       return;
     }
 
-    var currList = ref.read(currentListProvider);
+    var currList = ref.watch(currentListProvider);
     var shoppingListsController = ref.watch(shoppingListsProvider);
     var list = shoppingListsController.shoppingLists.copy();
     list.sort(((a, b) {
