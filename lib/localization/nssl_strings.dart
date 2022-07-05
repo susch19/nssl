@@ -49,6 +49,10 @@ class NSSLStrings {
   String chooseListToAddTitle() =>
       Intl.message('Which list to add?', name: 'chooseListToAddTitle', locale: _localeName);
   String addNewListTitle() => Intl.message('Add new List', name: 'addNewListTitle', locale: _localeName);
+  String recipeCreateError() => Intl.message('Could not create recipe', name: 'recipeCreateError', locale: _localeName);
+  String recipeFromShareTitle() =>
+      Intl.message('To which list to add?', name: 'recipeFromShareTitle', locale: _localeName);
+  String recipeFromShareNew() => Intl.message('NEW', name: 'recipeFromShareNew', locale: _localeName);
   String recipeName() => Intl.message('Recipe', name: 'recipeName', locale: _localeName);
   String recipeNameHint() => Intl.message('Recipe ID or URL', name: 'recipeNameHint', locale: _localeName);
   String addNewRecipeTitle() => Intl.message('Add new recipe', name: 'addNewRecipeTitle', locale: _localeName);

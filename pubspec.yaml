@@ -36,6 +36,7 @@ dependencies:
  #   git: git://github.com/susch19/dart-json_web_token.git
   #jaguar_jwt: "^1.1.5"
   url_launcher:
+  share_handler: ^0.0.8
 
 dev_dependencies:
   build_runner: ^2.0.6 
