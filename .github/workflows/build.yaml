@@ -6,7 +6,6 @@ on:
     branches: [ "master", "develop" ]
 
 jobs:
-
   create-build:
     name: Create ${{ matrix.target }} build
     runs-on: ${{ matrix.os }}
@@ -34,7 +33,6 @@ jobs:
           asset_content_type: application/vnd.android.package-archive
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
-    needs: draft-release
     steps:
     # Set up Flutter.
     - name: Clone Flutter repository with master channel
