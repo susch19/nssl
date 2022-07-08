@@ -93,7 +93,7 @@ class _BoughtItemsPagePageState extends ConsumerState<BoughtItemsPage> with Sing
                 id: f.id, amount: f.amount, changed: f.changed, created: f.created, crossedOut: false)));
 
             DateTime date;
-            shoppingItems.sort((x, y) => x.changed!.compareTo(y.changed!));
+            shoppingItems.sort((x, y) => y.changed!.compareTo(x.changed!));
             for (var item in shoppingItems) {
               date = dateTimeToDate(item.changed!);
               if (!shoppingItemsGrouped.containsKey(dateTimeToDate(item.changed!)))
