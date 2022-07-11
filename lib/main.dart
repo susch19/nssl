@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/forgot_password.dart';
@@ -110,7 +111,7 @@ class _NSSLState extends ConsumerState<NSSLPage> {
   }
 
   Future subscribeFirebase(BuildContext context) async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || !Platform.isAndroid) return;
 
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 

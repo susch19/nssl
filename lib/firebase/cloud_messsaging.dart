@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nssl/helper/iterable_extensions.dart';
 import 'package:nssl/models/model_export.dart';
 import 'package:riverpod/riverpod.dart';
 
-FirebaseMessaging? get firebaseMessaging => Platform.isAndroid ? FirebaseMessaging.instance : null;
+FirebaseMessaging? get firebaseMessaging => !kIsWeb && Platform.isAndroid ? FirebaseMessaging.instance : null;
 
 final cloudMessagingProvider = Provider<CloudMessaging>((ref) {
   return CloudMessaging(ref);

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/manager/database_manager.dart';
@@ -19,7 +20,7 @@ class Startup {
   static const LocalFileSystem fs = const LocalFileSystem();
 
   static Future<bool> initializeMinFunction() async {
-    if (!Platform.isAndroid) return true;
+    if (kIsWeb || !Platform.isAndroid) return true;
     return Firebase.initializeApp()
         .then((value) async => await ScanditFlutterDataCaptureBarcode.initialize())
         .then((value) => true);

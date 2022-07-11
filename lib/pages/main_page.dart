@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nssl/helper/choose_dialog.dart';
 import 'package:nssl/helper/simple_dialog.dart';
 import 'package:nssl/manager/export_manager.dart';
@@ -54,7 +55,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     super.initState();
     initPlatformState();
     WidgetsBinding.instance.addObserver(this);
-    Startup.deleteMessagesFromFolder();
+    if (!kIsWeb) Startup.deleteMessagesFromFolder();
     Startup.initializeNewListsFromServer(ref);
 
     _controller = AnimationController(
@@ -92,7 +93,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
                   TextButton(
                       child: Text(NSSLStrings.of(context).addPB()), onPressed: () => _addWithoutSearchDialog(context))
                 ] +
-                (Platform.isAndroid
+                (!kIsWeb && Platform.isAndroid
                     ? [TextButton(child: Text(NSSLStrings.of(context).scanPB()), onPressed: () => _getEAN(currentList))]
                     : []) +
                 [TextButton(child: Text(NSSLStrings.of(context).searchPB()), onPressed: search)]);
