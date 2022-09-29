@@ -4,7 +4,10 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nssl/options/themes.dart';
+import 'package:nssl/pages/forgot_password.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
 import 'package:nssl/models/model_export.dart';
@@ -13,6 +16,7 @@ import 'dart:async';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -24,31 +28,45 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
   await Startup.initializeMinFunction();
-  //Startup.remoteMessages.add(message);
-  var dir =
-      await Startup.fs.systemTempDirectory.childDirectory("message").create();
+  var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
   var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
   await file.writeAsString(jsonEncode(message.data));
 }
 
+final appRestartProvider = StateProvider<int>(
+  (ref) => 0,
+);
+
 Future<void> main() async {
 // iWonderHowLongThisTakes();
-
-  runApp(FutureBuilder(
-    builder: (c, t) {
-      if (t.connectionState == ConnectionState.done)
-        return NSSLPage();
-      else
-        return Container(color: Colors.green);
+  runApp(ProviderScope(child: Consumer(
+    builder: (context, ref, child) {
+      return FutureBuilder(
+        builder: (c, t) {
+          if (t.connectionState == ConnectionState.done) {
+            ref.watch(appRestartProvider);
+            return NSSLPage();
+          } else
+            return MaterialApp(
+              builder: (context, child) {
+                return Center(
+                  child: SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: SvgPicture.asset("assets/vectors/app_icon.svg"),
+                  ),
+                );
+              },
+            );
+        },
+        future: Startup.initialize(ref)
+            .then((value) => FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler)),
+      );
     },
-    future: Startup.initialize().then((value) =>
-        FirebaseMessaging.onBackgroundMessage(
-            _firebaseMessagingBackgroundHandler)),
-  ));
+  )));
 }
 
 class NSSL extends StatelessWidget {
@@ -58,19 +76,14 @@ class NSSL extends StatelessWidget {
   }
 }
 
-class NSSLPage extends StatefulWidget {
+class NSSLPage extends ConsumerStatefulWidget {
   NSSLPage({Key? key}) : super(key: key);
 
-  static _NSSLState? state;
   @override
-  _NSSLState createState() {
-    var localState = new _NSSLState();
-    state = localState;
-    return localState;
-  }
+  _NSSLState createState() => _NSSLState();
 }
 
-class _NSSLState extends State<NSSLPage> {
+class _NSSLState extends ConsumerState<NSSLPage> {
   _NSSLState() : super();
   final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -81,37 +94,34 @@ class _NSSLState extends State<NSSLPage> {
   @override
   void initState() {
     super.initState();
-
+    ref.read(cloudMessagingProvider); //Neded for ref on onMessage
     subscribeFirebase(context);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      CloudMessaging.onMessage(message, setState);
+      CloudMessaging.onMessage(message);
     });
 
     FirebaseMessaging.onMessage.listen((event) {
-      CloudMessaging.onMessage(event, setState);
+      CloudMessaging.onMessage(event);
     });
-    // FirebaseMessaging.onBackgroundMessage((message) async {
-    //   return;
-    // });
-    // FirebaseMessaging.onBackgroundMessage((message) => CloudMessaging.onMessage(message, setState));
-    // firebaseMessaging.configure(
-    //     onMessage: (x) => CloudMessaging.onMessage(x, setState), onLaunch: (x) => Startup.initialize());
-    for (var list in User.shoppingLists)
+
+    for (var list in ref.read(shoppingListsProvider).shoppingLists)
       if (list.messagingEnabled) list.subscribeForFirebaseMessaging();
   }
 
   Future subscribeFirebase(BuildContext context) async {
-    if (!Platform.isAndroid) return;
+    if (!Startup.firebaseSupported()) return;
 
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initMessage != null) {
-      CloudMessaging.onMessage(initMessage, setState);
+      CloudMessaging.onMessage(initMessage);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var user = ref.watch(userProvider);
+
     return AdaptiveTheme(
       light: Themes.lightTheme.theme!,
       dark: Themes.darkTheme.theme,
@@ -119,25 +129,24 @@ class _NSSLState extends State<NSSLPage> {
       builder: (theme, darkTheme) => MaterialApp(
         scrollBehavior: CustomScrollBehavior(),
         title: 'NSSL',
-        color: Colors.grey[500],
         localizationsDelegates: <LocalizationsDelegate<dynamic>>[
           new _NSSLLocalizationsDelegate(),
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: const <Locale>[
-          const Locale('en', 'US'),
-          const Locale('de', 'DE'),
+          const Locale('en', ''),
+          const Locale('de', ''),
         ],
         theme: theme,
         darkTheme: darkTheme,
         debugShowMaterialGrid: materialGrid,
-        home: User.username == null ? mainAppLoginRegister() : mainAppHome(),
+        home: user.ownId >= 0 ? mainAppHome() : mainAppLoginRegister(),
         routes: <String, WidgetBuilder>{
           '/login': (BuildContext context) => LoginPage(),
           '/registration': (BuildContext context) => Registration(),
           '/search': (BuildContext context) => ProductAddPage(),
-          '/forgot_password': (BuildContext context) => CustomThemePage(),
+          '/forgot_password': (BuildContext context) => ForgotPasswordPage(),
         },
         showPerformanceOverlay: performanceOverlay,
         showSemanticsDebugger: false,
@@ -147,9 +156,7 @@ class _NSSLState extends State<NSSLPage> {
   }
 
   Scaffold mainAppHome() => Scaffold(
-      key: _mainScaffoldKey,
-      resizeToAvoidBottomInset: false,
-      body: MainPage() //CustomThemePage()//LoginPage(),
+      key: _mainScaffoldKey, resizeToAvoidBottomInset: false, body: MainPage() //CustomThemePage()//LoginPage(),
       );
 
   Scaffold mainAppLoginRegister() => Scaffold(

@@ -15,8 +15,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+  def keystoreProperties = new Properties()
+   def keystorePropertiesFile = rootProject.file('key.properties')
+   if (keystorePropertiesFile.exists()) {
+       keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+   }
+
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     lintOptions {
         checkReleaseBuilds false // Add this
@@ -29,14 +35,22 @@ android {
         resValue "string", "app_name", "NSSL"
         multiDexEnabled true
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-        }
+           signingConfig signingConfigs.release
+       }
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"

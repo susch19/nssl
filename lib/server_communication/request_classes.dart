@@ -13,6 +13,12 @@ class ChangePasswordArgs {
   toJson() => {"oldPWHash": "$oldPWHash", "newPWHash": "$newPWHash"};
 }
 
+class ResetPasswordArgs {
+  ResetPasswordArgs(this.email);
+  String email;
+  toJson() => {"email": "$email"};
+}
+
 class AddContributorArgs {
   AddContributorArgs(this.name);
   String name;
@@ -29,7 +35,7 @@ class ChangeProductArgs {
   ChangeProductArgs({this.change, this.newName});
   int? change;
   String? newName;
-  toJson() => {"change": "$change", "newName" : "$newName"};
+  toJson() => {"change": "$change", "newName": "$newName"};
 }
 
 class ChangeProductsArgs {
@@ -51,6 +57,12 @@ class AddListArgs {
   toJson() => {"name": "$name"};
 }
 
+class AddRecipeArgs {
+  AddRecipeArgs(this.idOrUrl);
+  String idOrUrl;
+  toJson() => {"idOrUrl": "$idOrUrl"};
+}
+
 class DeleteProductArgs {
   DeleteProductArgs(this.listId, this.productId);
   int listId;
@@ -62,8 +74,7 @@ class AddProductArgs {
   String? productName;
   String? gtin;
   int? amount;
-  toJson() =>
-      {"productName": "$productName", "gtin": "$gtin", "amount": "$amount"};
+  toJson() => {"productName": "$productName", "gtin": "$gtin", "amount": "$amount"};
 }
 
 class AddNewProductArgs {
@@ -72,12 +83,7 @@ class AddNewProductArgs {
   String? gtin;
   String? unit;
   double quantity;
-  toJson() => {
-        "name": "$name",
-        "gtin": "$gtin",
-        "unit": "$unit",
-        "quantity": "$quantity"
-      };
+  toJson() => {"name": "$name", "gtin": "$gtin", "unit": "$unit", "quantity": "$quantity"};
 }
 
 class GetProductsArgs {

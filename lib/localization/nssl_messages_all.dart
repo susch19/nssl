@@ -14,34 +14,30 @@ Map<String, Function> _deferredLibraries = {
 
 MessageLookupByLibrary? _findExact(localeName) {
   switch (localeName) {
-    case 'en':
-      return m_en.messages;
-    case 'es':
-      return null; //messages_es.messages;
     case 'de':
       return m_de.messages;
     default:
-      return null;
+    return m_en.messages;
   }
 }
 
 /// User programs should call this before using [localeName] for messages.
-Future initializeMessages(String localeName) {
-  var lib = _deferredLibraries[Intl.canonicalizedLocale(localeName)];
-  var load = lib == null ? Future.value(false) : Future.value(null);
-  return load.then((_) {
-    initializeInternalMessageLookup(() => CompositeMessageLookup());
-    messageLookup.addLocale(localeName, _findGeneratedMessagesFor);
-  });
-}
+ Future initializeMessages(String localeName) {
+   var lib = _deferredLibraries[Intl.canonicalizedLocale(localeName)];
+   var load = lib == null ? Future.value(false) : Future.value(null);
+   return load.then((_) {
+     initializeInternalMessageLookup(() => CompositeMessageLookup());
+     messageLookup.addLocale(localeName, _findGeneratedMessagesFor);
+   });
+ }
 
-bool _messagesExistFor(String locale) {
-  var messages;
-  try {
-    messages = _findExact(locale);
-  } catch (e) {}
-  return messages != null;
-}
+ bool _messagesExistFor(String locale) {
+   var messages;
+   try {
+     messages = _findExact(locale);
+   } catch (e) {}
+   return messages != null;
+ }
 
 MessageLookupByLibrary? _findGeneratedMessagesFor(locale) {
   var actualLocale =

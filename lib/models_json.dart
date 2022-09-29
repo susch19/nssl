@@ -6,8 +6,7 @@ class User {
 
   toJson() => {"username": username, "email": email, "pwhash": password};
 
-  static User fromJson(Map data) =>
-      User(data["username"], data["email"], data["pwhash"]);
+  static User fromJson(Map data) => User(data["username"], data["email"], data["pwhash"]);
 }
 
 class Product {
@@ -26,15 +25,14 @@ class Product {
 }
 
 class ShoppingItem {
-  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created,
-      this.sortOrder)
-      : super();
-  int? id;
+  ShoppingItem(this.id, this.amount, this.name, this.changed, this.created, this.sortOrder, this.gtin) : super();
+  int id;
   int amount;
-  String? name;
+  String name;
+  String? gtin;
   DateTime? changed;
   DateTime? created;
-  int? sortOrder;
+  int sortOrder;
 
   toJson() => {
         "id": id,
@@ -42,34 +40,31 @@ class ShoppingItem {
         "name": name,
         "changed": changed,
         "created": created,
-        "sortOrder": sortOrder
+        "sortOrder": sortOrder,
+        "gtin": gtin
       };
 
   static ShoppingItem fromJson(Map data) => ShoppingItem(
       data["id"],
       data["amount"],
       data["name"],
-      data["changed"],
-      data["created"],
-      data["sortOrder"]);
+      DateTime.tryParse(data["changed"]),
+      DateTime.tryParse(data["created"]),
+      data["order"] ?? data["sortOrder"],
+      data["gtin"]);
 }
 
 class ShoppingList {
-  List<ShoppingItem>? products;
-  int? id;
-  String? name;
+  List<ShoppingItem> products;
+  int id;
+  String name;
 
-  toJson() => {
-        "products": products?.map((p) => p.toJson()).toList(growable: false),
-        "id": id,
-        "name": name
-      };
+  ShoppingList(this.id, this.name, this.products);
 
-  static ShoppingList fromJson(Map data) => ShoppingList()
-    ..id = data["id"]
-    ..name = data["name"]
-    ..products =
-        (data["products"] as List<Map>).map(ShoppingItem.fromJson).toList();
+  toJson() => {"products": products.map((p) => p.toJson()).toList(growable: false), "id": id, "name": name};
+
+  static ShoppingList fromJson(Map data) => ShoppingList(
+      data["id"] as int, data["name"] as String, (data["products"] as List<Map>).map(ShoppingItem.fromJson).toList());
 }
 
 class Contributor {
@@ -79,6 +74,5 @@ class Contributor {
   String? name;
 
   toJson() => {"id": id, "listId": listId, "name": name};
-  static Contributor fromJson(Map data) =>
-      Contributor(data["id"], data["listId"], data["name"]);
+  static Contributor fromJson(Map data) => Contributor(data["id"], data["listId"], data["name"]);
 }

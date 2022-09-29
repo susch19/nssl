@@ -46,15 +46,15 @@ class CustomThemePageState extends State<CustomThemePage> {
     return await (showDialog<bool>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            content: Text(NSSLStrings.of(context)!.discardNewTheme(), style: dialogTextStyle),
+            content: Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
             actions: <Widget>[
               TextButton(
-                  child: Text(NSSLStrings.of(context)!.cancelButton()),
+                  child: Text(NSSLStrings.of(context).cancelButton()),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   }),
               TextButton(
-                  child: Text(NSSLStrings.of(context)!.discardButton()),
+                  child: Text(NSSLStrings.of(context).discardButton()),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   }),
@@ -111,7 +111,7 @@ class CustomThemePageState extends State<CustomThemePage> {
       // backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(NSSLStrings.of(context)!.changeTheme()
+        title: Text(NSSLStrings.of(context).changeTheme()
             // , style: textColorTheme
             ),
         // backgroundColor: td.primaryColor,
@@ -124,7 +124,7 @@ class CustomThemePageState extends State<CustomThemePage> {
           child: ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
             Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
               Text(
-                NSSLStrings.of(context)!.changePrimaryColor(),
+                NSSLStrings.of(context).changePrimaryColor(),
                 // style: td.textTheme.subtitle1,
               ),
               Slider(
@@ -137,7 +137,7 @@ class CustomThemePageState extends State<CustomThemePage> {
             ]),
             Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
               Text(
-                NSSLStrings.of(context)!.changeAccentColor(),
+                NSSLStrings.of(context).changeAccentColor(),
                 //  style: td.textTheme.subtitle1,
               ),
               Slider(
@@ -150,7 +150,7 @@ class CustomThemePageState extends State<CustomThemePage> {
             ]),
             Row(children: [
               Text(
-                NSSLStrings.of(context)!.changeDarkTheme(),
+                NSSLStrings.of(context).changeDarkTheme(),
                 // style: td.textTheme.subtitle1,
               ),
               Checkbox(
