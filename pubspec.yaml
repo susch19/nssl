@@ -1,6 +1,8 @@
 name: nssl
 description: An app for handling shopping lists
 
+version: 0.40.0+0
+
 environment:
   sdk: '>=2.12.0'
 

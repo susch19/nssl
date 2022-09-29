@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="de.susch19.nssl" android:versionCode="30" android:versionName="0.0.30">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="de.susch19.nssl" android:versionCode="40" android:versionName="0.40.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />

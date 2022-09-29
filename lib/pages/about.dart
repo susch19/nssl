@@ -71,7 +71,7 @@ class AboutPage extends StatelessWidget {
           ),
         ),
         ListTile(
-          title: Text("Version 0.30"),
+          title: Text("Version 0.40.0"),
         ),
         Divider(),
         ListTile(
