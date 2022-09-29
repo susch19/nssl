@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/helper/iterable_extensions.dart';
@@ -309,10 +310,12 @@ class ShoppingList {
   const ShoppingList.messaging(this.id, this.name, /*this.shoppingItems,*/ this.messagingEnabled);
 
   void subscribeForFirebaseMessaging() {
+    if (kIsWeb) return;
     firebaseMessaging?.subscribeToTopic(id.toString() + "shoppingListTopic");
   }
 
   void unsubscribeFromFirebaseMessaging() {
+    if (kIsWeb) return;
     firebaseMessaging?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
   }
 }

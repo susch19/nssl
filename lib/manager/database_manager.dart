@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -6,16 +7,122 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+class FakeDatabase extends Database {
+  @override
+  Batch batch() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> close() {
+    return Future.value(null);
+  }
+
+  @override
+  Future<int> delete(String table, {String? where, List<Object?>? whereArgs}) {
+    return Future.value(0);
+  }
+
+  @override
+  Future<T> devInvokeMethod<T>(String method, [arguments]) {
+    return Future.value(null);
+  }
+
+  @override
+  Future<T> devInvokeSqlMethod<T>(String method, String sql, [List<Object?>? arguments]) {
+    return Future.value(null);
+  }
+
+  @override
+  Future<void> execute(String sql, [List<Object?>? arguments]) {
+    return Future.value(null);
+  }
+
+  @override
+  Future<int> getVersion() {
+    return Future.value(10);
+  }
+
+  @override
+  Future<int> insert(String table, Map<String, Object?> values,
+      {String? nullColumnHack, ConflictAlgorithm? conflictAlgorithm}) {
+    return Future.value(values.length);
+  }
+
+  @override
+  bool get isOpen => true;
+
+  @override
+  String get path => "";
+
+  @override
+  Future<List<Map<String, Object?>>> query(String table,
+      {bool? distinct,
+      List<String>? columns,
+      String? where,
+      List<Object?>? whereArgs,
+      String? groupBy,
+      String? having,
+      String? orderBy,
+      int? limit,
+      int? offset}) {
+    return Future.value([]);
+  }
+
+  @override
+  Future<int> rawDelete(String sql, [List<Object?>? arguments]) {
+    return Future.value(0);
+  }
+
+  @override
+  Future<int> rawInsert(String sql, [List<Object?>? arguments]) {
+    return Future.value(0);
+  }
+
+  @override
+  Future<List<Map<String, Object?>>> rawQuery(String sql, [List<Object?>? arguments]) {
+    return Future.value([]);
+  }
+
+  @override
+  Future<int> rawUpdate(String sql, [List<Object?>? arguments]) {
+    return Future.value(0);
+  }
+
+  @override
+  Future<void> setVersion(int version) {
+    return Future.value(null);
+  }
+
+  @override
+  Future<T> transaction<T>(Future<T> Function(Transaction txn) action, {bool? exclusive}) {
+    // TODO: implement transaction
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> update(String table, Map<String, Object?> values,
+      {String? where, List<Object?>? whereArgs, ConflictAlgorithm? conflictAlgorithm}) {
+    return Future.value(0);
+  }
+}
+
 class DatabaseManager {
-  static late Database database;
+  static late Database database; // = FakeDatabase();
 
   static int _version = 3;
 
   static Future initialize() async {
+    // if (kIsWeb) {
+    //   return;
+    // }
     WidgetsFlutterBinding.ensureInitialized();
     sqfliteFfiInit();
-
-    var dbPath = path.join((await getApplicationDocumentsDirectory()).path, "db.db");
+    String dbPath;
+    if (kIsWeb) {
+      dbPath = "db.db";
+    } else
+      dbPath = path.join((await getApplicationDocumentsDirectory()).path, "db.db");
     database = await databaseFactoryFfi.openDatabase(dbPath,
         options: OpenDatabaseOptions(
             version: _version,

@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/forgot_password.dart';
@@ -27,11 +28,9 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
   await Startup.initializeMinFunction();
-  //Startup.remoteMessages.add(message);
   var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
   var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
   await file.writeAsString(jsonEncode(message.data));
@@ -110,7 +109,7 @@ class _NSSLState extends ConsumerState<NSSLPage> {
   }
 
   Future subscribeFirebase(BuildContext context) async {
-    if (!Platform.isAndroid) return;
+    if (!Startup.firebaseSupported()) return;
 
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 
