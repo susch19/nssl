@@ -535,12 +535,6 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
             ListTile(title: Text(NSSLStrings.of(context).noListsInDrawerMessage())),
           ];
 
-    var emptyListTiles = <ListTile>[];
-    for (int i = 0; i < list.length - 2; i++)
-      emptyListTiles.add(ListTile(
-        title: const Text(("")),
-      ));
-
     var d = Scaffold(
         body: RefreshIndicator(
             child: ListView(
@@ -579,8 +573,7 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
                               onTap: () async {
                                 await _logout();
                               },
-                            ),
-                            Column(children: emptyListTiles)
+                            )
                           ],
                         ),
                       ),

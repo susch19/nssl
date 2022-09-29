@@ -22,7 +22,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
    }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     lintOptions {
         checkReleaseBuilds false // Add this
@@ -35,7 +35,7 @@ android {
         resValue "string", "app_name", "NSSL"
         multiDexEnabled true
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
     }
 
     signingConfigs {

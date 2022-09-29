@@ -13,17 +13,23 @@ import 'package:scandit_flutter_datacapture_barcode/scandit_flutter_datacapture_
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file/local.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nssl/firebase_options.dart';
 
 class Startup {
   static SharedPreferences? sharedPreferences;
   static List<RemoteMessage> remoteMessages = <RemoteMessage>[];
   static const LocalFileSystem fs = const LocalFileSystem();
 
+  static bool firebaseSupported() => kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
   static Future<bool> initializeMinFunction() async {
-    if (kIsWeb || !Platform.isAndroid) return true;
-    return Firebase.initializeApp()
-        .then((value) async => await ScanditFlutterDataCaptureBarcode.initialize())
-        .then((value) => true);
+    if (!firebaseSupported()) return true;
+    var initTask = Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (!kIsWeb && !Platform.isMacOS)
+      return initTask.then((value) async => await ScanditFlutterDataCaptureBarcode.initialize()).then((value) => true);
+
+    return initTask.then((value) => true);
   }
 
   static Future<void> loadMessagesFromFolder(WidgetRef ref) async {
@@ -66,9 +72,9 @@ class Startup {
     await Themes.loadTheme();
 
     var provider = ref.read(shoppingListsProvider);
+    await f1;
     await provider.load();
 
-    await f1;
     return true;
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:nssl/localization/nssl_strings.dart';
@@ -81,7 +82,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
     User.token = res.token;
     var user = User(res.id, res.username, res.eMail);
 
-    firebaseMessaging?.subscribeToTopic(res.username + "userTopic");
+    if (!kIsWeb) firebaseMessaging?.subscribeToTopic(res.username + "userTopic");
 
     var listController = ref.read(shoppingListsProvider);
     await listController.reloadAllLists(context);

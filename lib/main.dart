@@ -28,11 +28,9 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
   await Startup.initializeMinFunction();
-  //Startup.remoteMessages.add(message);
   var dir = await Startup.fs.systemTempDirectory.childDirectory("message").create();
   var file = dir.childFile(DateTime.now().microsecondsSinceEpoch.toString());
   await file.writeAsString(jsonEncode(message.data));
@@ -111,7 +109,7 @@ class _NSSLState extends ConsumerState<NSSLPage> {
   }
 
   Future subscribeFirebase(BuildContext context) async {
-    if (kIsWeb || !Platform.isAndroid) return;
+    if (!Startup.firebaseSupported()) return;
 
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 

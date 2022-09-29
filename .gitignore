@@ -28,3 +28,4 @@ windows/flutter/generated_plugins.cmake
 .license.dart
 windows/sqlite3.dll
 android/java_pid62552.hprof
+ios/Runner/GoogleService-Info.plist
