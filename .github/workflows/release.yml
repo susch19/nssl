@@ -60,7 +60,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [Android, Windows, Linux] 
+        target: [Android, PlayStore, Windows, Linux] 
         include:
         - os: windows-latest
           target: Windows
@@ -81,7 +81,7 @@ jobs:
           asset_extension: .apk
           asset_content_type: application/vnd.android.package-archive
         - os: ubuntu-latest
-          target: Android
+          target: PlayStore
           build_target: aab
           build_path: build/app/outputs/flutter-aab
           asset_extension: .aab
@@ -102,13 +102,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
     - name: Install Android dependencies
-      if: matrix.target == 'Android'
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '21'
     - name: Enable desktop support
-      if: matrix.target != 'Android'
+      if: matrix.target != 'Android' && matrix.target != 'PlayStore'
       run: |
         flutter config --enable-linux-desktop
         flutter config --enable-macos-desktop
@@ -122,7 +122,7 @@ jobs:
     - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
     - name: Configure Keystore for Android
-      if: matrix.target == 'Android'
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
       run: |
         echo "$KEY_STORE_FILE" | base64 --decode > app/nssl-keystore.jks
         echo "storeFile=nssl-keystore.jks" >> key.properties
@@ -176,9 +176,9 @@ jobs:
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
-    - name: Rename build for Android
-      if: matrix.target == 'Android'
-      run: mv app-release.apk $GITHUB_WORKSPACE/nssl_${{ matrix.target }}.apk
+    - name: Rename build for ${{ matrix.target }}
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
+      run: mv app-release.${{ matrix.asset_extension }} $GITHUB_WORKSPACE/nssl_${{ matrix.target }}${{ matrix.asset_extension }}
       working-directory: ${{ matrix.build_path }}
     - name: Compress build for Linux
       if: matrix.target == 'Linux'
@@ -186,7 +186,7 @@ jobs:
       working-directory: ${{ matrix.build_path }}
     - name: Compress build for Windows
       if: matrix.target == 'Windows'
-      run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\nssl_${{ matrix.target }}.zip
+      run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\nssl_${{ matrix.target }}${{ matrix.asset_extension }}
       working-directory: ${{ matrix.build_path }}
 
     # Upload the build.
