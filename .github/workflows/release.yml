@@ -178,7 +178,7 @@ jobs:
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
     - name: Rename build for ${{ matrix.target }}
       if: matrix.target == 'Android' || matrix.target == 'PlayStore'
-      run: mv app-release.${{ matrix.asset_extension }} $GITHUB_WORKSPACE/nssl_${{ matrix.target }}${{ matrix.asset_extension }}
+      run: mv app-release${{ matrix.asset_extension }} $GITHUB_WORKSPACE/nssl_${{ matrix.target }}${{ matrix.asset_extension }}
       working-directory: ${{ matrix.build_path }}
     - name: Compress build for Linux
       if: matrix.target == 'Linux'
