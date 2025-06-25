@@ -1,45 +1,57 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:nssl/helper/iterable_extensions.dart';
 import 'package:nssl/manager/startup_manager.dart';
 import 'package:nssl/models/model_export.dart';
+import 'package:nssl/server_communication/helper_methods.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-FirebaseMessaging? get firebaseMessaging => Startup.firebaseSupported() ? FirebaseMessaging.instance : null;
+part 'cloud_messsaging.g.dart';
 
-final cloudMessagingProvider = Provider<CloudMessaging>((ref) {
-  return CloudMessaging(ref);
-});
+FirebaseMessaging? get firebaseMessaging =>
+    Startup.firebaseSupported() ? FirebaseMessaging.instance : null;
 
-class CloudMessaging {
-  static late Ref _ref;
-
-  CloudMessaging(Ref ref) {
-    _ref = ref;
+@Riverpod(keepAlive: true)
+class CloudMessaging extends _$CloudMessaging {
+  @override
+  void build() {
+    return;
   }
 
-  static Future onMessage(RemoteMessage message) async {
+  Future onMessage(RemoteMessage message) async {
     final dynamic data = message.data;
+    final deviceToken = data["deviceToken"];
+    if (deviceToken != null && deviceToken == HelperMethods.deviceToken) return;
 
     int listId = int.parse(data["listId"]);
-    var ownId = _ref.read(userIdProvider);
-    if (ownId == int.parse(data["userId"])) {
+    var ownId = ref.read(userIdProvider);
+    if (deviceToken == null && ownId == int.parse(data["userId"])) {
       return null;
     }
-    var listController = _ref.read(shoppingListsProvider);
+    var listController = ref.read(shoppingListsProvider);
 
-    var list = listController.shoppingLists.firstOrNull((element) => element.id == listId);
+    var list = listController.shoppingLists.firstOrNull(
+      (element) => element.id == listId,
+    );
 
     if (list == null) {
       var mapp = jsonDecode(data["items"]);
       //User was added to new list
-      var items = _ref.watch(shoppingItemsProvider.notifier);
+      var items = ref.watch(shoppingItemsProvider.notifier);
       var newState = items.state.toList();
-      newState
-          .addAll(mapp.map((x) => ShoppingItem(x["name"], listId, x["sortOrder"], id: x["id"], amount: x["amount"])));
+      newState.addAll(
+        mapp.map(
+          (x) => ShoppingItem(
+            x["name"],
+            listId,
+            x["sortOrder"],
+            id: x["id"],
+            amount: x["amount"],
+          ),
+        ),
+      );
       items.state = newState;
       listController.addList(ShoppingList(listId, data["name"]));
     } else if (data.length == 1) {
@@ -51,7 +63,7 @@ class CloudMessaging {
       switch (action) {
         case "ItemChanged": //Id, Amount, action
           var id = int.parse(data["id"]);
-          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.watch(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == id);
           newState.remove(item);
@@ -65,13 +77,20 @@ class CloudMessaging {
           break;
         case "NewItemAdded": //Id, Name, Gtin, Amount, action
           var newItemId = int.parse(data["id"]);
-          var existing = _ref.read(shoppingItemProvider.create(newItemId));
+          var existing = ref.read(shoppingItemProvider(newItemId));
           if (existing != null) break;
 
           listController.addSingleItem(
-              list,
-              ShoppingItem(data["name"], list.id, int.parse(data["sortOrder"]),
-                  id: int.parse(data["id"]), amount: int.parse(data["amount"]), crossedOut: false));
+            list,
+            ShoppingItem(
+              data["name"],
+              list.id,
+              int.parse(data["sortOrder"]),
+              id: int.parse(data["id"]),
+              amount: int.parse(data["amount"]),
+              crossedOut: false,
+            ),
+          );
           break;
         case "ListRename": //Name, action
           listController.rename(list.id, data["name"] as String);
@@ -81,26 +100,26 @@ class CloudMessaging {
           break;
         case "ItemRenamed": //product.Id, product.Name
           var itemId = int.parse(data["id"]);
-          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.watch(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == itemId);
           newState.remove(item);
-          newState.add(
-            item.cloneWith(newName: data["name"]),
-          );
+          newState.add(item.cloneWith(newName: data["name"]));
           items.state = newState;
           listController.save(list);
           break;
         case "OrderChanged":
           var itemId = int.parse(data["id"]);
-          var items = _ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.watch(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == itemId);
           newState.remove(item);
-          newState.add(item.cloneWith(
-            newAmount: int.parse(data["amount"]),
-            newSortOrder: int.parse(data["sortOrder"]),
-          ));
+          newState.add(
+            item.cloneWith(
+              newAmount: int.parse(data["amount"]),
+              newSortOrder: int.parse(data["sortOrder"]),
+            ),
+          );
           items.state = newState;
           listController.save(list);
           break;

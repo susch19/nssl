@@ -105,6 +105,38 @@ class FakeDatabase extends Database {
       {String? where, List<Object?>? whereArgs, ConflictAlgorithm? conflictAlgorithm}) {
     return Future.value(0);
   }
+
+  @override
+  Future<QueryCursor> queryCursor(String table,
+      {bool? distinct,
+      List<String>? columns,
+      String? where,
+      List<Object?>? whereArgs,
+      String? groupBy,
+      String? having,
+      String? orderBy,
+      int? limit,
+      int? offset,
+      int? bufferSize}) {
+    // TODO: implement queryCursor
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<QueryCursor> rawQueryCursor(String sql, List<Object?>? arguments, {int? bufferSize}) {
+    // TODO: implement rawQueryCursor
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement database
+  Database get database => throw UnimplementedError();
+
+  @override
+  Future<T> readTransaction<T>(Future<T> Function(Transaction txn) action) {
+    // TODO: implement readTransaction
+    throw UnimplementedError();
+  }
 }
 
 class DatabaseManager {
