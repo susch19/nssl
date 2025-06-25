@@ -26,7 +26,7 @@ class CustomThemePageState extends State<CustomThemePage> {
   TextEditingController tec = TextEditingController();
 
   MaterialColor primary = Colors.blue;
-  MaterialAccentColor accent  = Colors.tealAccent;
+  MaterialAccentColor accent = Colors.tealAccent;
   Brightness? primaryBrightness = Brightness.dark;
   Brightness? accentBrightness = Brightness.dark;
 
@@ -35,29 +35,33 @@ class CustomThemePageState extends State<CustomThemePage> {
   double primaryColorSlider = 0.0;
   double accentColorSlider = 0.0;
   bool? primaryColorCheckbox = false;
+  bool? useMaterial3Checkbox = true;
   bool accentColorCheckbox = true;
+  bool? elevateAppBar = false;
 
   Future<bool> _onWillPop() async {
     if (!_saveNeeded) return true;
 
-    final ThemeData theme = Theme.of(context);
-    final TextStyle dialogTextStyle = theme.textTheme.subtitle1!.copyWith(color: theme.textTheme.caption!.color);
+    // final ThemeData theme = Theme.of(context);
+    // final TextStyle dialogTextStyle = theme.textTheme.titleSmall!.copyWith(color: theme.textTheme.!.color);
 
     return await (showDialog<bool>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            content: Text(NSSLStrings.of(context).discardNewTheme(), style: dialogTextStyle),
+            content: Text(NSSLStrings.of(context).discardNewTheme()),
             actions: <Widget>[
               TextButton(
-                  child: Text(NSSLStrings.of(context).cancelButton()),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  }),
+                child: Text(NSSLStrings.of(context).cancelButton()),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
               TextButton(
-                  child: Text(NSSLStrings.of(context).discardButton()),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  }),
+                child: Text(NSSLStrings.of(context).discardButton()),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
             ],
           ),
         )) ??
@@ -68,10 +72,18 @@ class CustomThemePageState extends State<CustomThemePage> {
     Themes.saveTheme(td!, primary, accent);
     if (td!.brightness == Brightness.dark) {
       AdaptiveTheme.of(context).setThemeMode(AdaptiveThemeMode.dark);
-      Themes.darkTheme = NSSLThemeData(td, primaryColorSlider.round(), accentColorSlider.round());
+      Themes.darkTheme = NSSLThemeData(
+        td,
+        primaryColorSlider.round(),
+        accentColorSlider.round(),
+      );
     } else {
       AdaptiveTheme.of(context).setThemeMode(AdaptiveThemeMode.light);
-      Themes.lightTheme = NSSLThemeData(td, primaryColorSlider.round(), accentColorSlider.round());
+      Themes.lightTheme = NSSLThemeData(
+        td,
+        primaryColorSlider.round(),
+        accentColorSlider.round(),
+      );
     }
     Navigator.of(context).pop();
   }
@@ -91,74 +103,108 @@ class CustomThemePageState extends State<CustomThemePage> {
       td = darkTheme ? Themes.darkTheme.theme : Themes.lightTheme.theme;
       primaryColorCheckbox = darkTheme;
       primary =
-          Colors.primaries[darkTheme ? Themes.darkTheme.primarySwatchIndex! : Themes.lightTheme.primarySwatchIndex!];
-      accent = Colors.accents[darkTheme ? Themes.darkTheme.accentSwatchIndex! : Themes.lightTheme.accentSwatchIndex!];
+          Colors.primaries[darkTheme
+              ? Themes.darkTheme.primarySwatchIndex!
+              : Themes.lightTheme.primarySwatchIndex!];
+      accent =
+          Colors.accents[darkTheme
+              ? Themes.darkTheme.accentSwatchIndex!
+              : Themes.lightTheme.accentSwatchIndex!];
 
       primaryBrightness = td!.brightness;
       primaryColorSlider = Colors.primaries.indexOf(primary).toDouble();
       accentColorSlider = Colors.accents.indexOf(accent).toDouble();
+      useMaterial3Checkbox = td?.useMaterial3;
+      elevateAppBar = (td?.appBarTheme.elevation ?? -1) > 0;
     }
 
     // var textColorTheme = TextStyle(color: td.textTheme.headline6.color);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.save,
-            // color: td.accentIconTheme.color,
-          ),
-          // backgroundColor: td.accentColor,
-          onPressed: _handleSubmitted),
+        child: Icon(
+          Icons.save,
+          // color: td.accentIconTheme.color,
+        ),
+        // backgroundColor: td.accentColor,
+        onPressed: _handleSubmitted,
+      ),
       // backgroundColor: td.scaffoldBackgroundColor,
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(NSSLStrings.of(context).changeTheme()
-            // , style: textColorTheme
-            ),
+        title: Text(
+          NSSLStrings.of(context).changeTheme(),
+          // , style: textColorTheme
+        ),
         // backgroundColor: td.primaryColor,
         // iconTheme: td.iconTheme,
         // textTheme: td.textTheme,
       ),
       body: Form(
-          key: _formKey,
-          onWillPop: _onWillPop,
-          child: ListView(padding: const EdgeInsets.all(16.0), children: <Widget>[
-            Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              Text(
-                NSSLStrings.of(context).changePrimaryColor(),
-                // style: td.textTheme.subtitle1,
-              ),
-              Slider(
-                value: primaryColorSlider,
-                max: (Colors.primaries).length.ceilToDouble() - 1.0,
-                divisions: Colors.primaries.length - 1,
-                onChanged: onChangedPrimarySlider,
-                // activeColor: td.accentColor,
-              ),
-            ]),
-            Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              Text(
-                NSSLStrings.of(context).changeAccentColor(),
-                //  style: td.textTheme.subtitle1,
-              ),
-              Slider(
-                value: accentColorSlider,
-                max: Colors.accents.length.ceilToDouble() - 1.0,
-                divisions: Colors.accents.length - 1,
-                onChanged: onChangedSecondarySlider,
-                // activeColor: td.accentColor
-              ),
-            ]),
-            Row(children: [
-              Text(
-                NSSLStrings.of(context).changeDarkTheme(),
-                // style: td.textTheme.subtitle1,
-              ),
-              Checkbox(
-                value: primaryColorCheckbox,
-                onChanged: primaryBrightnessChange,
-                // activeColor: td.accentColor,
-              ),
-            ]),
+        key: _formKey,
+        onWillPop: _onWillPop,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: <Widget>[
+            CheckboxListTile(
+              title: Text(NSSLStrings.of(context).useMaterial3()),
+              value: useMaterial3Checkbox,
+              onChanged: (value) {
+                useMaterial3Checkbox = value;
+                setColors();
+              },
+            ),
+            !(useMaterial3Checkbox ?? true)
+                ? Container()
+                : CheckboxListTile(
+                    title: Text(NSSLStrings.of(context).elevateAppBar()),
+                    value: elevateAppBar,
+                    onChanged: (value) {
+                      elevateAppBar = value;
+                      setColors();
+                    },
+                  ),
+            CheckboxListTile(
+              title: Text(NSSLStrings.of(context).changeDarkTheme()),
+              value: primaryColorCheckbox,
+              onChanged: (value) {
+                primaryBrightnessChange(value);
+              },
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  NSSLStrings.of(context).changePrimaryColor(),
+                  // style: td.textTheme.subtitle1,
+                ),
+                Slider(
+                  value: primaryColorSlider,
+                  max: (Colors.primaries).length.ceilToDouble() - 1.0,
+                  divisions: Colors.primaries.length - 1,
+                  onChanged: onChangedPrimarySlider,
+                  // activeColor: td.accentColor,
+                ),
+              ],
+            ),
+            (useMaterial3Checkbox ?? false)
+                ? Container()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        NSSLStrings.of(context).changeAccentColor(),
+                        //  style: td.textTheme.subtitle1,
+                      ),
+                      Slider(
+                        value: accentColorSlider,
+                        max: Colors.accents.length.ceilToDouble() - 1.0,
+                        divisions: Colors.accents.length - 1,
+                        onChanged: onChangedSecondarySlider,
+                        // activeColor: td.accentColor
+                      ),
+                    ],
+                  ),
+
             // Row(children: [
             //   Text(
             //     NSSLStrings.of(context).changeAccentTextColor(),
@@ -180,7 +226,9 @@ class CustomThemePageState extends State<CustomThemePage> {
             //   enableLabel: true,
             //   pickerAreaHeightPercent: 0.8,
             // ),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 
@@ -207,40 +255,46 @@ class CustomThemePageState extends State<CustomThemePage> {
     // print(accentBrightness);
     if (primaryBrightness == Brightness.light)
       td = ThemeData(
+        useMaterial3: useMaterial3Checkbox,
+        colorSchemeSeed: primary,
         brightness: primaryBrightness,
-        primarySwatch: primary,
+        // primarySwatch: primary,
         secondaryHeaderColor: accent,
-        floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade400),
-        checkboxTheme: CheckboxThemeData(
-          fillColor: MaterialStateColor.resolveWith(
-            (s) {
-              if (s.contains(MaterialState.selected)) {
-                return accent.shade200;
-              }
-              return Colors.black;
-            },
-          ),
-        ),
+        appBarTheme: AppBarTheme(elevation: (elevateAppBar ?? false) ? 4 : 0),
+        // floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade400),
+        // checkboxTheme: CheckboxThemeData(
+        //   fillColor: MaterialStateColor.resolveWith(
+        //     (s) {
+        //       if (s.contains(MaterialState.selected)) {
+        //         return accent.shade200;
+        //       }
+        //       return Colors.black;
+        //     },
+        //   ),
+        // ),
       );
     else
       td = ThemeData(
+        useMaterial3: useMaterial3Checkbox,
+        colorSchemeSeed: primary,
         brightness: primaryBrightness,
-        primarySwatch: primary,
+        // primarySwatch: primary,
         secondaryHeaderColor: accent,
-        floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade100),
-        checkboxTheme: CheckboxThemeData(
-          checkColor: MaterialStateColor.resolveWith((states) {
-            return Colors.black;
-          }),
-          fillColor: MaterialStateColor.resolveWith(
-            (s) {
-              if (s.contains(MaterialState.selected)) {
-                return accent.shade200;
-              }
-              return Colors.black;
-            },
-          ),
-        ),
+        appBarTheme: AppBarTheme(elevation: (elevateAppBar ?? false) ? 4 : 0),
+        // floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: accent.shade100),
+        // checkboxTheme: CheckboxThemeData(
+        //   checkColor: MaterialStateColor.resolveWith((states) {
+        //     return Colors.black;
+        //   }),
+        //   fillColor: MaterialStateColor.resolveWith(
+        //     (s) {
+        //       if (s.contains(MaterialState.selected)) {
+        //         return accent.shade200;
+        //       }
+        //       return Colors.black;
+        //     },
+        //   ),
+        // ),
       );
 
     AdaptiveTheme.of(context).setTheme(light: td!, dark: td);

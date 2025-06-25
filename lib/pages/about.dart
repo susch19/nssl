@@ -8,15 +8,15 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(NSSLStrings.of(context).about()),
-      ),
+      appBar: AppBar(title: Text(NSSLStrings.of(context).about())),
       body: buildBody(context),
     );
   }
 
   Widget buildBody(BuildContext context) {
-    var iconColor = AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark ? Colors.white : Colors.black;
+    var iconColor = AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
+        ? Colors.white
+        : Colors.black;
     return ListView(
       children: [
         Container(
@@ -30,9 +30,7 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(
-                  top: 8.0,
-                ),
+                margin: EdgeInsets.only(top: 8.0),
                 child: Center(
                   child: Text(
                     "Non Sucking Shopping List",
@@ -65,14 +63,8 @@ class AboutPage extends StatelessWidget {
           ),
         ),
         Divider(),
-        ListTile(
-          title: Text(
-            "Entwickelt von susch19 (Sascha Hering)",
-          ),
-        ),
-        ListTile(
-          title: Text("Version 0.40.0"),
-        ),
+        ListTile(title: Text("Entwickelt von susch19 (Sascha Hering)")),
+        ListTile(title: Text("Version 0.41.0")),
         Divider(),
         ListTile(
           leading: SvgPicture.asset(
@@ -90,10 +82,16 @@ class AboutPage extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: SvgPicture.asset("assets/vectors/nssl_icon.svg", alignment: Alignment.center, width: 32),
+          leading: SvgPicture.asset(
+            "assets/vectors/nssl_icon.svg",
+            alignment: Alignment.center,
+            width: 32,
+          ),
           title: Text(NSSLStrings.of(context).iconSource()),
           onTap: () {
-            var urlString = Uri.parse("https://www.flaticon.com/free-icon/check-list_306470");
+            var urlString = Uri.parse(
+              "https://www.flaticon.com/free-icon/check-list_306470",
+            );
             canLaunchUrl(urlString).then((value) {
               if (value) launchUrl(urlString);
             });
@@ -101,10 +99,16 @@ class AboutPage extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: SvgPicture.asset("assets/vectors/google_play.svg", alignment: Alignment.center, width: 32),
+          leading: SvgPicture.asset(
+            "assets/vectors/google_play.svg",
+            alignment: Alignment.center,
+            width: 32,
+          ),
           title: Text(NSSLStrings.of(context).playstoreEntry()),
           onTap: () {
-            var urlString = Uri.parse("https://play.google.com/store/apps/details?id=de.susch19.nssl");
+            var urlString = Uri.parse(
+              "https://play.google.com/store/apps/details?id=de.susch19.nssl",
+            );
             canLaunchUrl(urlString).then((value) {
               if (value) launchUrl(urlString);
             });
@@ -112,7 +116,12 @@ class AboutPage extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: Image.asset("assets/images/scandit.png", alignment: Alignment.center, width: 128, color: iconColor),
+          leading: Image.asset(
+            "assets/images/scandit.png",
+            alignment: Alignment.center,
+            width: 128,
+            color: iconColor,
+          ),
           title: Text(NSSLStrings.of(context).scanditCredit()),
           onTap: () {
             var urlString = Uri.parse("https://scandit.com");

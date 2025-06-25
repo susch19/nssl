@@ -95,8 +95,8 @@ class RegistrationState extends ConsumerState<Registration> {
   String? _validatePassword(String? value) {
     var errorCode = PasswordService.checkNewPassword(value ?? "");
 
+    String errorText = "";
     if (errorCode != PasswordErrorCode.none) {
-      String errorText = "";
       switch (errorCode) {
         case PasswordErrorCode.empty:
           return NSSLStrings.of(context).passwordEmptyError();
@@ -108,6 +108,7 @@ class RegistrationState extends ConsumerState<Registration> {
           return NSSLStrings.of(context).passwordMissingCharactersError();
       }
     }
+    return errorText;
   }
 
   String? _validatePassword2(String? value) {

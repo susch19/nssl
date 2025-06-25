@@ -41,7 +41,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
   var validateMode = AutovalidateMode.disabled;
 
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value), duration: Duration(seconds: 3)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(value), duration: Duration(seconds: 3)),
+    );
   }
 
   Future _handleSubmitted() async {
@@ -58,13 +60,21 @@ class LoginPageState extends ConsumerState<LoginPage> {
 
     if (_validateEmail(nameInput.textEditingController.text) != null) {
       var res = await UserSync.login(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey.currentState))
+      if (!HelperMethods.reactToRespone(
+        res,
+        context,
+        scaffoldState: _scaffoldKey.currentState,
+      ))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
     } else {
       var res = await UserSync.loginEmail(name, password, context);
-      if (!HelperMethods.reactToRespone(res, context, scaffoldState: _scaffoldKey.currentState))
+      if (!HelperMethods.reactToRespone(
+        res,
+        context,
+        scaffoldState: _scaffoldKey.currentState,
+      ))
         return;
       else
         _handleLoggedIn(LoginResult.fromJson(res.body));
@@ -82,7 +92,8 @@ class LoginPageState extends ConsumerState<LoginPage> {
     User.token = res.token;
     var user = User(res.id, res.username, res.eMail);
 
-    if (!kIsWeb) firebaseMessaging?.subscribeToTopic(res.username + "userTopic");
+    if (!kIsWeb)
+      firebaseMessaging?.subscribeToTopic(res.username + "userTopic");
 
     var listController = ref.read(shoppingListsProvider);
     await listController.reloadAllLists(context);
@@ -90,6 +101,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
     user.save(0);
     ref.watch(currentListIndexProvider.notifier).state = 0;
     userState.state = user;
+    if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
   String? _validateName(String? value) {
@@ -102,24 +114,30 @@ class LoginPageState extends ConsumerState<LoginPage> {
   String? _validateEmail(String value) {
     if (value.isEmpty) return NSSLStrings.of(context).emailRequiredError();
     RegExp email = RegExp(
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
+    );
 
-    if (!email.hasMatch(value)) return NSSLStrings.of(context).emailIncorrectFormatError();
+    if (!email.hasMatch(value))
+      return NSSLStrings.of(context).emailIncorrectFormatError();
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (pwInput.textEditingController.text.isEmpty) return NSSLStrings.of(context).passwordEmptyError();
+    if (pwInput.textEditingController.text.isEmpty)
+      return NSSLStrings.of(context).passwordEmptyError();
     return null;
   }
 
   _resetInput() {
     nameInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(),
-        labelText: NSSLStrings.of(context).usernameOrEmailTitle());
+      helperText: NSSLStrings.of(context).usernameOrEmailForLoginHint(),
+      labelText: NSSLStrings.of(context).usernameOrEmailTitle(),
+    );
 
     pwInput.decoration = InputDecoration(
-        helperText: NSSLStrings.of(context).choosenPasswordHint(), labelText: NSSLStrings.of(context).password());
+      helperText: NSSLStrings.of(context).choosenPasswordHint(),
+      labelText: NSSLStrings.of(context).password(),
+    );
   }
 
   @override
@@ -131,7 +149,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     _resetInput();
-//    return ListView(children: <Widget>[new (child: Scaffold(
+    //    return ListView(children: <Widget>[new (child: Scaffold(
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
@@ -140,75 +158,82 @@ class LoginPageState extends ConsumerState<LoginPage> {
         key: _formKey,
         autovalidateMode: validateMode,
         child: ListView(
-//              physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            children: [
-              ListTile(
-                  title: TextFormField(
-                      key: nameInput.key,
-                      decoration: nameInput.decoration,
-                      //onChanged: (input) => nameInput.errorText = _validateName(input),
-                      controller: nameInput.textEditingController,
-                      keyboardType: TextInputType.emailAddress,
-                      autofillHints: [AutofillHints.username, AutofillHints.email],
-                      autocorrect: false,
-                      autofocus: true,
-                      validator: _validateName,
-                      onSaved: (val) {
-                        FocusScope.of(context).requestFocus(pwInput.focusNode);
-                      })),
-              ListTile(
-                  title: TextFormField(
-                      key: pwInput.key,
-                      decoration: pwInput.decoration,
-                      focusNode: pwInput.focusNode,
-                      obscureText: true,
-                      autocorrect: false,
-                      autofillHints: [AutofillHints.password],
-                      controller: pwInput.textEditingController,
-                      validator: _validatePassword,
-                      onSaved: (val) {
-                        _handleSubmitted();
-                      })),
-              ListTile(
-                title: Container(
-                    child: ElevatedButton(
-                      key: submit.key,
-                      child: Center(child: Text(NSSLStrings.of(context).loginButton())),
-                      onPressed: _handleSubmitted,
-                    ),
-                    padding: const EdgeInsets.only(top: 16.0)),
+          //              physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          children: [
+            ListTile(
+              title: TextFormField(
+                key: nameInput.key,
+                decoration: nameInput.decoration,
+                //onChanged: (input) => nameInput.errorText = _validateName(input),
+                controller: nameInput.textEditingController,
+                keyboardType: TextInputType.emailAddress,
+                autofillHints: [AutofillHints.username, AutofillHints.email],
+                autocorrect: false,
+                autofocus: true,
+                validator: _validateName,
+                onSaved: (val) {
+                  FocusScope.of(context).requestFocus(pwInput.focusNode);
+                },
               ),
-              ListTile(
-                title: Container(
-                  padding: const EdgeInsets.only(top: 40.0),
-                  child: TextButton(
-                    onPressed: () {
-                      var userId = ref.read(userIdProvider);
-                      userId == null || userId < 0
-                          ? Navigator.pushNamed(context, "/registration")
-                          : Navigator.popAndPushNamed(context, "/registration");
-                    },
-                    child: Text(NSSLStrings.of(context).registerTextOnLogin()),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Container(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/forgot_password");
-                    },
-                    child: Text(NSSLStrings.of(context).forgotPassword()),
-                  ),
-                ),
-              ),
-              //padding: EdgeInsets.only(
-              //    top: MediaQuery.of(context).size.height / 5),
-            ]
-            //]),
-
             ),
+            ListTile(
+              title: TextFormField(
+                key: pwInput.key,
+                decoration: pwInput.decoration,
+                focusNode: pwInput.focusNode,
+                obscureText: true,
+                autocorrect: false,
+                autofillHints: [AutofillHints.password],
+                controller: pwInput.textEditingController,
+                validator: _validatePassword,
+                onSaved: (val) {
+                  _handleSubmitted();
+                },
+              ),
+            ),
+            ListTile(
+              title: Container(
+                child: ElevatedButton(
+                  key: submit.key,
+                  child: Center(
+                    child: Text(NSSLStrings.of(context).loginButton()),
+                  ),
+                  onPressed: _handleSubmitted,
+                ),
+                padding: const EdgeInsets.only(top: 16.0),
+              ),
+            ),
+            ListTile(
+              title: Container(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: TextButton(
+                  onPressed: () {
+                    var userId = ref.read(userIdProvider);
+                    userId == null || userId < 0
+                        ? Navigator.pushNamed(context, "/registration")
+                        : Navigator.popAndPushNamed(context, "/registration");
+                  },
+                  child: Text(NSSLStrings.of(context).registerTextOnLogin()),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Container(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/forgot_password");
+                  },
+                  child: Text(NSSLStrings.of(context).forgotPassword()),
+                ),
+              ),
+            ),
+            //padding: EdgeInsets.only(
+            //    top: MediaQuery.of(context).size.height / 5),
+          ],
+
+          //]),
+        ),
       ),
     );
   }

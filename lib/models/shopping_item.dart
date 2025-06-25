@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nssl/helper/iterable_extensions.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 class TestClass {
   int test;
@@ -13,7 +14,10 @@ class TestClass {
 
 final shoppingItemsProvider = StateProvider<List<ShoppingItem>>(((ref) => []));
 
-final shoppingItemsPerListProvider = Provider.family<List<ShoppingItem>, int>((ref, listId) {
+final shoppingItemsPerListProvider = Provider.family<List<ShoppingItem>, int>((
+  ref,
+  listId,
+) {
   var items = ref.watch(shoppingItemsProvider);
   return items.where((element) => element.listId == listId).toList();
 });
@@ -35,6 +39,7 @@ class ShoppingItem {
   final int listId;
 
   int get sortWithOffset => sortOrder + (crossedOut ? 0xFFFFFFFF : 0);
+  String get cleanedName => name.replaceFirst('0.0', '').replaceAll('null', '');
 
   const ShoppingItem(
     this.name,
@@ -60,25 +65,38 @@ class ShoppingItem {
   /// Creates an identical clone, where all fields are the same as
   /// the parent item
   ShoppingItem clone() {
-    return ShoppingItem(name, listId, sortOrder,
-        amount: amount, id: id, changed: changed, created: created, crossedOut: crossedOut);
+    return ShoppingItem(
+      name,
+      listId,
+      sortOrder,
+      amount: amount,
+      id: id,
+      changed: changed,
+      created: created,
+      crossedOut: crossedOut,
+    );
   }
 
-  ShoppingItem cloneWith(
-      {String? newName,
-      int? newListId,
-      int? newAmount,
-      int? newId,
-      DateTime? newCreated,
-      DateTime? newChanged,
-      bool? newCrossedOut,
-      int? newSortOrder}) {
-    return ShoppingItem(newName ?? name, newListId ?? listId, newSortOrder ?? sortOrder,
-        amount: newAmount ?? amount,
-        id: newId ?? id,
-        changed: newChanged ?? changed,
-        created: newCreated ?? created,
-        crossedOut: newCrossedOut ?? crossedOut);
+  ShoppingItem cloneWith({
+    String? newName,
+    int? newListId,
+    int? newAmount,
+    int? newId,
+    DateTime? newCreated,
+    DateTime? newChanged,
+    bool? newCrossedOut,
+    int? newSortOrder,
+  }) {
+    return ShoppingItem(
+      newName ?? name,
+      newListId ?? listId,
+      newSortOrder ?? sortOrder,
+      amount: newAmount ?? amount,
+      id: newId ?? id,
+      changed: newChanged ?? changed,
+      created: newCreated ?? created,
+      crossedOut: newCrossedOut ?? crossedOut,
+    );
   }
 
   // ShoppingItem.fromJson(String s) :  name = s;
@@ -96,7 +114,8 @@ class ShoppingItem {
       other.listId == listId;
 
   @override
-  int get hashCode => Object.hash(name, amount, id, crossedOut, sortOrder, listId);
+  int get hashCode =>
+      Object.hash(name, amount, id, crossedOut, sortOrder, listId);
 
   void exchange(ShoppingItem newItem, WidgetRef ref) {
     var items = ref.watch(shoppingItemsProvider.notifier);

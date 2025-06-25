@@ -25,7 +25,7 @@ jobs:
           future_release: ${{ github.ref }}
           #since_tag: ${{ steps.get_latest_release.outputs.release }}
       - name: Upload changelog
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: changelog
           path: CHANGELOG.md
@@ -39,7 +39,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Download changelog
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: changelog
     - name: Draft release with changelog
@@ -60,33 +60,39 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [Android, Windows, Linux] 
+        target: [Android, PlayStore, Windows, Linux] 
         include:
-        - os: windows-2019
+        - os: windows-latest
           target: Windows
           build_target: windows
-          build_path: build\windows\runner\Release
+          build_path: build\windows\x64\runner\Release
           asset_extension: .zip
           asset_content_type: application/zip
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           target: Linux
           build_target: linux
           build_path: build/linux/x64/release/bundle
           asset_extension: .tar.gz
           asset_content_type: application/gzip
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           target: Android
           build_target: apk
           build_path: build/app/outputs/flutter-apk
           asset_extension: .apk
           asset_content_type: application/vnd.android.package-archive
+        - os: ubuntu-latest
+          target: PlayStore
+          build_target: aab
+          build_path: build/app/outputs/bundle/release
+          asset_extension: .aab
+          asset_content_type: application/x-authorware-bin
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
     needs: draft-release
     steps:
     # Set up Flutter.
     - name: Clone Flutter repository with master channel
-      uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
+      uses: subosito/flutter-action@v2
       with:
         channel: master
 
@@ -96,12 +102,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
     - name: Install Android dependencies
-      if: matrix.target == 'Android'
-      uses: actions/setup-java@v1
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
+      uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
+        distribution: 'temurin'
+        java-version: '21'
     - name: Enable desktop support
-      if: matrix.target != 'Android'
+      if: matrix.target != 'Android' && matrix.target != 'PlayStore'
       run: |
         flutter config --enable-linux-desktop
         flutter config --enable-macos-desktop
@@ -111,11 +118,11 @@ jobs:
 
     # Checkout NSSL code, recreate missing files, and get packages.
     - name: Checkout NSSL code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - run: flutter create . --project-name nssl --org de.susch19
     - run: flutter pub get
     - name: Configure Keystore for Android
-      if: matrix.target == 'Android'
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
       run: |
         echo "$KEY_STORE_FILE" | base64 --decode > app/nssl-keystore.jks
         echo "storeFile=nssl-keystore.jks" >> key.properties
@@ -169,9 +176,9 @@ jobs:
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\msvcp140.dll') .
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140.dll') .
         Copy-Item (vswhere -latest -find 'VC\Redist\MSVC\*\x64\*\vcruntime140_1.dll') .
-    - name: Rename build for Android
-      if: matrix.target == 'Android'
-      run: mv app-release.apk $GITHUB_WORKSPACE/nssl_${{ matrix.target }}.apk
+    - name: Rename build for ${{ matrix.target }}
+      if: matrix.target == 'Android' || matrix.target == 'PlayStore'
+      run: mv app-release${{ matrix.asset_extension }} $GITHUB_WORKSPACE/nssl_${{ matrix.target }}${{ matrix.asset_extension }}
       working-directory: ${{ matrix.build_path }}
     - name: Compress build for Linux
       if: matrix.target == 'Linux'
@@ -179,7 +186,7 @@ jobs:
       working-directory: ${{ matrix.build_path }}
     - name: Compress build for Windows
       if: matrix.target == 'Windows'
-      run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\nssl_${{ matrix.target }}.zip
+      run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\nssl_${{ matrix.target }}${{ matrix.asset_extension }}
       working-directory: ${{ matrix.build_path }}
 
     # Upload the build.

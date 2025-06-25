@@ -8,8 +8,10 @@ import 'dart:async';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/shopping_list_sync.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
-final shoppingListsProvider = ChangeNotifierProvider<ShoppingListController>((ref) {
+final shoppingListsProvider =
+    ChangeNotifierProvider<ShoppingListController>((ref) {
   var userId = ref.watch(userIdProvider);
   if (userId == null) return ShoppingListController(ref, -1);
 
@@ -28,16 +30,17 @@ final listProvider = Provider.family<ShoppingList?, int>((ref, indx) {
 final currentListProvider = Provider<ShoppingList?>((ref) {
   var index = ref.watch(currentListIndexProvider);
   if (index == null) return null;
-  return ref.watch(listProvider.create(index));
+  return ref.watch(listProvider(index));
 });
 
 final currentShoppingItemsProvider = Provider<List<ShoppingItem>>((ref) {
   var list = ref.watch(currentListProvider);
   if (list == null || list.id < 0) return [];
-  return ref.watch(shoppingItemsPerListProvider.create(list.id));
+  return ref.watch(shoppingItemsPerListProvider(list.id));
 });
 
-final shoppingListByIndexProvider = Provider.family<ShoppingList?, int>((ref, indx) {
+final shoppingListByIndexProvider =
+    Provider.family<ShoppingList?, int>((ref, indx) {
   var shoppingListController = ref.watch(shoppingListsProvider);
   if (indx > shoppingListController.shoppingLists.length) return null;
 
@@ -47,7 +50,8 @@ final shoppingListByIndexProvider = Provider.family<ShoppingList?, int>((ref, in
 final shoppingListByIdProvider = Provider.family<ShoppingList?, int>((ref, id) {
   var shoppingListController = ref.watch(shoppingListsProvider);
 
-  return shoppingListController.shoppingLists.firstOrNull((element) => element.id == id);
+  return shoppingListController.shoppingLists
+      .firstOrNull((element) => element.id == id);
 });
 
 class ShoppingListController with ChangeNotifier {
@@ -62,20 +66,30 @@ class ShoppingListController with ChangeNotifier {
 
   Future save(ShoppingList list) async {
     await DatabaseManager.database.transaction((z) async {
-      await z.execute('INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
+      await z.execute(
+          'INSERT OR REPLACE INTO ShoppingLists(id, name, messaging, user_id) VALUES(?, ?, ?, ?)',
           [list.id, list.name, list.messagingEnabled ? 1 : 0, _userId]);
-      var shoppingItems = _ref.read(shoppingItemsPerListProvider.create(list.id));
-      await z.rawDelete("DELETE FROM ShoppingItems WHERE res_list_id = ? and id not in (?)",
+      var shoppingItems = _ref.read(shoppingItemsPerListProvider(list.id));
+      await z.rawDelete(
+          "DELETE FROM ShoppingItems WHERE res_list_id = ? and id not in (?)",
           [list.id, shoppingItems.map((e) => e.id).join(",")]);
       for (var item in shoppingItems) {
         await z.execute(
             "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
-            [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, list.id, item.sortOrder]);
+            [
+              item.id,
+              item.name,
+              item.amount,
+              item.crossedOut ? 1 : 0,
+              list.id,
+              item.sortOrder
+            ]);
       }
     });
   }
 
-  Future addSingleItem(ShoppingList list, ShoppingItem item, {int index = -1}) async {
+  Future addSingleItem(ShoppingList list, ShoppingItem item,
+      {int index = -1}) async {
     // var shoppingItems = _ref.read(shoppingItemsPerListProvider.create(list.id));
     // if (index < 0) index = shoppingItems.length;
     // shoppingItems.insert(index, item);
@@ -89,7 +103,14 @@ class ShoppingListController with ChangeNotifier {
 
     await DatabaseManager.database.execute(
         "INSERT OR REPLACE INTO ShoppingItems(id, name, amount, crossed, res_list_id, sortorder) VALUES (?, ?, ?, ?, ?, ?)",
-        [item.id, item.name, item.amount, item.crossedOut ? 1 : 0, list.id, item.sortOrder]);
+        [
+          item.id,
+          item.name,
+          item.amount,
+          item.crossedOut ? 1 : 0,
+          list.id,
+          item.sortOrder
+        ]);
     save(list);
     notifyListeners();
   }
@@ -102,7 +123,8 @@ class ShoppingListController with ChangeNotifier {
     // var newList = ShoppingList(list.id, list.name, list.shoppingItems.where((element) => element != item).toList(),
     //     messagingEnabled: list.messagingEnabled);
     // _exchangeLists(list, newList);
-    await DatabaseManager.database.rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [itemId]);
+    await DatabaseManager.database
+        .rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [itemId]);
     save(list);
   }
 
@@ -114,14 +136,17 @@ class ShoppingListController with ChangeNotifier {
     // var newList = ShoppingList(list.id, list.name, list.shoppingItems.where((element) => element != item).toList(),
     //     messagingEnabled: list.messagingEnabled);
     // _exchangeLists(list, newList);
-    await DatabaseManager.database.rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
+    await DatabaseManager.database
+        .rawDelete("DELETE FROM ShoppingItems WHERE id = ?", [item.id]);
     save(list);
   }
 
   Future<List<ShoppingList>> load() async {
-    var lists = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingLists WHERE user_id = ?", [_userId]);
+    var lists = await DatabaseManager.database
+        .rawQuery("SELECT * FROM ShoppingLists WHERE user_id = ?", [_userId]);
 
-    var items = await DatabaseManager.database.rawQuery("SELECT * FROM ShoppingItems ORDER BY res_list_id, sortorder");
+    var items = await DatabaseManager.database.rawQuery(
+        "SELECT * FROM ShoppingItems ORDER BY res_list_id, sortorder");
 
     int curSortOrder = 0;
     var newShoppingItems = items.map(
@@ -143,8 +168,8 @@ class ShoppingListController with ChangeNotifier {
     ).toList();
 
     shoppingLists = lists
-        .map((x) =>
-            ShoppingList(x["id"] as int, x["name"] as String, messagingEnabled: x["messaging"] == 0 ? false : true))
+        .map((x) => ShoppingList(x["id"] as int, x["name"] as String,
+            messagingEnabled: x["messaging"] == 0 ? false : true))
         .toList();
 
     var sip = _ref.watch(shoppingItemsProvider.notifier);
@@ -159,8 +184,9 @@ class ShoppingListController with ChangeNotifier {
 
     var newListResult = GetListResult.fromJson(res.body);
     List<Map<String, dynamic>> items;
-    items = (await DatabaseManager.database
-        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?", [list.id]));
+    items = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed, sortorder FROM ShoppingItems WHERE res_list_id = ?",
+        [list.id]));
 
     var shoppingItems = <ShoppingItem>[];
     var sip = _ref.watch(shoppingItemsProvider.notifier);
@@ -176,13 +202,17 @@ class ShoppingListController with ChangeNotifier {
         amount: item.amount,
         changed: item.changed,
         created: item.created,
-        crossedOut:
-            (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0 ? false : true),
+        crossedOut: (items.firstWhere((x) => x["id"] == item.id,
+                    orElse: () => {"crossed": 0})["crossed"] ==
+                0
+            ? false
+            : true),
       ));
 
     shoppingItems.sort((a, b) => a.sortWithOffset.compareTo(b.sortWithOffset));
     newState.addAll(shoppingItems);
-    var newList = ShoppingList(list.id, list.name, messagingEnabled: list.messagingEnabled);
+    var newList = ShoppingList(list.id, list.name,
+        messagingEnabled: list.messagingEnabled);
     _exchangeLists(list, newList);
     sip.state = newState;
     save(newList);
@@ -205,11 +235,12 @@ class ShoppingListController with ChangeNotifier {
 
     var result = GetListsResult.fromJson(res.body);
     shoppingLists.clear();
-    await DatabaseManager.database.delete("ShoppingLists", where: "user_id = ?", whereArgs: [_userId]);
+    await DatabaseManager.database
+        .delete("ShoppingLists", where: "user_id = ?", whereArgs: [_userId]);
 
     List<Map<String, dynamic>> items;
-    items = (await DatabaseManager.database
-        .rawQuery("SELECT id, crossed, sortorder FROM ShoppingItems where crossed = 1 or sortorder > 0"));
+    items = (await DatabaseManager.database.rawQuery(
+        "SELECT id, crossed, sortorder FROM ShoppingItems where crossed = 1 or sortorder > 0"));
 
     var shoppintItemsState = _ref.watch(shoppingItemsProvider.notifier);
     var shoppingItems = <ShoppingItem>[];
@@ -230,7 +261,9 @@ class ShoppingListController with ChangeNotifier {
           amount: item.amount,
           changed: item.changed,
           created: item.created,
-          crossedOut: (items.firstWhere((x) => x["id"] == item.id, orElse: () => {"crossed": 0})["crossed"] == 0
+          crossedOut: (items.firstWhere((x) => x["id"] == item.id,
+                      orElse: () => {"crossed": 0})["crossed"] ==
+                  0
               ? false
               : true),
         ));
@@ -270,7 +303,8 @@ class ShoppingListController with ChangeNotifier {
   void removeList(int listId) {
     shoppingLists.removeWhere((x) => x.id == listId);
 
-    firebaseMessaging?.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
+    firebaseMessaging
+        ?.unsubscribeFromTopic(listId.toString() + "shoppingListTopic");
     notifyListeners();
   }
 
@@ -281,8 +315,11 @@ class ShoppingListController with ChangeNotifier {
 
   void toggleFirebaseMessaging(int listId) {
     var list = shoppingLists.firstWhere((element) => element.id == listId);
-    var newList = ShoppingList(listId, list.name, messagingEnabled: !list.messagingEnabled);
-    newList.messagingEnabled ? list.subscribeForFirebaseMessaging() : list.unsubscribeFromFirebaseMessaging();
+    var newList = ShoppingList(listId, list.name,
+        messagingEnabled: !list.messagingEnabled);
+    newList.messagingEnabled
+        ? list.subscribeForFirebaseMessaging()
+        : list.unsubscribeFromFirebaseMessaging();
     _exchangeLists(list, newList);
     save(newList);
   }
@@ -290,7 +327,8 @@ class ShoppingListController with ChangeNotifier {
   void rename(int id, String name) {
     var list = shoppingLists.firstWhere((element) => element.id == id);
 
-    var newList = ShoppingList(id, name, messagingEnabled: list.messagingEnabled);
+    var newList =
+        ShoppingList(id, name, messagingEnabled: list.messagingEnabled);
     _exchangeLists(list, newList);
     saveAndNotify(list);
   }
@@ -305,9 +343,11 @@ class ShoppingList {
   // final List<ShoppingItem> shoppingItems;
   final bool messagingEnabled;
 
-  const ShoppingList(this.id, this.name, /*this.shoppingItems,*/ {this.messagingEnabled = true});
+  const ShoppingList(this.id, this.name,
+      /*this.shoppingItems,*/ {this.messagingEnabled = true});
 
-  const ShoppingList.messaging(this.id, this.name, /*this.shoppingItems,*/ this.messagingEnabled);
+  const ShoppingList.messaging(
+      this.id, this.name, /*this.shoppingItems,*/ this.messagingEnabled);
 
   void subscribeForFirebaseMessaging() {
     if (kIsWeb) return;
@@ -316,6 +356,7 @@ class ShoppingList {
 
   void unsubscribeFromFirebaseMessaging() {
     if (kIsWeb) return;
-    firebaseMessaging?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
+    firebaseMessaging
+        ?.unsubscribeFromTopic(id.toString() + "shoppingListTopic");
   }
 }

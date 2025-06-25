@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:nssl/helper/choose_dialog.dart';
 import 'package:nssl/helper/simple_dialog.dart';
 import 'package:nssl/manager/export_manager.dart';
@@ -27,7 +28,8 @@ class MainPage extends ConsumerStatefulWidget {
   MainPageState createState() => MainPageState();
 }
 
-class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixin, WidgetsBindingObserver {
+class MainPageState extends ConsumerState<MainPage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final ScrollController _mainController = ScrollController();
   final ScrollController _drawerController = ScrollController();
 
@@ -66,37 +68,49 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
       parent: ReverseAnimation(_controller!),
       curve: Curves.fastOutSlowIn,
     );
-    _drawerDetailsPosition = Tween<Offset>(
-      begin: const Offset(0.0, -1.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller!,
-      curve: Curves.fastOutSlowIn,
-    ));
+    _drawerDetailsPosition =
+        Tween<Offset>(begin: const Offset(0.0, -1.0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _controller!, curve: Curves.fastOutSlowIn),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     var currentList = ref.watch(currentListProvider);
     return Scaffold(
-        appBar: AppBar(
-            title: Text(
-              currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
-            ),
-            actions: _getMainDropdownActions(context)),
-        body: ShoppingListWidget(this),
-        floatingActionButton: acceptReordingFAB(),
-        drawer: _buildDrawer(context),
-        persistentFooterButtons: ref.watch(_isReorderingProvider) || currentList == null
-            ? <Widget>[]
-            : <Widget>[
+      appBar: AppBar(
+        title: Text(
+          currentList?.name ?? NSSLStrings.of(context).noListLoaded(),
+        ),
+        actions: _getMainDropdownActions(context),
+      ),
+      body: ShoppingListWidget(this),
+      floatingActionButton: acceptReordingFAB(),
+      drawer: _buildDrawer(context),
+      persistentFooterButtons:
+          ref.watch(_isReorderingProvider) || currentList == null
+          ? <Widget>[]
+          : <Widget>[
                   TextButton(
-                      child: Text(NSSLStrings.of(context).addPB()), onPressed: () => _addWithoutSearchDialog(context))
+                    child: Text(NSSLStrings.of(context).addPB()),
+                    onPressed: () => _addWithoutSearchDialog(context),
+                  ),
                 ] +
                 (!kIsWeb && Platform.isAndroid
-                    ? [TextButton(child: Text(NSSLStrings.of(context).scanPB()), onPressed: () => _getEAN(currentList))]
+                    ? [
+                        TextButton(
+                          child: Text(NSSLStrings.of(context).scanPB()),
+                          onPressed: () => _getEAN(currentList),
+                        ),
+                      ]
                     : []) +
-                [TextButton(child: Text(NSSLStrings.of(context).searchPB()), onPressed: search)]);
+                [
+                  TextButton(
+                    child: Text(NSSLStrings.of(context).searchPB()),
+                    onPressed: search,
+                  ),
+                ],
+    );
   }
 
   void _onReorderItems(int oldIndex, int newIndex) {
@@ -132,14 +146,32 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     shoppingState.state = newState;
   }
 
-  void showInSnackBar(String value, {Duration? duration, SnackBarAction? action}) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(value), duration: duration ?? Duration(seconds: 3), action: action));
+  void showInSnackBar(
+    String value, {
+    Duration? duration,
+    SnackBarAction? action,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(value),
+        duration: duration ?? Duration(seconds: 3),
+        action: action,
+      ),
+    );
   }
 
-  void showInDrawerSnackBar(String value, {Duration? duration, SnackBarAction? action}) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(value), duration: duration ?? Duration(seconds: 3), action: action));
+  void showInDrawerSnackBar(
+    String value, {
+    Duration? duration,
+    SnackBarAction? action,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(value),
+        duration: duration ?? Duration(seconds: 3),
+        action: action,
+      ),
+    );
   }
 
   Future register() => Navigator.pushNamed(context, "/registration");
@@ -156,21 +188,31 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     if (list == null) return;
     var listProvider = ref.read(shoppingListsProvider);
 
-    final String action =
-        (dir == DismissDirection.endToStart) ? NSSLStrings.of(context).archived() : NSSLStrings.of(context).deleted();
+    final String action = (dir == DismissDirection.endToStart)
+        ? NSSLStrings.of(context).archived()
+        : NSSLStrings.of(context).deleted();
     await listProvider.deleteSingleItem(list, s);
 
     ShoppingListSync.deleteProduct(list.id, s.id, context);
 
-    showInSnackBar(NSSLStrings.of(context).youHaveActionItemMessage() + "${s.name} $action",
-        action: SnackBarAction(
-            label: NSSLStrings.of(context).undo(),
-            onPressed: () {
-              listProvider.addSingleItem(list, s);
-              ShoppingListSync.changeProductAmount(list.id, s.id, s.amount, context);
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-            }),
-        duration: Duration(seconds: 10));
+    showInSnackBar(
+      NSSLStrings.of(context).youHaveActionItemMessage() +
+          "${s.cleanedName} $action",
+      action: SnackBarAction(
+        label: NSSLStrings.of(context).undo(),
+        onPressed: () {
+          listProvider.addSingleItem(list, s);
+          ShoppingListSync.changeProductAmount(
+            list.id,
+            s.id,
+            s.amount,
+            context,
+          );
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        },
+      ),
+      duration: Duration(seconds: 10),
+    );
   }
 
   Future selectedOption(String s) async {
@@ -180,13 +222,18 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
         break;
       case "options":
         await Navigator.push(
-                context,
-                MaterialPageRoute<DismissDialogAction>(
-                  builder: (BuildContext context) => SettingsPage(),
-                  fullscreenDialog: true,
-                ))
-            .whenComplete(() => AdaptiveTheme.of(context)
-                .setTheme(light: Themes.lightTheme.theme!, dark: Themes.darkTheme.theme, notify: true));
+          context,
+          MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => SettingsPage(),
+            fullscreenDialog: true,
+          ),
+        ).whenComplete(
+          () => AdaptiveTheme.of(context).setTheme(
+            light: Themes.lightTheme.theme!,
+            dark: Themes.darkTheme.theme,
+            notify: true,
+          ),
+        );
         break;
       case "PerformanceOverlay":
         setState(() => performanceOverlay = !performanceOverlay);
@@ -202,11 +249,12 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
         break;
       case "ChangePassword":
         Navigator.push(
-            context,
-            MaterialPageRoute<DismissDialogAction>(
-              builder: (BuildContext context) => ChangePasswordPage(),
-              fullscreenDialog: true,
-            ));
+          context,
+          MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => ChangePasswordPage(),
+            fullscreenDialog: true,
+          ),
+        );
         break;
       case "reorderItems":
         var reordering = ref.watch(_isReorderingProvider.notifier);
@@ -228,11 +276,12 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
   Future<Null> _getEAN(ShoppingList currentList) async {
     ean = await Navigator.push(
-        context,
-        MaterialPageRoute<String>(
-          builder: (BuildContext context) => BarcodeScannerScreen(),
-          fullscreenDialog: true,
-        ));
+      context,
+      MaterialPageRoute<String>(
+        builder: (BuildContext context) => BarcodeScannerScreen(),
+        fullscreenDialog: true,
+      ),
+    );
 
     if (ean == null || ean == "" || ean == "Permissions denied") return;
 
@@ -242,23 +291,51 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
     if (k.success) {
       RegExp reg = RegExp("([0-9]+[.,]?[0-9]*(\\s)?[gkmlGKML]{1,2})");
-      String? name = reg.hasMatch(k.name!) ? k.name : "${k.name} ${k.quantity}${k.unit}";
-      var shoppingItems = ref.read(shoppingItemsPerListProvider.create(currentList.id));
+      String? name = reg.hasMatch(k.name!)
+          ? k.name
+          : "${k.name} ${k.quantity?.toString() ?? ""}${k.unit ?? ""}";
+      var shoppingItems = ref.read(
+        shoppingItemsPerListProvider(currentList.id),
+      );
       var item = shoppingItems.firstOrNull((x) => x.name == name);
       if (item != null) {
-        var answer = await ShoppingListSync.changeProductAmount(currentList.id, item.id, 1, context);
+        var answer = await ShoppingListSync.changeProductAmount(
+          currentList.id,
+          item.id,
+          1,
+          context,
+        );
         var p = ChangeListItemResult.fromJson((answer).body);
-        var newItem = item.cloneWith(newAmount: p.amount, newChanged: p.changed);
+        var newItem = item.cloneWith(
+          newAmount: p.amount,
+          newChanged: p.changed,
+        );
         item.exchange(newItem, ref);
       } else {
-        var p =
-            AddListItemResult.fromJson((await ShoppingListSync.addProduct(currentList.id, name, '-', 1, context)).body);
+        var p = AddListItemResult.fromJson(
+          (await ShoppingListSync.addProduct(
+            currentList.id,
+            name,
+            '-',
+            1,
+            context,
+          )).body,
+        );
 
         var items = ref.watch(shoppingItemsProvider.notifier);
         var newState = items.state.toList();
         int sortOrder = 0;
-        if (shoppingItems.length > 0) sortOrder = shoppingItems.last.sortOrder + 1;
-        newState.add(ShoppingItem(p.name, currentList.id, sortOrder, amount: 1, id: p.productId));
+        if (shoppingItems.length > 0)
+          sortOrder = shoppingItems.last.sortOrder + 1;
+        newState.add(
+          ShoppingItem(
+            p.name,
+            currentList.id,
+            sortOrder,
+            amount: 1,
+            id: p.productId,
+          ),
+        );
         items.state = newState;
       }
       var provider = ref.read(shoppingListsProvider);
@@ -267,54 +344,76 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
       return;
     }
     Navigator.push(
-        context,
-        MaterialPageRoute<DismissDialogAction>(
-            builder: (BuildContext context) => AddProductToDatabase(ean), fullscreenDialog: true));
+      context,
+      MaterialPageRoute<DismissDialogAction>(
+        builder: (BuildContext context) => AddProductToDatabase(ean),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void chooseListToAddDialog() {
     var dialog = ChooseDialog.create(
-        context: context,
-        title: NSSLStrings.of(context).chooseListToAddTitle(),
-        titleOption1: NSSLStrings.of(context).chooseAddListDialog(),
-        onOption1: addListDialog,
-        titleOption2: NSSLStrings.of(context).chooseAddRecipeDialog(),
-        onOption2: () => addRecipeDialog(false));
-    showDialog(builder: (BuildContext context) => dialog, context: context, barrierDismissible: false);
+      context: context,
+      title: NSSLStrings.of(context).chooseListToAddTitle(),
+      titleOption1: NSSLStrings.of(context).chooseAddListDialog(),
+      onOption1: addListDialog,
+      titleOption2: NSSLStrings.of(context).chooseAddRecipeDialog(),
+      onOption2: () => addRecipeDialog(false),
+    );
+    showDialog(
+      builder: (BuildContext context) => dialog,
+      context: context,
+      barrierDismissible: false,
+    );
   }
 
   void addListDialog() {
     var sd = SimpleDialogSingleInput.create(
-        hintText: NSSLStrings.of(context).newNameOfListHint(),
-        labelText: NSSLStrings.of(context).listName(),
-        onSubmitted: createNewList,
-        title: NSSLStrings.of(context).addNewListTitle(),
-        context: context);
+      hintText: NSSLStrings.of(context).newNameOfListHint(),
+      labelText: NSSLStrings.of(context).listName(),
+      onSubmitted: createNewList,
+      title: NSSLStrings.of(context).addNewListTitle(),
+      context: context,
+    );
 
-    showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
+    showDialog(
+      builder: (BuildContext context) => sd,
+      context: context,
+      barrierDismissible: false,
+    );
   }
 
   void addRecipeDialog(bool import) {
     var sd = SimpleDialogSingleInput.create(
-        hintText: NSSLStrings.of(context).recipeNameHint(),
-        labelText: NSSLStrings.of(context).recipeName(),
-        onSubmitted: import ? importNewRecipe : createNewRecipe,
-        title: import ? NSSLStrings.of(context).importNewRecipeTitle() : NSSLStrings.of(context).addNewRecipeTitle(),
-        context: context);
+      hintText: NSSLStrings.of(context).recipeNameHint(),
+      labelText: NSSLStrings.of(context).recipeName(),
+      onSubmitted: import ? importNewRecipe : createNewRecipe,
+      title: import
+          ? NSSLStrings.of(context).importNewRecipeTitle()
+          : NSSLStrings.of(context).addNewRecipeTitle(),
+      context: context,
+    );
 
-    showDialog(builder: (BuildContext context) => sd, context: context, barrierDismissible: false);
+    showDialog(
+      builder: (BuildContext context) => sd,
+      context: context,
+      barrierDismissible: false,
+    );
   }
 
   Future renameListDialog(int listId) {
     return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => SimpleDialogSingleInput.create(
+        hintText: NSSLStrings.of(context).renameListHint(),
+        labelText: NSSLStrings.of(context).listName(),
+        onSubmitted: (s) => renameList(listId, s),
+        title: NSSLStrings.of(context).renameListTitle(),
         context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => SimpleDialogSingleInput.create(
-            hintText: NSSLStrings.of(context).renameListHint(),
-            labelText: NSSLStrings.of(context).listName(),
-            onSubmitted: (s) => renameList(listId, s),
-            title: NSSLStrings.of(context).renameListTitle(),
-            context: context));
+      ),
+    );
   }
 
   Future createNewRecipe(String idOrUrl) async {
@@ -322,7 +421,9 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var indexProvider = ref.watch(currentListIndexProvider.notifier);
     var res = await ShoppingListSync.addRecipe(idOrUrl, context);
     if (res.statusCode >= 400) {
-      showInSnackBar(NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""));
+      showInSnackBar(
+        NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""),
+      );
       return;
     }
     var newListRes = GetListResult.fromJson(res.body);
@@ -331,8 +432,19 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var items = ref.watch(shoppingItemsProvider.notifier);
     var newState = items.state.toList();
     if (newListRes.products != null)
-      newState.addAll(newListRes.products!.map((e) => ShoppingItem(e.name, newList.id, e.sortOrder,
-          amount: e.amount, id: e.id, created: e.created, changed: e.changed)));
+      newState.addAll(
+        newListRes.products!.map(
+          (e) => ShoppingItem(
+            e.name,
+            newList.id,
+            e.sortOrder,
+            amount: e.amount,
+            id: e.id,
+            created: e.created,
+            changed: e.changed,
+          ),
+        ),
+      );
 
     items.state = newState;
 
@@ -356,7 +468,9 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var res = await ShoppingListSync.importRecipe(idOrUrl, list.id, context);
 
     if (res.statusCode >= 400) {
-      showInSnackBar(NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""));
+      showInSnackBar(
+        NSSLStrings.of(context).recipeCreateError() + (res.reasonPhrase ?? ""),
+      );
       return;
     }
 
@@ -425,56 +539,82 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
         child: FractionallySizedBox(
           heightFactor: 0.8,
           child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: list.length,
-              itemBuilder: (BuildContext context, int index) {
-                var currentSelected = list[index].id == currList?.id;
-                return Container(
-                  height: 50,
-                  child: ListTile(
-                    onTap: () {
-                      importNewRecipeIntoList(list[index], url);
-                      Navigator.pop(context, "");
-                    },
-                    title: Text(
-                      list[index].name,
-                      style: TextStyle(
-                        fontWeight: currentSelected ? FontWeight.bold : FontWeight.normal,
-                        fontStyle: currentSelected ? FontStyle.italic : FontStyle.normal,
-                      ),
+            padding: const EdgeInsets.all(8),
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              var currentSelected = list[index].id == currList?.id;
+              return Container(
+                height: 50,
+                child: ListTile(
+                  onTap: () {
+                    importNewRecipeIntoList(list[index], url);
+                    Navigator.pop(context, "");
+                  },
+                  title: Text(
+                    list[index].name,
+                    style: TextStyle(
+                      fontWeight: currentSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontStyle: currentSelected
+                          ? FontStyle.italic
+                          : FontStyle.normal,
                     ),
                   ),
-                );
-              }),
+                ),
+              );
+            },
+          ),
         ),
       ),
       actions: [
-        TextButton(child: Text(NSSLStrings.of(context).cancelButton()), onPressed: () => Navigator.pop(context, "")),
         TextButton(
-            child: Text(NSSLStrings.of(context).recipeFromShareNew()),
-            onPressed: () {
-              createNewRecipe(url);
-              Navigator.pop(context, "");
-            }),
+          child: Text(NSSLStrings.of(context).cancelButton()),
+          onPressed: () => Navigator.pop(context, ""),
+        ),
+        TextButton(
+          child: Text(NSSLStrings.of(context).recipeFromShareNew()),
+          onPressed: () {
+            createNewRecipe(url);
+            Navigator.pop(context, "");
+          },
+        ),
       ],
     );
-    showDialog(builder: (BuildContext context) => dialog, context: context, barrierDismissible: false);
+    showDialog(
+      builder: (BuildContext context) => dialog,
+      context: context,
+      barrierDismissible: false,
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
     var user = ref.watch(userProvider);
     var isDarkTheme = AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark;
     var userheader = UserAccountsDrawerHeader(
-      accountName: Text(user.username == "" ? NSSLStrings.of(context).notLoggedInYet() : user.username),
-      accountEmail: Text(user.eMail == "" ? NSSLStrings.of(context).notLoggedInYet() : user.username),
+      accountName: Text(
+        user.username == ""
+            ? NSSLStrings.of(context).notLoggedInYet()
+            : user.username,
+      ),
+      accountEmail: Text(
+        user.eMail == ""
+            ? NSSLStrings.of(context).notLoggedInYet()
+            : user.username,
+      ),
       currentAccountPicture: CircleAvatar(
-          child: Text(
-            user.username.substring(0, 2).toUpperCase(),
-            style: TextStyle(color: isDarkTheme ? Colors.black : Colors.white),
-          ),
-          backgroundColor: isDarkTheme
-              ? Themes.darkTheme.theme!.floatingActionButtonTheme.backgroundColor
-              : Themes.lightTheme.theme!.floatingActionButtonTheme.backgroundColor),
+        child: Text(
+          user.username.substring(0, 2).toUpperCase(),
+          style: TextStyle(color: isDarkTheme ? Colors.black : Colors.white),
+        ),
+        backgroundColor: isDarkTheme
+            ? Themes.darkTheme.theme!.floatingActionButtonTheme.backgroundColor
+            : Themes
+                  .lightTheme
+                  .theme!
+                  .floatingActionButtonTheme
+                  .backgroundColor,
+      ),
       onDetailsPressed: () {
         _showDrawerContents = !_showDrawerContents;
         _showDrawerContents ? _controller!.reverse() : _controller!.forward();
@@ -483,111 +623,137 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var shoppingListsController = ref.watch(shoppingListsProvider);
     var list = shoppingListsController.shoppingLists.isNotEmpty
         ? shoppingListsController.shoppingLists
-            .map((x) => ListTile(
+              .map(
+                (x) => ListTile(
                   title: Text(x.name),
-                  onTap: () => changeCurrentList(shoppingListsController.shoppingLists
-                      .indexOf(shoppingListsController.shoppingLists.firstWhere((y) => y.id == x.id))),
+                  onTap: () => changeCurrentList(
+                    shoppingListsController.shoppingLists.indexOf(
+                      shoppingListsController.shoppingLists.firstWhere(
+                        (y) => y.id == x.id,
+                      ),
+                    ),
+                  ),
                   trailing: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      onSelected: (v) async => await drawerListItemMenuClicked(v),
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
-                              value: x.id.toString() + "\u{1E}" + "Contributors",
-                              child: ListTile(
-                                leading: const Icon(Icons.person_add),
-                                title: Text(NSSLStrings.of(context).contributors()),
-                              ),
-                            ),
-                            PopupMenuItem<String>(
-                              value: x.id.toString() + "\u{1E}" + "BoughtList",
-                              child: ListTile(
-                                leading: const Icon(Icons.history),
-                                title: Text(NSSLStrings.of(context).boughtProducts()),
-                                // NSSLStrings.of(context)!.contributors()),
-                              ),
-                            ),
-                            //Deactivated, because it's not working at the moment
-                            // PopupMenuItem<String>(
-                            //   value: x.id.toString() + "\u{1E}" + 'ExportAsPdf',
-                            //   child: ListTile(
-                            //       leading: const Icon(Icons.picture_as_pdf),
-                            //       title: Text(NSSLStrings.of(context)!.exportAsPdf())),
-                            // ),
-                            PopupMenuItem<String>(
-                                value: x.id.toString() + "\u{1E}" + 'Rename',
-                                child: ListTile(
-                                    leading: const Icon(Icons.mode_edit),
-                                    title: Text(NSSLStrings.of(context).rename()))),
-                            PopupMenuItem<String>(
-                                value: x.id.toString() + "\u{1E}" + 'Auto-Sync',
-                                child: ListTile(
-                                    leading: Icon(x.messagingEnabled ? Icons.check_box : Icons.check_box_outline_blank),
-                                    title: Text(NSSLStrings.of(context).autoSync()))),
-                            const PopupMenuDivider(),
-                            PopupMenuItem<String>(
-                                value: x.id.toString() + "\u{1E}" + 'Remove',
-                                child: ListTile(
-                                    leading: const Icon(Icons.delete), title: Text(NSSLStrings.of(context).remove())))
-                          ]),
-                ))
-            .toList()
+                    padding: EdgeInsets.zero,
+                    onSelected: (v) async => await drawerListItemMenuClicked(v),
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        value: x.id.toString() + "\u{1E}" + "Contributors",
+                        child: ListTile(
+                          leading: const Icon(Icons.person_add),
+                          title: Text(NSSLStrings.of(context).contributors()),
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: x.id.toString() + "\u{1E}" + "BoughtList",
+                        child: ListTile(
+                          leading: const Icon(Icons.history),
+                          title: Text(NSSLStrings.of(context).boughtProducts()),
+                          // NSSLStrings.of(context)!.contributors()),
+                        ),
+                      ),
+                      //Deactivated, because it's not working at the moment
+                      // PopupMenuItem<String>(
+                      //   value: x.id.toString() + "\u{1E}" + 'ExportAsPdf',
+                      //   child: ListTile(
+                      //       leading: const Icon(Icons.picture_as_pdf),
+                      //       title: Text(NSSLStrings.of(context)!.exportAsPdf())),
+                      // ),
+                      PopupMenuItem<String>(
+                        value: x.id.toString() + "\u{1E}" + 'Rename',
+                        child: ListTile(
+                          leading: const Icon(Icons.mode_edit),
+                          title: Text(NSSLStrings.of(context).rename()),
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: x.id.toString() + "\u{1E}" + 'Auto-Sync',
+                        child: ListTile(
+                          leading: Icon(
+                            x.messagingEnabled
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank,
+                          ),
+                          title: Text(NSSLStrings.of(context).autoSync()),
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        value: x.id.toString() + "\u{1E}" + 'Remove',
+                        child: ListTile(
+                          leading: const Icon(Icons.delete),
+                          title: Text(NSSLStrings.of(context).remove()),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .toList()
         : [
-            ListTile(title: Text(NSSLStrings.of(context).noListsInDrawerMessage())),
+            ListTile(
+              title: Text(NSSLStrings.of(context).noListsInDrawerMessage()),
+            ),
           ];
 
     var d = Scaffold(
-        body: RefreshIndicator(
-            child: ListView(
-              controller: _drawerController,
+      body: RefreshIndicator(
+        child: ListView(
+          controller: _drawerController,
+          children: <Widget>[
+            userheader,
+            Stack(
               children: <Widget>[
-                userheader,
-                Stack(
-                  children: <Widget>[
-                    FadeTransition(
-                      opacity: _drawerContentsOpacity!,
-                      child: Column(children: list),
-                    ),
-                    SlideTransition(
-                      position: _drawerDetailsPosition!,
-                      child: FadeTransition(
-                        opacity: ReverseAnimation(_drawerContentsOpacity!),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            ListTile(
-                              leading: const Icon(Icons.sync),
-                              title: Text(NSSLStrings.of(context).refresh()),
-                              onTap: () => _handleDrawerRefresh(),
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.restore_page_outlined),
-                              title: Text(
-                                NSSLStrings.of(context).changePasswordPD(),
-                              ),
-                              onTap: () => selectedOption("ChangePassword"),
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.exit_to_app),
-                              title: Text(NSSLStrings.of(context).logout()),
-                              onTap: () async {
-                                await _logout();
-                              },
-                            )
-                          ],
+                FadeTransition(
+                  opacity: _drawerContentsOpacity!,
+                  child: Column(children: list),
+                ),
+                SlideTransition(
+                  position: _drawerDetailsPosition!,
+                  child: FadeTransition(
+                    opacity: ReverseAnimation(_drawerContentsOpacity!),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        ListTile(
+                          leading: const Icon(Icons.sync),
+                          title: Text(NSSLStrings.of(context).refresh()),
+                          onTap: () => _handleDrawerRefresh(),
                         ),
-                      ),
+                        ListTile(
+                          leading: const Icon(Icons.restore_page_outlined),
+                          title: Text(
+                            NSSLStrings.of(context).changePasswordPD(),
+                          ),
+                          onTap: () => selectedOption("ChangePassword"),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.exit_to_app),
+                          title: Text(NSSLStrings.of(context).logout()),
+                          onTap: () async {
+                            await _logout();
+                          },
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
-              physics: AlwaysScrollableScrollPhysics(),
             ),
-            onRefresh: _handleDrawerRefresh,
-            displacement: 1.0),
-        persistentFooterButtons: [
-          TextButton(child: Text(NSSLStrings.of(context).addListPB()), onPressed: chooseListToAddDialog)
-        ]);
+          ],
+          physics: AlwaysScrollableScrollPhysics(),
+        ),
+        onRefresh: _handleDrawerRefresh,
+        displacement: 1.0,
+      ),
+      persistentFooterButtons: [
+        TextButton(
+          child: Text(NSSLStrings.of(context).addListPB()),
+          onPressed: chooseListToAddDialog,
+        ),
+      ],
+    );
 
     return Drawer(child: d);
   }
@@ -608,48 +774,62 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     int id = int.parse(splitted[0]);
     switch (splitted[1]) {
       case "Contributors":
-        Navigator.maybeOf(context)?.push(MaterialPageRoute<DismissDialogAction>(
-          builder: (BuildContext context) => ContributorsPage(id),
-          fullscreenDialog: true,
-        ));
+        Navigator.maybeOf(context)?.push(
+          MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => ContributorsPage(id),
+            fullscreenDialog: true,
+          ),
+        );
         break;
       case "BoughtList":
         await Navigator.push(
-            context,
-            MaterialPageRoute<DismissDialogAction>(
-              builder: (BuildContext context) => BoughtItemsPage(id),
-              fullscreenDialog: true,
-            ));
+          context,
+          MaterialPageRoute<DismissDialogAction>(
+            builder: (BuildContext context) => BoughtItemsPage(id),
+            fullscreenDialog: true,
+          ),
+        );
         break;
       case "Rename":
         renameListDialog(id);
         break;
       case "Remove":
-        var deleteList = ref.read(shoppingListByIdProvider.create(id));
+        var deleteList = ref.read(shoppingListByIdProvider(id));
         if (deleteList == null) return;
         var cont = context;
         showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
+            title: NSSLStrings.of(context).deleteListTitle() + deleteList.name,
+            text: NSSLStrings.of(context).deleteListText(),
+            onSubmitted: (s) async {
+              var res = Result.fromJson(
+                (await ShoppingListSync.deleteList(id, context)).body,
+              );
+              if (!(res.success))
+                showInDrawerSnackBar(res.error);
+              else {
+                var currentList = ref.read(currentListProvider);
+                var shoppingListController = ref.read(shoppingListsProvider);
+                if (currentList == null || currentList.id == id) {
+                  var other = shoppingListController.shoppingLists.firstOrNull(
+                    (l) => l.id != id,
+                  );
+                  if (other != null)
+                    changeCurrentList(
+                      shoppingListController.shoppingLists.indexOf(other),
+                    );
+                }
+                shoppingListController.removeList(deleteList.id);
+                showInDrawerSnackBar(
+                  deleteList.name + " " + NSSLStrings.of(cont).removed(),
+                );
+              }
+            },
             context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) => SimpleDialogAcceptDeny.create(
-                title: NSSLStrings.of(context).deleteListTitle() + deleteList.name,
-                text: NSSLStrings.of(context).deleteListText(),
-                onSubmitted: (s) async {
-                  var res = Result.fromJson((await ShoppingListSync.deleteList(id, context)).body);
-                  if (!(res.success))
-                    showInDrawerSnackBar(res.error);
-                  else {
-                    var currentList = ref.read(currentListProvider);
-                    var shoppingListController = ref.read(shoppingListsProvider);
-                    if (currentList == null || currentList.id == id) {
-                      var other = shoppingListController.shoppingLists.firstOrNull((l) => l.id != id);
-                      if (other != null) changeCurrentList(shoppingListController.shoppingLists.indexOf(other));
-                    }
-                    shoppingListController.removeList(deleteList.id);
-                    showInDrawerSnackBar(deleteList.name + " " + NSSLStrings.of(cont).removed());
-                  }
-                },
-                context: context));
+          ),
+        );
         break;
       case "Auto-Sync":
         var shoppingListController = ref.read(shoppingListsProvider);
@@ -658,7 +838,10 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
         break;
       case "ExportAsPdf":
         ExportManager.exportAsPDF(
-            ref.read(shoppingListByIdProvider.create(id))!, ref.read(shoppingItemsPerListProvider.create(id)), context);
+          ref.read(shoppingListByIdProvider(id))!,
+          ref.read(shoppingItemsPerListProvider(id)),
+          context,
+        );
         break;
     }
   }
@@ -670,21 +853,34 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
   Future<Null> _handleMainListRefresh(int id) => _handleListRefresh(id);
 
   Future<Null> _handleListRefresh(int listId) async {
-    await ref.read(shoppingListsProvider).refresh(ref.read(shoppingListByIdProvider.create(listId))!);
+    await ref
+        .read(shoppingListsProvider)
+        .refresh(ref.read(shoppingListByIdProvider(listId))!);
   }
 
   Future<Null> shoppingItemChange(ShoppingItem s, int change) async {
     var res = ChangeListItemResult.fromJson(
-        (await ShoppingListSync.changeProductAmount(s.listId, s.id, change, context)).body);
+      (await ShoppingListSync.changeProductAmount(
+        s.listId,
+        s.id,
+        change,
+        context,
+      )).body,
+    );
     if (!res.success) return;
-    s.exchange(s.cloneWith(newAmount: res.amount, newChanged: res.changed), ref);
+    s.exchange(
+      s.cloneWith(newAmount: res.amount, newChanged: res.changed),
+      ref,
+    );
   }
 
   var amountPopList = <PopupMenuEntry<String>>[];
   List<PopupMenuEntry<String>> buildChangeMenuItems(BuildContext context) {
     if (amountPopList.length == 0)
       for (int i = 1; i <= 99; i++)
-        amountPopList.add(PopupMenuItem<String>(value: i.toString(), child: Text(i.toString())));
+        amountPopList.add(
+          PopupMenuItem<String>(value: i.toString(), child: Text(i.toString())),
+        );
     return amountPopList;
   }
 
@@ -698,14 +894,16 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
 
   void _addWithoutSearchDialog(BuildContext extContext) {
     showDialog(
-        context: extContext,
-        barrierDismissible: false,
-        builder: (BuildContext context) => SimpleDialogSingleInput.create(
-            context: context,
-            title: NSSLStrings.of(context).addProduct(),
-            hintText: NSSLStrings.of(context).addProductWithoutSearch(),
-            labelText: NSSLStrings.of(context).productName(),
-            onSubmitted: _addWithoutSearch));
+      context: extContext,
+      barrierDismissible: false,
+      builder: (BuildContext context) => SimpleDialogSingleInput.create(
+        context: context,
+        title: NSSLStrings.of(context).addProduct(),
+        hintText: NSSLStrings.of(context).addProductWithoutSearch(),
+        labelText: NSSLStrings.of(context).productName(),
+        onSubmitted: _addWithoutSearch,
+      ),
+    );
   }
 
   Future<Null> renameList(int id, String text) async {
@@ -718,26 +916,42 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
   }
 
   Future<Null> _addWithoutSearch(String value) async {
+    if (value.isEmpty) return;
     var list = ref.read(currentListProvider);
     if (list == null) return;
     var shoppingItems = ref.read(currentShoppingItemsProvider);
 
-    var same = shoppingItems.firstOrNull((x) => x.name.toLowerCase() == value.toLowerCase());
+    var same = shoppingItems.firstOrNull(
+      (x) => x.name.toLowerCase() == value.toLowerCase(),
+    );
     if (same != null) {
-      var res = await ShoppingListSync.changeProductAmount(list.id, same.id, 1, context);
+      var res = await ShoppingListSync.changeProductAmount(
+        list.id,
+        same.id,
+        1,
+        context,
+      );
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase!);
       var product = ChangeListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
       same.exchange(
-          same.cloneWith(
-              newAmount: product.amount,
-              newChanged: product.changed,
-              newId: product.id,
-              newName: product.name,
-              newListId: product.listId),
-          ref);
+        same.cloneWith(
+          newAmount: product.amount,
+          newChanged: product.changed,
+          newId: product.id,
+          newName: product.name,
+          newListId: product.listId,
+        ),
+        ref,
+      );
     } else {
-      var res = await ShoppingListSync.addProduct(list.id, value, null, 1, context);
+      var res = await ShoppingListSync.addProduct(
+        list.id,
+        value,
+        null,
+        1,
+        context,
+      );
       if (res.statusCode != 200) showInSnackBar(res.reasonPhrase!);
       var product = AddListItemResult.fromJson(res.body);
       if (!product.success) showInSnackBar(product.error);
@@ -746,7 +960,16 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
       var order = 0;
       if (shoppingItems.length > 0) order = shoppingItems.last.sortOrder + 1;
 
-      newState.add(ShoppingItem(product.name, list.id, order, id: product.productId, amount: 1, crossedOut: false));
+      newState.add(
+        ShoppingItem(
+          product.name,
+          list.id,
+          order,
+          id: product.productId,
+          amount: 1,
+          crossedOut: false,
+        ),
+      );
       sips.state = newState;
     }
     var listProv = ref.watch(shoppingListsProvider);
@@ -759,7 +982,11 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     var shoppingList = ref.read(currentShoppingItemsProvider);
 
     var sublist = shoppingList.where((s) => s.crossedOut).toList();
-    var res = await ShoppingListSync.deleteProducts(list.id, sublist.map((s) => s.id).toList(), context);
+    var res = await ShoppingListSync.deleteProducts(
+      list.id,
+      sublist.map((s) => s.id).toList(),
+      context,
+    );
     if (!Result.fromJson(res.body).success) return;
     var shoppingItemsState = ref.watch(shoppingItemsProvider.notifier);
     var newState = shoppingItemsState.state.toList();
@@ -769,70 +996,85 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
     shoppingItemsState.state = newState;
     var listProv = ref.watch(shoppingListsProvider);
     listProv.save(list);
-    showInSnackBar(NSSLStrings.of(context).messageDeleteAllCrossedOut(),
-        duration: Duration(seconds: 10),
-        action: SnackBarAction(
-            label: NSSLStrings.of(context).undo(),
-            onPressed: () async {
-              var res = await ShoppingListSync.changeProducts(
-                  list.id, sublist.map((s) => s.id).toList(), sublist.map((s) => s.amount).toList(), context);
-              var hashResult = HashResult.fromJson(res.body);
-              int ownHash = 0;
-              for (var item in sublist) ownHash += item.id + item.amount;
-              if (ownHash == hashResult.hash) {
-                var shoppingItemsState = ref.watch(shoppingItemsProvider.notifier);
-                var newState = shoppingItemsState.state.toList();
-                newState.addAll(sublist);
-                shoppingItemsState.state = newState;
-                var listProv = ref.watch(shoppingListsProvider);
-                listProv.save(list);
-              } else
-                _handleListRefresh(list.id);
-            }));
+    showInSnackBar(
+      NSSLStrings.of(context).messageDeleteAllCrossedOut(),
+      duration: Duration(seconds: 10),
+      action: SnackBarAction(
+        label: NSSLStrings.of(context).undo(),
+        onPressed: () async {
+          var res = await ShoppingListSync.changeProducts(
+            list.id,
+            sublist.map((s) => s.id).toList(),
+            sublist.map((s) => s.amount).toList(),
+            context,
+          );
+          var hashResult = HashResult.fromJson(res.body);
+          int ownHash = 0;
+          for (var item in sublist) ownHash += item.id + item.amount;
+          if (ownHash == hashResult.hash) {
+            var shoppingItemsState = ref.watch(shoppingItemsProvider.notifier);
+            var newState = shoppingItemsState.state.toList();
+            newState.addAll(sublist);
+            shoppingItemsState.state = newState;
+            var listProv = ref.watch(shoppingListsProvider);
+            listProv.save(list);
+          } else
+            _handleListRefresh(list.id);
+        },
+      ),
+    );
   }
 
   renameListItem(ShoppingItem shoppingItem) {
     showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => SimpleDialogSingleInput.create(
         context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => SimpleDialogSingleInput.create(
-            context: context,
-            title: NSSLStrings.of(context).renameListItem(),
-            hintText: NSSLStrings.of(context).renameListHint(),
-            labelText: NSSLStrings.of(context).renameListItemLabel(),
-            defaultText: shoppingItem.name,
-            maxLines: 2,
-            onSubmitted: (s) async {
-              var currentList = ref.read(currentListProvider);
-              if (currentList == null) return;
+        title: NSSLStrings.of(context).renameListItem(),
+        hintText: NSSLStrings.of(context).renameListHint(),
+        labelText: NSSLStrings.of(context).renameListItemLabel(),
+        defaultText: shoppingItem.name,
+        maxLines: 2,
+        onSubmitted: (s) async {
+          var currentList = ref.read(currentListProvider);
+          if (currentList == null) return;
 
-              var res = ChangeListItemResult.fromJson(
-                  (await ShoppingListSync.changeProductName(currentList.id, shoppingItem.id, s, context)).body);
+          var res = ChangeListItemResult.fromJson(
+            (await ShoppingListSync.changeProductName(
+              currentList.id,
+              shoppingItem.id,
+              s,
+              context,
+            )).body,
+          );
 
-              var items = ref.watch(shoppingItemsProvider.notifier);
-              var newState = items.state.toList();
-              var item = newState.firstWhere((x) => x.id == shoppingItem.id);
-              newState.remove(item);
-              newState.add(
-                item.cloneWith(newName: res.name),
-              );
-              items.state = newState;
-            }));
+          var items = ref.watch(shoppingItemsProvider.notifier);
+          var newState = items.state.toList();
+          var item = newState.firstWhere((x) => x.id == shoppingItem.id);
+          newState.remove(item);
+          newState.add(item.cloneWith(newName: res.name));
+          items.state = newState;
+        },
+      ),
+    );
   }
 
   Widget? acceptReordingFAB() {
     var isReordering = ref.watch(_isReorderingProvider);
     if (!isReordering) return null;
     return FloatingActionButton(
-      child: Icon(
-        Icons.check,
-      ),
+      child: Icon(Icons.check),
       onPressed: () async {
         var reorderingState = ref.watch(_isReorderingProvider.notifier);
         reorderingState.state = false;
         var currentList = ref.read(currentListProvider);
         var ids = ref.read(currentShoppingItemsProvider);
-        await ShoppingListSync.reorderProducts(currentList!.id, ids.map((e) => e.id).toList(), context);
+        await ShoppingListSync.reorderProducts(
+          currentList!.id,
+          ids.map((e) => e.id).toList(),
+          context,
+        );
       },
     );
   }
@@ -853,37 +1095,30 @@ class MainPageState extends ConsumerState<MainPage> with TickerProviderStateMixi
       //     },
       //     icon: Icon(Icons.settings)),
       PopupMenuButton<String>(
-          onSelected: selectedOption,
-          itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                PopupMenuItem<String>(
-                  value: 'deleteCrossedOut',
-                  child: Text(
-                    NSSLStrings.of(context).deleteCrossedOutPB(),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'reorderItems',
-                  child: Text(
-                    NSSLStrings.of(context).reorderItems(),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'recipeImport',
-                  child: Text(NSSLStrings.of(context).importNewRecipe()),
-                ),
-                PopupMenuItem<String>(
-                  value: 'options',
-                  child: Text(
-                    NSSLStrings.of(context).options(),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'logout',
-                  child: Text(
-                    NSSLStrings.of(context).logout(),
-                  ),
-                ),
-              ])
+        onSelected: selectedOption,
+        itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+          PopupMenuItem<String>(
+            value: 'deleteCrossedOut',
+            child: Text(NSSLStrings.of(context).deleteCrossedOutPB()),
+          ),
+          PopupMenuItem<String>(
+            value: 'reorderItems',
+            child: Text(NSSLStrings.of(context).reorderItems()),
+          ),
+          PopupMenuItem<String>(
+            value: 'recipeImport',
+            child: Text(NSSLStrings.of(context).importNewRecipe()),
+          ),
+          PopupMenuItem<String>(
+            value: 'options',
+            child: Text(NSSLStrings.of(context).options()),
+          ),
+          PopupMenuItem<String>(
+            value: 'logout',
+            child: Text(NSSLStrings.of(context).logout()),
+          ),
+        ],
+      ),
     ];
   }
 }
@@ -896,7 +1131,11 @@ class ShoppingListWidget extends ConsumerWidget {
   final MainPageState mainPageState;
   const ShoppingListWidget(this.mainPageState, {Key? key}) : super(key: key);
 
-  void updateOrderIndiciesAndSave(ShoppingList currentList, List<ShoppingItem> shoppingItems, WidgetRef ref) async {
+  void updateOrderIndiciesAndSave(
+    ShoppingList currentList,
+    List<ShoppingItem> shoppingItems,
+    WidgetRef ref,
+  ) async {
     // var newItems = <ShoppingItem>[];
     // var curSortOrder = 0;
     // for (var i = 0; i < shoppingItems.length; i++) {
@@ -923,31 +1162,41 @@ class ShoppingListWidget extends ConsumerWidget {
     var shoppingItems = ref.watch(currentShoppingItemsProvider);
     if (shoppingItems.isEmpty) return const Text("");
 
-    if (shoppingItems.any((item) => item.sortOrder == -1)) updateOrderIndiciesAndSave(currentList, shoppingItems, ref);
+    if (shoppingItems.any((item) => item.sortOrder == -1))
+      updateOrderIndiciesAndSave(currentList, shoppingItems, ref);
 
     shoppingItems.sort((a, b) => a.sortWithOffset.compareTo(b.sortWithOffset));
     var lv;
     if (shoppingItems.length > 0) {
       final isReorderingItems = ref.watch(_isReorderingProvider);
-      var mainList = shoppingItems.map((x) {
-        return getListTileForShoppingItem(x, isReorderingItems, context);
-      }).toList(growable: true);
+      var mainList = shoppingItems
+          .map((x) {
+            return getListTileForShoppingItem(x, isReorderingItems, context);
+          })
+          .toList(growable: true);
 
       if (isReorderingItems) {
         lv = ReorderableListView(
-            onReorder: mainPageState._onReorderItems, scrollDirection: Axis.vertical, children: mainList);
+          onReorder: mainPageState._onReorderItems,
+          scrollDirection: Axis.vertical,
+          children: mainList,
+        );
       } else {
         lv = CustomScrollView(
           controller: mainPageState._mainController,
           slivers: [
             SliverFixedExtentList(
-                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                  return Container(
-                    alignment: FractionalOffset.center,
-                    child: mainList[index],
-                  );
-                }, childCount: mainList.length),
-                itemExtent: 50.0)
+              delegate: SliverChildBuilderDelegate((
+                BuildContext context,
+                int index,
+              ) {
+                return Container(
+                  alignment: FractionalOffset.center,
+                  child: mainList[index],
+                );
+              }, childCount: mainList.length),
+              itemExtent: 50.0,
+            ),
           ],
           physics: AlwaysScrollableScrollPhysics(),
         );
@@ -963,8 +1212,12 @@ class ShoppingListWidget extends ConsumerWidget {
     );
   }
 
-  Widget getListTileForShoppingItem(ShoppingItem? x, bool isReorderingItems, BuildContext context) {
-    if (x == null || x.name == "") return Text("Null");
+  Widget getListTileForShoppingItem(
+    ShoppingItem? x,
+    bool isReorderingItems,
+    BuildContext context,
+  ) {
+    if (x == null) return Container();
     // return Text(x.name!);
 
     var lt = ListTile(
@@ -972,28 +1225,39 @@ class ShoppingListWidget extends ConsumerWidget {
       title: Wrap(
         children: [
           Text(
-            x.name,
+            x.cleanedName,
             maxLines: 2,
             softWrap: true,
-            style: TextStyle(decoration: x.crossedOut ? TextDecoration.lineThrough : TextDecoration.none),
+            style: TextStyle(
+              decoration: x.crossedOut
+                  ? TextDecoration.lineThrough
+                  : TextDecoration.none,
+            ),
           ),
         ],
       ),
       leading: PopupMenuButton<String>(
         child: FittedBox(
-          child: Row(children: [
-            Text(x.amount.toString() + "x"),
-            const Icon(Icons.expand_more, size: 16.0),
-            SizedBox(height: 38.0), //for larger clickable size (2 Lines)
-          ]),
+          child: Row(
+            children: [
+              Text(x.amount.toString() + "x"),
+              const Icon(Icons.expand_more, size: 16.0),
+              SizedBox(height: 38.0), //for larger clickable size (2 Lines)
+            ],
+          ),
         ),
         initialValue: x.amount.toString(),
-        onSelected: (y) => mainPageState.shoppingItemChange(x, int.parse(y) - x.amount),
+        onSelected: (y) =>
+            mainPageState.shoppingItemChange(x, int.parse(y) - x.amount),
         itemBuilder: mainPageState.buildChangeMenuItems,
       ),
       trailing: isReorderingItems ? Icon(Icons.reorder) : null,
-      onTap: isReorderingItems ? null : (() => mainPageState.crossOutMainListItem(x)),
-      onLongPress: isReorderingItems ? null : (() => mainPageState.renameListItem(x)),
+      onTap: isReorderingItems
+          ? null
+          : (() => mainPageState.crossOutMainListItem(x)),
+      onLongPress: isReorderingItems
+          ? null
+          : (() => mainPageState.renameListItem(x)),
     );
 
     if (isReorderingItems) {
@@ -1002,14 +1266,17 @@ class ShoppingListWidget extends ConsumerWidget {
       return Dismissible(
         key: ValueKey(x),
         child: lt,
-        onDismissed: (DismissDirection d) => mainPageState.handleDismissMain(d, x),
+        onDismissed: (DismissDirection d) =>
+            mainPageState.handleDismissMain(d, x),
         direction: DismissDirection.startToEnd,
         background: Container(
           decoration: BoxDecoration(color: Theme.of(context).primaryColor),
           child: ListTile(
-            leading: Icon(Icons.delete,
-                //  color: Theme.of(context).accentIconTheme.color,
-                size: 36.0),
+            leading: Icon(
+              Icons.delete,
+              //  color: Theme.of(context).accentIconTheme.color,
+              size: 36.0,
+            ),
           ),
         ),
       );
