@@ -80,6 +80,12 @@ jobs:
           build_path: build/app/outputs/flutter-apk
           asset_extension: .apk
           asset_content_type: application/vnd.android.package-archive
+        - os: ubuntu-latest
+          target: Android
+          build_target: aab
+          build_path: build/app/outputs/flutter-aab
+          asset_extension: .aab
+          asset_content_type: application/x-authorware-bin
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
     needs: draft-release

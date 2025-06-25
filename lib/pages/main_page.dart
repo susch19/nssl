@@ -247,25 +247,6 @@ class MainPageState extends ConsumerState<MainPage>
       case "logout":
         _logout();
         break;
-      case "testLogin":
-        showDialog(
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(NSSLStrings.of(context).tokenExpired()),
-              content: Text(NSSLStrings.of(context).tokenExpiredExplanation()),
-              actions: [
-                MaterialButton(
-                  onPressed: () async {
-                    Navigator.pushReplacementNamed(context, "/login");
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-          context: context,
-        );
-        break;
       case "ChangePassword":
         Navigator.push(
           context,
@@ -1136,7 +1117,6 @@ class MainPageState extends ConsumerState<MainPage>
             value: 'logout',
             child: Text(NSSLStrings.of(context).logout()),
           ),
-          PopupMenuItem<String>(value: 'testLogin', child: Text("testlogin")),
         ],
       ),
     ];
