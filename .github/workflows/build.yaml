@@ -34,7 +34,7 @@ jobs:
         - os: ubuntu-latest
           target: PlayStore
           build_target: aab
-          build_path: build/app/outputs/flutter-aab
+          build_path: build/app/outputs/bundle/release
           asset_extension: .aab
           asset_content_type: application/x-authorware-bin
       # Disable fail-fast as we want results from all even if one fails.
