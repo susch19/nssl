@@ -11,16 +11,21 @@ if (localPropertiesFile.exists()) {
         localProperties.load(reader)
     }
 }
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    flutterVersionName = "1.0"
 }
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+def str = ""
+for (element in flutterVersionName.split("\\.")) {
+    str += element.toString().padLeft(2, "0")
+}
+flutterVersionCode = str + flutterVersionCode.padLeft(2, "0") //Use 4 left pads, to be compatible with the old mobile client versioning stuff
+
 
 
 def keystoreProperties = new Properties()
