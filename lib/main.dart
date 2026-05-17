@@ -16,7 +16,12 @@ import 'package:nssl/firebase/cloud_messsaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
+
+final sharedPreferencesProvider = Provider<SharedPreferences>(
+  (ref) => throw UnimplementedError(),
+);
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -40,9 +45,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 final appRestartProvider = StateProvider<int>((ref) => 0);
 
 Future<void> main() async {
-  // iWonderHowLongThisTakes();
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
     ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: Consumer(
         builder: (context, ref, child) {
           return EagerInitialize(
@@ -119,11 +127,11 @@ class _NSSLState extends ConsumerState<NSSLPage> {
     super.initState();
     subscribeFirebase(context);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      ref.read(cloudMessagingProvider.notifier).onMessage(message);
+      _pushMessage(message);
     });
 
     FirebaseMessaging.onMessage.listen((event) {
-      ref.read(cloudMessagingProvider.notifier).onMessage(event);
+      _pushMessage(event);
     });
 
     for (var list in ref.read(shoppingListsProvider).shoppingLists)
@@ -135,8 +143,16 @@ class _NSSLState extends ConsumerState<NSSLPage> {
     var initMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initMessage != null) {
-      ref.read(cloudMessagingProvider.notifier).onMessage(initMessage);
+      _pushMessage(initMessage);
     }
+  }
+
+  void _pushMessage(RemoteMessage msg) {
+    if (!ref.context.mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _pushMessage(msg));
+      return;
+    }
+    ref.read(cloudMessagingProvider.notifier).onMessage(msg);
   }
 
   @override

@@ -369,6 +369,12 @@ class NSSLStrings {
           name: 'useMaterial3', locale: _localeName);
   String elevateAppBar() => Intl.message('Colorize Title Background',
       name: 'elevateAppBar', locale: _localeName);
+  String setupList() => Intl.message('Setup Startup List',
+      name: 'setupStartupList', locale: _localeName);
+  String setupListDescription() => Intl.message('Which list should be shown, when app starts initially?',
+      name: 'setupStartupListDescription', locale: _localeName);
+  String setupListLastOpened() => Intl.message('Last opened',
+      name: 'setupListLastOpened', locale: _localeName);
 
   //String openAppDrawerTooltip() => Intl.message('Open navigation menu', name: 'openNavigationMenu', locale: _localeName);
 }

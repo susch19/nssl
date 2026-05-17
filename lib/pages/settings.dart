@@ -1,5 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:nssl/helper/simple_dialog.dart';
+import 'package:nssl/helper/simple_dialog_single_input.dart';
 import 'package:nssl/localization/nssl_strings.dart';
 import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
@@ -18,31 +20,58 @@ class SettingsPageState extends State<SettingsPage> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(NSSLStrings.of(context).settings()),
-        leading: IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+        ),
       ),
-      body: ListView(children: [
-        ListTile(
-          leading: Icon(Icons.palette),
-          title: Text(NSSLStrings.of(context).changeTheme()),
-          onTap: () {
-            Navigator.push(
-                    context,
-                    MaterialPageRoute<DismissDialogAction>(
-                      builder: (BuildContext context) => CustomThemePage(),
-                      fullscreenDialog: true,
-                    ))
-                .whenComplete(() => AdaptiveTheme.of(context)
-                    .setTheme(light: Themes.lightTheme.theme!, dark: Themes.darkTheme.theme, notify: true));
-          },
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.info),
-          title: Text(NSSLStrings.of(context).about()),
-          onTap: () => Navigator.push(
-              context, MaterialPageRoute<DismissDialogAction>(builder: (c) => AboutPage(), fullscreenDialog: true)),
-        ),
-      ]),
+      body: ListView(
+        children: [
+          ListTile(
+            leading: Icon(Icons.palette),
+            title: Text(NSSLStrings.of(context).changeTheme()),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<DismissDialogAction>(
+                  builder: (BuildContext context) => CustomThemePage(),
+                  fullscreenDialog: true,
+                ),
+              ).whenComplete(
+                () => AdaptiveTheme.of(context).setTheme(
+                  light: Themes.lightTheme.theme!,
+                  dark: Themes.darkTheme.theme,
+                  notify: true,
+                ),
+              );
+            },
+          ),
+          Divider(),
+          // ListTile(
+          //   title: Text(NSSLStrings.of(context).setupList()),
+          //   onTap: () {
+          //     SimpleDialogAcceptDeny.createHookSingleState(
+          //       title: NSSLStrings.of(context).setupList(),
+          //       context: context,
+          //       builder: (context, state) {},
+          //       initialValue: null,
+          //     );
+          //   },
+          // ),
+          // Divider(),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text(NSSLStrings.of(context).about()),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute<DismissDialogAction>(
+                builder: (c) => AboutPage(),
+                fullscreenDialog: true,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

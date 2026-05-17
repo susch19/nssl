@@ -1,6 +1,5 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -35,16 +34,20 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    buildFeatures {
+        resValues true
+        buildConfig true
+    }
     namespace "de.susch19.nssl"
     compileSdk flutter.compileSdkVersion
-
+    ndkVersion "28.2.13676358"
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -52,7 +55,7 @@ android {
         applicationId 'de.susch19.nssl'
         resValue "string", "app_name", "NSSL"
         multiDexEnabled true
-        minSdk 23
+        minSdkVersion flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
