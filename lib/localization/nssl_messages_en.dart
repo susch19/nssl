@@ -249,5 +249,11 @@ class MessageLookup extends MessageLookupByLibrary {
             'Use Material Design 3 (Colors based on Android Version)'),
         "elevateAppBar":
             MessageLookupByLibrary.simpleMessage('Colorize Title Background'),
-      };
+        "setupStartupList":
+            MessageLookupByLibrary.simpleMessage('Setup Startup List'),
+        "setupStartupListDescription":
+            MessageLookupByLibrary.simpleMessage('Which list should be shown, when app starts initially?'),
+        "setupListLastOpened":
+            MessageLookupByLibrary.simpleMessage('Last opened')
+  };
 }

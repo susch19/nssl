@@ -10,6 +10,7 @@ import 'package:nssl/options/themes.dart';
 import 'package:nssl/pages/pages.dart';
 import 'package:nssl/manager/manager_export.dart';
 import 'package:nssl/models/model_export.dart';
+import 'package:nssl/pages/scandit_scanner_page.dart';
 import 'package:nssl/server_communication/return_classes.dart';
 import 'package:nssl/server_communication/s_c.dart';
 import 'package:nssl/helper/simple_dialog_single_input.dart';
@@ -278,7 +279,7 @@ class MainPageState extends ConsumerState<MainPage>
     ean = await Navigator.push(
       context,
       MaterialPageRoute<String>(
-        builder: (BuildContext context) => BarcodeScannerScreen(),
+        builder: (BuildContext context) => ScanditBarcodeScannerScreen(),
         fullscreenDialog: true,
       ),
     );

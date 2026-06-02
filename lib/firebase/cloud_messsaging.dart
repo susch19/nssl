@@ -39,7 +39,7 @@ class CloudMessaging extends _$CloudMessaging {
     if (list == null) {
       var mapp = jsonDecode(data["items"]);
       //User was added to new list
-      var items = ref.watch(shoppingItemsProvider.notifier);
+      var items = ref.read(shoppingItemsProvider.notifier);
       var newState = items.state.toList();
       newState.addAll(
         mapp.map(
@@ -63,7 +63,7 @@ class CloudMessaging extends _$CloudMessaging {
       switch (action) {
         case "ItemChanged": //Id, Amount, action
           var id = int.parse(data["id"]);
-          var items = ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.read(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == id);
           newState.remove(item);
@@ -100,7 +100,7 @@ class CloudMessaging extends _$CloudMessaging {
           break;
         case "ItemRenamed": //product.Id, product.Name
           var itemId = int.parse(data["id"]);
-          var items = ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.read(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == itemId);
           newState.remove(item);
@@ -110,7 +110,7 @@ class CloudMessaging extends _$CloudMessaging {
           break;
         case "OrderChanged":
           var itemId = int.parse(data["id"]);
-          var items = ref.watch(shoppingItemsProvider.notifier);
+          var items = ref.read(shoppingItemsProvider.notifier);
           var newState = items.state.toList();
           var item = newState.firstWhere((x) => x.id == itemId);
           newState.remove(item);

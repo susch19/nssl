@@ -6,12 +6,15 @@ part of 'cloud_messsaging.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
 @ProviderFor(CloudMessaging)
-const cloudMessagingProvider = CloudMessagingProvider._();
+final cloudMessagingProvider = CloudMessagingProvider._();
 
 final class CloudMessagingProvider
     extends $NotifierProvider<CloudMessaging, void> {
-  const CloudMessagingProvider._()
+  CloudMessagingProvider._()
     : super(
         from: null,
         argument: null,
@@ -38,14 +41,13 @@ final class CloudMessagingProvider
   }
 }
 
-String _$cloudMessagingHash() => r'e7b1ca03a469d2c91c63648330681342dfd39a86';
+String _$cloudMessagingHash() => r'59e5c2e5cb899106e0e1000a43065b37c666c780';
 
 abstract class _$CloudMessaging extends $Notifier<void> {
   void build();
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<void, void>;
     final element =
         ref.element
@@ -55,9 +57,6 @@ abstract class _$CloudMessaging extends $Notifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

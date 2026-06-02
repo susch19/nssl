@@ -64,7 +64,7 @@ class AboutPage extends StatelessWidget {
         ),
         Divider(),
         ListTile(title: Text("Entwickelt von susch19 (Sascha Hering)")),
-        ListTile(title: Text("Version 0.41.0")),
+        ListTile(title: Text("Version 0.41.2")),
         Divider(),
         ListTile(
           leading: SvgPicture.asset(
